@@ -28,7 +28,7 @@ canvas{width:100%;height:340px;display:block}.lg{display:flex;gap:12px;flex-wrap
 <div class="mu">Model output from public Binance data; not financial advice. Probabilities are heuristic model estimates, not guarantees. Exchange netflow needs an on-chain provider and is not in Binance's public API; add a Glassnode key in Settings to include it, otherwise taker-buy share is shown as a flow proxy.</div>
 </div>
 <script>
-const A=[['BTC','Bitcoin',.08],['ETH','Ethereum',.08],['SOL','Solana',.12],['XRP','XRP',.12],['ONDO','Ondo',.12],['SUI','Sui',.12],['SEI','Sei',.12]].map(([s,n,a])=>({s,n,a,p:s+'USDT'}));
+const A=[['BTC','Bitcoin',.08],['ETH','Ethereum',.08],['SOL','Solana',.12],['XRP','XRP',.12],['ONDO','Ondo',.12],['SUI','Sui',.12],['SEI','Sei',.12],['HBAR','Hedera',.12]].map(([s,n,a])=>({s,n,a,p:s+'USDT'}));
 const SP=['https://api.binance.com','https://data-api.binance.vision'],FU='https://fapi.binance.com',$=i=>document.getElementById(i);
 const cl_=(x,a,b)=>Math.max(a,Math.min(b,x)),th=Math.tanh,sum=a=>a.reduce((x,y)=>x+y,0),mean=a=>sum(a)/a.length,sd=a=>{const m=mean(a);return Math.sqrt(mean(a.map(x=>(x-m)**2)))||1e-12},zs=(a,x)=>a.length>=5?(x-mean(a))/sd(a):null;
 const pd=x=>x>=1000?2:x>=1?4:5,f=x=>x==null?'n/a':x.toLocaleString('en-US',{minimumFractionDigits:pd(x),maximumFractionDigits:pd(x)}),pc=x=>x==null?'n/a':(x>=0?'+':'')+x.toFixed(2)+'%',cs=x=>x>=0?'up':'dn';
