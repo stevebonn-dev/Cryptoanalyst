@@ -24,7 +24,7 @@ canvas{width:100%;height:340px;display:block}.lg{display:flex;gap:12px;flex-wrap
 <div class="tabs" id="tabs"></div><div id="det"></div>
 <div class="card sc"><h2>Rolling attribution matrix</h2><div class="mu" style="margin-bottom:6px">Each refresh (max every 6h) stores the model's short-term call in this browser. Calls are scored against realized 24h, 48h and 7d moves, and the per-asset bias is nudged by α × (realized − predicted).</div><table id="fb"></table></div>
 <div class="card"><h2>Settings</h2><div class="g"><div class="k"><b>Exchange netflow (Glassnode API key)</b><input id="gk" type="password" placeholder="Glassnode API key" autocomplete="off"><div class="mu">Stored only in this browser. Adds exchange netflow to the score.</div></div><div class="k"><b>Zone alerts</b><button id="an">Enable notifications</button><div class="mu">Fires when price enters the nearest support or resistance zone. Works while the app is open or recently backgrounded.</div></div></div><div class="k" style="margin-top:10px"><b>Assets (Binance USDT spot pairs)</b><input id="na" placeholder="Add symbol, e.g. AVAX" autocomplete="off" style="max-width:200px"> <button id="ad">Add</button> <button id="rs">Reset list</button><div class="mu">Use the Remove button on an asset's panel to drop it.</div></div><button id="sv" style="margin-top:8px">Save settings</button></div>
-<div class="card sc"><h2>G indicator scorecard</h2><table id="gsc"></table><div class="mu" style="margin-top:6px">G is a regime-switching composite (MACD, RSI, Bollinger %B, Donchian, ADX, weighted MAs, taker-buy CVD). Per asset, its entry threshold is chosen on the first 24 months and tested on the last 12. Ratings use only the out-of-sample year. Each live signal is scored 0–100 after its hold period, and poor scores tighten that asset's threshold (rate α).</div></div>
+<div class="card sc"><h2>G indicator scorecard</h2><table id="gsc"></table><div class="mu" style="margin-top:6px">G is a regime-switching composite (MACD, RSI, Bollinger %B, Donchian, ADX, Kaufman efficiency, volume confirmation, a high-volatility damper, weighted MAs, an overextension guard and taker-buy CVD). Binance keeps only about 30 days of derivatives history, so top-trader, crowd and perp-flow data cannot be backtested; it is scored live as a confirm/conflict check instead. Per asset, its entry threshold is chosen on the first 24 months and tested on the last 12. Ratings use only the out-of-sample year. Each live signal is scored 0–100 after its hold period, and poor scores tighten that asset's threshold (rate α).</div></div>
 <div class="card sc"><h2>Alert log</h2><table id="alog"></table></div>
 <div class="mu">Model output from public Binance data; not financial advice. Probabilities are heuristic model estimates, not guarantees. The G indicator is my own composite and is not financial advice; past backtest results do not guarantee future signals. Exchange netflow needs an on-chain provider and is not in Binance's public API; add a Glassnode key in Settings to include it, otherwise taker-buy share is shown as a flow proxy.</div>
 </div>
@@ -40,8 +40,8 @@ async function fu(p){try{const r=await fetch(FU+p);if(r.ok)return r.json()}catch
 function wmaAt(c,e,n){if(e+1<n)return null;let s=0;for(let i=0;i<n;i++)s+=(i+1)*c[e-n+1+i];return s/(n*(n+1)/2)}
 async function nfetch(a){if(!CFG.gk)return null;try{const r=await fetch(`https://api.glassnode.com/v1/metrics/transactions/transfers_volume_exchanges_net?a=${a.s}&i=24h&s=${Math.floor(Date.now()/1e3)-40*86400}&api_key=${encodeURIComponent(CFG.gk)}`);if(!r.ok)return null;const j=await r.json();return Array.isArray(j)&&j.length>=8?j.map(x=>x.v):null}catch(e){return null}}
 async function kl(a){const r1=await sp(`/api/v3/klines?symbol=${a.p}&interval=1d&limit=1000`);let r2=[];try{if(r1.length>=1000)r2=await sp(`/api/v3/klines?symbol=${a.p}&interval=1d&limit=600&endTime=${r1[0][0]-1}`)}catch(e){}return r2.concat(r1)}
-async function fetchAsset(a){const [k1,kw,t,d,fr,oi,nv]=await Promise.all([kl(a),sp(`/api/v3/klines?symbol=${a.p}&interval=1w&limit=300`),sp(`/api/v3/ticker/24hr?symbol=${a.p}`),sp(`/api/v3/depth?symbol=${a.p}&limit=500`),fu(`/fapi/v1/fundingRate?symbol=${a.p}&limit=100`),fu(`/futures/data/openInterestHist?symbol=${a.p}&period=1d&limit=30`),nfetch(a)]);return{k1:k1.map(pk),kw:kw.map(pk),t,d,fr,oi,nv}}
-const W={ST:{trend:.10,mom:.25,cvd:.25,fund:.12,oi:.08,book:.20,flow:.08},MT:{trend:.40,mom:.25,cvd:.15,fund:.05,oi:.05,book:.10,flow:.05},LT:{trend:.55,mom:.10,cvd:.10}};
+async function fetchAsset(a){const [k1,kw,t,d,fr,oi,nv,tl,gl,tk]=await Promise.all([kl(a),sp(`/api/v3/klines?symbol=${a.p}&interval=1w&limit=300`),sp(`/api/v3/ticker/24hr?symbol=${a.p}`),sp(`/api/v3/depth?symbol=${a.p}&limit=500`),fu(`/fapi/v1/fundingRate?symbol=${a.p}&limit=100`),fu(`/futures/data/openInterestHist?symbol=${a.p}&period=1d&limit=30`),nfetch(a),fu(`/futures/data/topLongShortPositionRatio?symbol=${a.p}&period=1d&limit=30`),fu(`/futures/data/globalLongShortAccountRatio?symbol=${a.p}&period=1d&limit=30`),fu(`/futures/data/takerlongshortRatio?symbol=${a.p}&period=1d&limit=30`)]);return{k1:k1.map(pk),kw:kw.map(pk),t,d,fr,oi,nv,tl,gl,tk}}
+const W={ST:{trend:.08,mom:.18,cvd:.16,ptk:.10,fund:.10,oi:.07,book:.14,top:.10,crowd:.06,flow:.06},MT:{trend:.36,mom:.20,cvd:.12,fund:.04,oi:.04,book:.06,top:.08,crowd:.05,ptk:.04,flow:.05},LT:{trend:.55,mom:.10,cvd:.10}};
 function analyze(a,R,tf,bias){
 const p=+R.t.lastPrice,D=R.k1,n=D.length,K=(tf==='1w'?R.kw:R.k1).map(k=>({...k}));K[K.length-1].c=p;const c=K.map(k=>k.c),e=c.length-1;
 const m={50:wmaAt(c,e,50),100:wmaAt(c,e,100),200:wmaAt(c,e,200)};
@@ -55,20 +55,25 @@ let fz=null,fl=null,oz=null,oc=null;
 if(R.fr&&R.fr.length>10){const r=R.fr.map(x=>+x.fundingRate);fl=r[r.length-1]*100;fz=zs(r.slice(0,-1),r[r.length-1])}
 if(R.oi&&R.oi.length>10){const o=R.oi.map(x=>+x.sumOpenInterestValue);oz=zs(o.slice(0,-1),o[o.length-1]);oc=o[o.length-1]/o[Math.max(0,o.length-8)]-1}
 let nfz,nfl=null,nf7=null;if(CFG.gk){nfz=null;if(R.nv){nfl=R.nv[R.nv.length-1];nf7=sum(R.nv.slice(-7));nfz=zs(R.nv.slice(0,-1),nfl)}}
+let topr=null,gr=null,gz=null,pt7=null;const lg=v=>Math.log(Math.max(+v,1e-6));
+if(R.tl&&R.tl.length)topr=+R.tl[R.tl.length-1].longShortRatio;
+if(R.gl&&R.gl.length>=8){const r=R.gl.map(x=>lg(x.longShortRatio));gr=+R.gl[R.gl.length-1].longShortRatio;gz=zs(r.slice(0,-1),r[r.length-1])}
+if(R.tk&&R.tk.length>=7){const t7=R.tk.slice(-7),bb=sum(t7.map(x=>+x.buyVol)),ss=sum(t7.map(x=>+x.sellVol));pt7=bb+ss?(bb-ss)/(bb+ss):null}
+const div=pt7!=null&&Math.sign(c7)!==Math.sign(pt7)&&Math.abs(c7)>.02&&Math.abs(pt7)>.02;
 const votes=[];[[p,m[50]],[p,m[100]],[p,m[200]],[m[50],m[100]],[m[100],m[200]]].forEach(([x,y])=>{if(x!=null&&y!=null)votes.push(x>y?1:0)});
 const hi=Math.max(...D.map(k=>k.h)),dd=p/hi-1,mom=th(ret7/(atrp*2.6));
-const comp={trend:votes.length?mean(votes)*2-1:null,mom,cvd:th(c7*8),fund:fz==null?null:-th(fz/2),oi:oz==null?null:th(oz/2)*Math.sign(mom)*.6,book:th(imb*3),flow:nfz===undefined?undefined:nfz==null?null:-th(nfz/2)};
+const comp={trend:votes.length?mean(votes)*2-1:null,mom,cvd:th(c7*8),fund:fz==null?null:-th(fz/2),oi:oz==null?null:th(oz/2)*Math.sign(mom)*.6,book:th(imb*3),flow:nfz===undefined?undefined:nfz==null?null:-th(nfz/2),top:topr==null?null:th(lg(topr)*2),crowd:gz==null?null:-th(gz/2),ptk:pt7==null?null:th(pt7*8)};
 const sc=w=>sum(Object.keys(w).map(k=>comp[k]==null?0:w[k]*comp[k]));
 const tilt=.15*th((-dd-.3)/.3);
 const s={ST:cl_(sc(W.ST)+bias,-1,1),MT:cl_(sc(W.MT)+bias*.5,-1,1),LT:cl_(sc(W.LT)+tilt,-1,1)};
-const conf=(h,pen)=>{const w=W[h],ks=Object.keys(w).filter(k=>comp[k]!==undefined),av=ks.filter(k=>comp[k]!=null),miss=ks.length-av.length,sg=Math.sign(s[h]);const ag=sum(av.map(k=>Math.sign(comp[k])===sg?w[k]:0))/sum(av.map(k=>w[k]));return Math.round(cl_(50+38*Math.abs(s[h])+8*(ag-.5)-4*miss-pen,45,88))};
+const conf=(h,pen)=>{const w=W[h],ks=Object.keys(w).filter(k=>comp[k]!==undefined),av=ks.filter(k=>comp[k]!=null),miss=ks.length-av.length,sg=Math.sign(s[h]);const ag=sum(av.map(k=>Math.sign(comp[k])===sg?w[k]:0))/sum(av.map(k=>w[k]));return Math.round(cl_(50+38*Math.abs(s[h])+8*(ag-.5)-Math.min(12,3*miss)-pen,45,88))};
 const cf={ST:conf('ST',0),MT:conf('MT',3),LT:conf('LT',6)};
-const pUp=Math.round(100/(1+Math.exp(-2.6*(.6*s.ST+.4*s.MT))));
+const gs=(GX[a.s]&&GX[a.s].ST&&GX[a.s].ST.g)||0,pUp=Math.round(100/(1+Math.exp(-2.6*(.5*s.ST+.3*s.MT+.2*gs))));
 const H30=D.slice(-30),H90=D.slice(-90),cand=[['50 MWA',m[50]],['100 MWA',m[100]],['200 MWA',m[200]],['30d high',Math.max(...H30.map(k=>k.h))],['30d low',Math.min(...H30.map(k=>k.l))],['90d high',Math.max(...H90.map(k=>k.h))],['90d low',Math.min(...H90.map(k=>k.l))],['Ask wall',aw[0]],['Bid wall',bw[0]],['+1.5 ATR',p+1.5*atr],['−1.5 ATR',p-1.5*atr]].filter(x=>x[1]!=null).map(([l,v])=>({l,v}));
 const ded=L=>L.filter((x,i)=>L.findIndex(y=>Math.abs(y.v/x.v-1)<.005)===i);
 const sup=ded(cand.filter(x=>x.v<p*.996).sort((x,y)=>y.v-x.v)),res=ded(cand.filter(x=>x.v>p*1.004).sort((x,y)=>x.v-y.v));
 const chg=+R.t.priceChangePercent;
-return{nfz,nfl,nf7,a,p,chg,K,c,m,atr,atrp,ret7,c7,c30,tk,imb,rg,bw,aw,fz,fl,oz,oc,comp,s,cf,pUp,sup,res,dd,hi,bN,aN,vol:+R.t.quoteVolume,tf}}
+return{topr,gr,gz,pt7,div,nfz,nfl,nf7,a,p,chg,K,c,m,atr,atrp,ret7,c7,c30,tk,imb,rg,bw,aw,fz,fl,oz,oc,comp,s,cf,pUp,sup,res,dd,hi,bN,aN,vol:+R.t.quoteVolume,tf}}
 function recs(x){const{p,m,atr,s,sup,res}=x,S=sup[0]?.v??p-1.5*atr,S2=sup[1]?.v??S-atr,Rz=res[0]?.v??p+1.5*atr,R2=res[1]?.v??Rz+atr;
 const mw=[[m[50]],[m[100]],[m[200]]].map(z=>z[0]).filter(v=>v!=null);const mS=Math.max(...mw.filter(v=>v<p),S),bd=v=>v>.35?0:v>.1?1:v>-.1?2:v>-.35?3:4;
 const ST=[`Bias long. Hold; add on dips to ${f(S)}. Take 20% profit at ${f(Rz)} and 30% more at ${f(R2)}. Invalidate on a close below ${f(S-.5*x.atr)}.`,`Mild long. Buy dips into ${f(S)}; take 15% at ${f(Rz)}. Stop ${f(S-.5*x.atr)}.`,`Neutral. Trade the range ${f(S)}–${f(Rz)} with small size; wait for a break of either edge.`,`Reduce risk. Trim 20% into bounces near ${f(Rz)}; scale short only on rejection, target ${f(S)}, stop ${f(Rz+.5*x.atr)}.`,`Defensive. Trim 30–40%; scale into shorts on bounces to ${f(Rz)}, targets ${f(S)} then ${f(S2)}, stop ${f(Rz+.5*x.atr)}.`];
@@ -96,39 +101,46 @@ const fl=(i,w)=>i>=w-1?(Pd[i+1]-Pd[i+1-w])/(Pv[i+1]-Pv[i+1-w]):0;
 const dp=(i,w)=>{let H=-1e18,L=1e18;for(let j=i-w+1;j<=i;j++){H=Math.max(H,h[j]);L=Math.min(L,l[j])}return H>L?(c[i]-L)/(H-L):.5};
 const ST=new Array(n).fill(null),MT=new Array(n).fill(null);
 for(let i=200;i<n;i++){let s=0,q=0;for(let j=i-19;j<=i;j++)s+=c[j];const mu=s/20;for(let j=i-19;j<=i;j++)q+=(c[j]-mu)**2;const sd=Math.sqrt(q/20)||1e-9,pb=(c[i]-(mu-2*sd))/(4*sd);
-const w=cl_((adx[i]-18)/12,0,1),trend=.5*th(3*hs[i]/atr[i])+.5*(2*dp(i,20)-1),rev=-.5*Math.pow(cl_(2*pb-1,-1,1),3)-.5*Math.pow(cl_((rsi[i]-50)/25,-1,1),3);
-ST[i]=cl_(w*trend+(1-w)*rev+.2*th(fl(i,7)*8),-1,1);
+let s1=0,s2=0;for(let j=i-19;j<=i;j++)s1+=vv[j];const vm=s1/20;for(let j=i-19;j<=i;j++)s2+=(vv[j]-vm)**2;const vz=(vv[i]-vm)/(Math.sqrt(s2/20)||1e-9);let pth=0;for(let j=i-9;j<=i;j++)pth+=Math.abs(c[j]-c[j-1]);const er=pth?Math.abs(c[i]-c[i-10])/pth:0;const ar=[];for(let j=i-99;j<=i;j++)ar.push(atr[j]/c[j]);ar.sort((p,q)=>p-q);const chaos=atr[i]/c[i]>2.2*ar[50];
+const w=cl_(.5*(adx[i]-18)/12+.5*(er-.25)/.3,0,1),trend=(.5*th(3*hs[i]/atr[i])+.5*(2*dp(i,20)-1))*(1+.15*cl_(vz,-1,2)),rev=-.5*Math.pow(cl_(2*pb-1,-1,1),3)-.5*Math.pow(cl_((rsi[i]-50)/25,-1,1),3);
+ST[i]=cl_((w*trend+(1-w)*rev+.2*th(fl(i,7)*8))*(chaos?.6:1),-1,1);
 const w50=wmaAt(c,i,50),w100=wmaAt(c,i,100),w200=wmaAt(c,i,200),al=([c[i]>w50,c[i]>w100,c[i]>w200,w50>w100].filter(Boolean).length/4)*2-1,roc=c[i]/c[i-30]-1;
-MT[i]=cl_(.35*al+.25*(2*dp(i,55)-1)+.2*th(roc/(atr[i]/c[i]*Math.sqrt(30)*1.2))+.2*th(fl(i,30)*6),-1,1)}
+const ext=c[i]/w200-1;MT[i]=cl_(.35*al+.25*(2*dp(i,55)-1)+.2*th(roc/(atr[i]/c[i]*Math.sqrt(30)*1.2))+.2*th(fl(i,30)*6)-(ext>.8?.25:0)+(ext<-.5?.15:0),-1,1)}
 return{c,atr,G:{ST,MT}}}
-function trades(I,hz,t,i0,i1){const g=I.G[hz],c=I.c,{H,gap}=HZ[hz],o=[];let st=0,li=-99;
-for(let i=200;i<=i1;i++){const s=g[i]>t?1:g[i]<-t?-1:0;if(s!==0&&s!==st&&i-li>=gap){li=i;if(i>=i0)o.push(s*(c[i+H]/c[i]-1)-.002)}st=s}return o}
+function trades(I,hz,t,i0,i1,f){const g=I.G[hz],c=I.c,{H,gap}=HZ[hz],o=[];let st=0,li=-99;
+for(let i=200;i<=i1;i++){const s=g[i]>t?1:g[i]<-t?-1:0;if(s!==0&&s!==st&&i-li>=gap&&(!f||s*I.G.MT[i]>-.15)){li=i;if(i>=i0)o.push(s*(c[i+H]/c[i]-1)-.002)}st=s}return o}
 const stats=t=>{const n=t.length;if(!n)return{n:0,hit:0,avg:0,pf:0,score:0};const w=sum(t.filter(x=>x>0)),l=-sum(t.filter(x=>x<=0)),hit=t.filter(x=>x>0).length/n,pf=l?Math.min(w/l,3):(w?3:0);return{n,hit,avg:mean(t),pf,score:Math.min(mean(t)>0?100:45,Math.round(100*(.45*cl_((hit-.45)/.25,0,1)+.35*cl_((pf-.8)/1.4,0,1)+.2*cl_(n/20,0,1))))}};
 function gBack(I){const nC=I.c.length-2,w0=Math.max(200,nC-1094),ie=w0+Math.min(729,Math.floor((nC-w0)*2/3)),res={days:nC-w0+1};
 for(const hz of['ST','MT']){const H=HZ[hz].H;let b=null;
-for(const t of GRID){const s=stats(trades(I,hz,t,w0,ie-H));if(!b||s.score>b.s.score||(s.score===b.s.score&&s.pf>b.s.pf))b={t,s}}
+for(const f of hz==='ST'?[0,1]:[0])for(const t of GRID){const s=stats(trades(I,hz,t,w0,ie-H,f));if(!b||s.score>b.s.score||(s.score===b.s.score&&s.pf>b.s.pf))b={t,f,s}}
 const fw=[];for(let i=ie+1;i<=nC-H;i++)fw.push(I.c[i+H]/I.c[i]-1);
-res[hz]={th:b.t,IS:b.s,OOS:stats(trades(I,hz,b.t,ie+1,nC-H)),bl:fw.length?mean(fw):0}}return res}
-function gTrack(a,I,bt,now){const GL=ST_.g||(ST_.g={sig:[],adj:{},last:{}}),o={},n=I.c.length-1,p=I.c[n];GL.adj[a.s]??={};
-for(const hz of['ST','MT']){const H=HZ[hz].H,ad=GL.adj[a.s][hz]||0,t=cl_(bt[hz].th+ad,.1,.6),g=I.G[hz][n],s=g==null?0:g>t?1:g<-t?-1:0,k=a.s+hz;o[hz]={g,th:t,s,ad};
-if(s!==0&&GL.last[k]!==s&&!GL.sig.some(r=>r.s===a.s&&r.hz===hz&&now-r.t<HZ[hz].gap*864e5))GL.sig.push({s:a.s,hz,dir:s,p,t:now,atrp:I.atr[n]/p,q:null,r:null});
+res[hz]={th:b.t,f:b.f,IS:b.s,OOS:stats(trades(I,hz,b.t,ie+1,nC-H,b.f)),bl:fw.length?mean(fw):0}}return res}
+function gTrack(a,I,bt,now,ov){const GL=ST_.g||(ST_.g={sig:[],adj:{},last:{}}),o={},n=I.c.length-1,p=I.c[n];GL.adj[a.s]??={};
+for(const hz of['ST','MT']){const H=HZ[hz].H,ad=GL.adj[a.s][hz]||0,t=cl_(bt[hz].th+ad,.1,.6),g=I.G[hz][n],s0=g==null?0:g>t?1:g<-t?-1:0,s=(hz==='ST'&&bt.ST.f&&s0*I.G.MT[n]<=-.15)?0:s0,cf=(ov==null||s===0)?null:(Math.sign(ov)===s&&Math.abs(ov)>.15)?1:(Math.sign(ov)===-s&&Math.abs(ov)>.15)?-1:0,k=a.s+hz;o[hz]={g,th:t,s,ad,cf};
+if(s!==0&&GL.last[k]!==s&&!GL.sig.some(r=>r.s===a.s&&r.hz===hz&&now-r.t<HZ[hz].gap*864e5))GL.sig.push({s:a.s,hz,dir:s,p,t:now,atrp:I.atr[n]/p,q:null,r:null,cf:o[hz].cf});
 GL.last[k]=s;
 for(const r of GL.sig){if(r.s!==a.s||r.hz!==hz||r.q!=null)continue;const age=(now-r.t)/864e5;if(age<H)continue;if(age>H*1.6){r.q=-1;continue}
 r.r=r.dir*(p/r.p-1);r.q=Math.round(50+50*th(r.r/(r.atrp*Math.sqrt(H)*1.2)));GL.adj[a.s][hz]=cl_((GL.adj[a.s][hz]||0)+a.a*(.5-r.q/100)*.5,-.15,.15)}}
 GL.sig=GL.sig.slice(-400);save();return o}
-function gRun(a,now){const R=RAW[a.s],p=+R.t.lastPrice,D=R.k1.map(k=>({...k})),L=D[D.length-1];if(D.length<260)return;L.c=p;L.h=Math.max(L.h,p);L.l=Math.min(L.l,p);
-const I=gInd(D),key=D[D.length-2].t;if(!BT[a.s]||BT[a.s].key!==key)BT[a.s]={key,res:gBack(I)};GX[a.s]=gTrack(a,I,BT[a.s].res,now)}
+function gRun(a,now,x){const R=RAW[a.s],p=+R.t.lastPrice,D=R.k1.map(k=>({...k})),L=D[D.length-1];if(D.length<260)return;L.c=p;L.h=Math.max(L.h,p);L.l=Math.min(L.l,p);
+const I=gInd(D),key=D[D.length-2].t;if(!BT[a.s]||BT[a.s].key!==key)BT[a.s]={key,res:gBack(I)};const cm=x?x.comp:null,has=cm&&(cm.top!=null||cm.ptk!=null||cm.crowd!=null),ov=has?.5*(cm.top||0)+.3*(cm.ptk||0)+.2*(cm.crowd||0):null;GX[a.s]=gTrack(a,I,BT[a.s].res,now,ov)}
 const sgp=s=>`<span class="pill" style="background:${s>0?'#1d4a46':s<0?'#5a2a35':'#2b3448'}">${s>0?'BUY':s<0?'SELL':'NEUTRAL'}</span>`;
 const gp=(s,hz)=>{const g=GX[s]?.[hz];return g?`${sgp(g.s)} <span class="mu">${BT[s].res[hz].OOS.score}</span>`:'<span class="mu">n/a</span>'};
 const rate=o=>o.n<6?'insufficient data':o.score>=70?'reliable':o.score>=50?'moderate':'unproven';
 const stx=o=>o.n?`${o.n} signals, hit ${Math.round(o.hit*100)}%, avg net ${pc(o.avg*100)}, PF ${o.pf.toFixed(2)}`:'no signals';
 const liveQ=(s,hz)=>{const q=((ST_.g||{}).sig||[]).filter(r=>r.s===s&&r.hz===hz&&r.q!=null&&r.q>=0);return q.length?`avg ${Math.round(mean(q.map(r=>r.q)))}/100 (n=${q.length})`:'pending'};
 function gCard(a){const b=BT[a.s]?.res,g=GX[a.s];if(!b||!g)return'<div class="card mu">G indicator needs at least 260 daily candles; not enough history for this asset yet.</div>';
-const box=hz=>{const t=b[hz],l=g[hz];return`<div class="k hz"><b>G-${hz} · ${hz==='ST'?'1–7 days (5-day hold)':'1–4 weeks (20-day hold)'}</b><div class="big n" style="font-size:20px">${l.g==null?'n/a':(l.g>=0?'+':'')+l.g.toFixed(2)} ${sgp(l.s)}</div><div class="mu">Threshold ±${l.th.toFixed(2)} (backtest ${t.th.toFixed(2)}, live tune ${l.ad>=0?'+':''}${l.ad.toFixed(3)})</div><div style="margin-top:6px">Out-of-sample, last 12m: ${stx(t.OOS)}<br>In-sample, prior 24m: ${stx(t.IS)}</div><div class="mu">Quality ${t.OOS.score}/100 · ${rate(t.OOS)} · avg ${HZ[hz].H}-day move any day ${pc(t.bl*100)}</div><div class="mu">Live-scored signals: ${liveQ(a.s,hz)}</div></div>`};
+const box=hz=>{const t=b[hz],l=g[hz];return`<div class="k hz"><b>G-${hz} · ${hz==='ST'?'1–7 days (5-day hold)':'1–4 weeks (20-day hold)'}</b><div class="big n" style="font-size:20px">${l.g==null?'n/a':(l.g>=0?'+':'')+l.g.toFixed(2)} ${sgp(l.s)}</div><div class="mu">Threshold ±${l.th.toFixed(2)} (backtest ${t.th.toFixed(2)}${t.f?', MT filter on':''}, live tune ${l.ad>=0?'+':''}${l.ad.toFixed(3)})</div><div style="margin-top:6px">Out-of-sample, last 12m: ${stx(t.OOS)}<br>In-sample, prior 24m: ${stx(t.IS)}</div><div class="mu">Quality ${t.OOS.score}/100 · ${rate(t.OOS)} · avg ${HZ[hz].H}-day move any day ${pc(t.bl*100)}</div><div class="mu">Live-scored signals: ${liveQ(a.s,hz)}${cfQ(a.s,hz)}</div><div class="mu">Derivatives check: ${l.cf==null?'n/a':l.cf>0?'confirms signal':l.cf<0?'conflicts with signal':'neutral'}</div></div>`};
 const rs=((ST_.g||{}).sig||[]).filter(r=>r.s===a.s).slice(-6).reverse();
 return`<div class="card"><h2>G indicator</h2><div class="g">${box('ST')}${box('MT')}</div><div class="mu" style="margin-top:8px">Backtest window ${b.days} days of Binance daily closes, 0.2% round-trip cost. Values on the current candle are provisional until the daily close.</div>${rs.length?'<table style="margin-top:6px"><tr><th>When</th><th>Horizon</th><th>Signal</th><th>Entry</th><th>Result</th><th>Score</th></tr>'+rs.map(r=>`<tr><td>${new Date(r.t).toLocaleDateString()}</td><td>${r.hz}</td><td>${sgp(r.dir)}</td><td class="n">${f(r.p)}</td><td class="n">${r.r==null?'pending':pc(r.r*100)}</td><td>${r.q==null?'-':r.q<0?'expired':r.q}</td></tr>`).join('')+'</table>':''}</div>`}
 function gScore(){$('gsc').innerHTML='<tr><th>Asset</th><th>Days</th><th>G-ST OOS</th><th>G-MT OOS</th><th>Live ST</th><th>Live MT</th></tr>'+A.map(a=>{const b=BT[a.s]?.res;if(!b)return`<tr><td>${a.s}</td><td colspan=5 class="mu">not enough history</td></tr>`;return`<tr><td>${a.s}</td><td>${b.days}</td><td>${b.ST.OOS.score} · ${rate(b.ST.OOS)}</td><td>${b.MT.OOS.score} · ${rate(b.MT.OOS)}</td><td>${liveQ(a.s,'ST')}</td><td>${liveQ(a.s,'MT')}</td></tr>`}).join('')}
 function saveList(l){CFG.list=l;localStorage.setItem('cid_cfg',JSON.stringify(CFG));A=l.map(mk)}
+let LQ=JSON.parse(localStorage.getItem('cid_lq')||'{}'),LQ_ON=false;
+function lqStart(){try{const w=new WebSocket('wss://fstream.binance.com/ws/!forceOrder@arr');w.onopen=()=>{LQ_ON=true};w.onmessage=m=>{try{const o=JSON.parse(m.data).o;if(!o||o.s.slice(-4)!=='USDT')return;const s=o.s.slice(0,-4);if(!A.some(a=>a.s===s))return;(LQ[s]=LQ[s]||[]).push([Date.now(),o.S,+o.ap*+o.z])}catch(e){}};w.onclose=()=>{LQ_ON=false;setTimeout(lqStart,8000)}}catch(e){}}
+function lqSave(){const c=Date.now()-864e5;for(const k in LQ)LQ[k]=LQ[k].filter(r=>r[0]>c).slice(-500);try{localStorage.setItem('cid_lq',JSON.stringify(LQ))}catch(e){}}
+const fm=v=>v>=1e6?(v/1e6).toFixed(2)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v.toFixed(0);
+function lqTxt(s){const c=Date.now()-864e5,r=(LQ[s]||[]).filter(x=>x[0]>c),l=sum(r.filter(x=>x[1]==='SELL').map(x=>x[2])),sh=sum(r.filter(x=>x[1]==='BUY').map(x=>x[2]));return LQ_ON?`longs $${fm(l)} / shorts $${fm(sh)} (since app opened)`:'stream not connected'}
+const cfQ=(s,hz)=>{const q=((ST_.g||{}).sig||[]).filter(r=>r.s===s&&r.hz===hz&&r.q!=null&&r.q>=0),a=q.filter(r=>r.cf>0),b=q.filter(r=>!(r.cf>0));return a.length&&b.length?` · confirmed ${Math.round(mean(a.map(r=>r.q)))} (n=${a.length}) vs other ${Math.round(mean(b.map(r=>r.q)))} (n=${b.length})`:''};
 const AL=JSON.parse(localStorage.getItem('cid_al')||'{"in":{},"t":{},"log":[]}');
 function notify(m){const b=document.createElement('div');b.className='card al';b.innerHTML=m+' <button>Dismiss</button>';b.querySelector('button').onclick=()=>b.remove();$('al').prepend(b);
 if(CFG.al&&'Notification'in window&&Notification.permission==='granted'){try{new Notification('Zone alert',{body:m,icon:'icon.svg'})}catch(e){navigator.serviceWorker&&navigator.serviceWorker.ready.then(r=>r.showNotification('Zone alert',{body:m,icon:'icon.svg'}))}}}
@@ -136,8 +148,8 @@ function alertCheck(a,x){for(const[side,l]of[['S1',x.sup[0]],['R1',x.res[0]]]){i
 if(inz&&was===false&&Date.now()-(AL.t[k]||0)>144e5){AL.t[k]=Date.now();const m=`${a.s} entered ${side==='S1'?'support':'resistance'} zone (${l.l} ${f(l.v)}), price ${f(x.p)}`;AL.log.unshift({t:Date.now(),m});AL.log=AL.log.slice(0,30);notify(m)}}
 try{localStorage.setItem('cid_al',JSON.stringify(AL))}catch(e){}}
 async function loadAll(){$('st').textContent='Updating from Binance Spot…';let err=0;
-await Promise.all(A.map(async a=>{try{RAW[a.s]=await fetchAsset(a);const now=Date.now(),x=analyze(a,RAW[a.s],'1d',ST_.bias[a.s]||0);feedback(a,x,now);alertCheck(a,x);try{gRun(a,now)}catch(e2){console.error(e2)}}catch(e){err++}}));
-$('st').textContent=err?`${A.length-err}/${A.length} assets loaded — check your connection or Binance access in your region.`:`Binance Spot USDT · updated ${new Date().toLocaleTimeString()}`;render()}
+await Promise.all(A.map(async a=>{try{RAW[a.s]=await fetchAsset(a);const now=Date.now(),x=analyze(a,RAW[a.s],'1d',ST_.bias[a.s]||0);feedback(a,x,now);alertCheck(a,x);try{gRun(a,now,x)}catch(e2){console.error(e2)}}catch(e){err++}}));
+$('st').textContent=err?`${A.length-err}/${A.length} assets loaded — check your connection or Binance access in your region.`:`Binance Spot USDT · updated ${new Date().toLocaleTimeString()}`;lqSave();render()}
 function render(){if(!A.some(a=>a.s===SEL))SEL=A[0].s;A.forEach(a=>{if(RAW[a.s])AN[a.s]=analyze(a,RAW[a.s],TF,ST_.bias[a.s]||0)});
 const rows=A.filter(a=>AN[a.s]).sort((p,q)=>AN[q.s].s.ST-AN[p.s].s.ST);
 const pill=v=>`<span class="pill" style="background:${v>.1?'#1d4a46':v<-.1?'#5a2a35':'#2b3448'}">${v>0?'+':''}${v.toFixed(2)}</span>`;
@@ -157,7 +169,8 @@ $('det').innerHTML=`<div class="card"><div class="hd" style="margin:0"><div><h2>
 <div class="k"><b>Moving weighted averages (${TF==='1d'?'daily':'weekly'})</b><span class="n">50: ${f(x.m[50])}<br>100: ${f(x.m[100])}<br>200: ${f(x.m[200])}</span></div>
 <div class="k"><b>Cumulative volume delta</b>7d ${(x.c7*100).toFixed(1)}% of volume (${cv(x.c7)})<br>30d ${(x.c30*100).toFixed(1)}% (${cv(x.c30)})<div class="mu">Flow proxy: taker-buy share today ${(x.tk*100).toFixed(1)}%</div></div>
 <div class="k"><b>Order book (±${(x.rg*100).toFixed(2)}%)</b>Bid ${(x.bN/1e6).toFixed(2)}M vs ask ${(x.aN/1e6).toFixed(2)}M USDT<br>Imbalance ${(x.imb*100).toFixed(1)}%<div class="mu n">Bid wall ${f(x.bw[0])} · ask wall ${f(x.aw[0])}</div></div>
-<div class="k"><b>Funding and open interest</b>Funding ${x.fl==null?'n/a':x.fl.toFixed(4)+'%'} (z ${z(x.fz)})<br>OI z ${z(x.oz)}${x.oc==null?'':' · 7d '+pc(x.oc*100)}<br>${x.nfz===undefined?'Netflow: add a Glassnode key in Settings':x.nfl==null?'Netflow: unavailable for this asset or key':'Exchange netflow 24h '+Math.round(x.nfl).toLocaleString('en-US')+' · 7d '+Math.round(x.nf7).toLocaleString('en-US')+' (z '+z(x.nfz)+')'}</div></div>
+<div class="k"><b>Funding and open interest</b>Funding ${x.fl==null?'n/a':x.fl.toFixed(4)+'%'} (z ${z(x.fz)})<br>OI z ${z(x.oz)}${x.oc==null?'':' · 7d '+pc(x.oc*100)}<br>${x.nfz===undefined?'Netflow: add a Glassnode key in Settings':x.nfl==null?'Netflow: unavailable for this asset or key':'Exchange netflow 24h '+Math.round(x.nfl).toLocaleString('en-US')+' · 7d '+Math.round(x.nf7).toLocaleString('en-US')+' (z '+z(x.nfz)+')'}</div>
+<div class="k"><b>Derivatives positioning (Binance perps)</b>${x.topr==null?'Perp data unavailable for this asset':`Top traders L/S ${x.topr.toFixed(2)} · crowd L/S ${x.gr==null?'n/a':x.gr.toFixed(2)} (z ${z(x.gz)})<br>Perp taker flow 7d ${x.pt7==null?'n/a':(x.pt7*100).toFixed(1)+'%'}${x.div?' · <span class="dn">diverges from spot CVD</span>':''}`}<br>Liquidations 24h: ${lqTxt(a.s)}</div></div>
 ${gCard(a)}<div class="card sc"><h2>Zones</h2><table><tr><th>Resistance</th><th>Price</th><th>Support</th><th>Price</th></tr>${[0,1,2].map(i=>`<tr><td>${x.res[i]?.l??'-'}</td><td class="n dn">${x.res[i]?f(x.res[i].v):'-'}</td><td>${x.sup[i]?.l??'-'}</td><td class="n up">${x.sup[i]?f(x.sup[i].v):'-'}</td></tr>`).join('')}</table></div>`}
 function drawChart(x){const c=$('cv');if(!c)return;const dpr=devicePixelRatio||1,Wd=c.clientWidth,Ht=c.clientHeight;c.width=Wd*dpr;c.height=Ht*dpr;const g=c.getContext('2d');g.scale(dpr,dpr);
 const K=x.K.slice(-120),off=x.K.length-K.length;let lo=Math.min(...K.map(k=>k.l)),hi=Math.max(...K.map(k=>k.h));
@@ -180,5 +193,5 @@ $('ad').onclick=async()=>{const s=$('na').value.trim().toUpperCase().replace(/US
 saveList([...A.map(a=>[a.s,a.n,a.a]),[s,s,.12]]);$('na').value='';loadAll()};
 $('rs').onclick=()=>{saveList(DEF);loadAll()};
 $('rf').onclick=loadAll;addEventListener('resize',()=>{const x=AN[SEL];if(x)drawChart(x)});
-loadAll();setInterval(loadAll,6e4);if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+lqStart();loadAll();setInterval(loadAll,6e4);if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script></body></html>
