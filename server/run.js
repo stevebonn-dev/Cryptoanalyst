@@ -5,7 +5,20 @@ const fs = require('fs'), vm = require('vm'), path = require('path');
 async function run(opts = {}) {
   const root = opts.root || path.join(__dirname, '..');
   const env = opts.env || process.env;
-  const doFetch = opts.fetch || fetch;
+  const baseFetch = opts.fetch || fetch;
+  const seen = new Set();
+  const doFetch = async (u, o) => {            // logs each failing host once so the Actions log shows why a run failed
+    let host = '', pth = '';
+    try { const x = new URL(String(u)); host = x.host; pth = x.pathname; } catch (e) {}
+    try {
+      const res = await baseFetch(u, o);
+      if (!res.ok) { const k = host + ' ' + res.status; if (!seen.has(k)) { seen.add(k); console.log('HTTP ' + res.status + ' from ' + host + pth); } }
+      return res;
+    } catch (e) {
+      const k = host + ' err'; if (!seen.has(k)) { seen.add(k); console.log('FETCH ERROR ' + host + ': ' + e.message); }
+      throw e;
+    }
+  };
   const cfg = JSON.parse(fs.readFileSync(path.join(root, 'config.json'), 'utf8'));
   let state = {};
   try { state = JSON.parse(fs.readFileSync(path.join(root, 'data/state.json'), 'utf8')); } catch (e) {}
@@ -16,7 +29,10 @@ async function run(opts = {}) {
   store.cid_cfg = JSON.stringify({ list: cfg.assets || undefined, fib: cfg.fib || 'auto', gk: env.GLASSNODE_KEY || undefined, pos: cfg.positions || undefined });
 
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-  const js = html.split('<script>')[1].split('</script>')[0].replace(/\nboot\(\);[^\n]*\n?/, '\n');
+  const js = html.split('<script>')[1].split('</script>')[0]
+    .replace(/\nboot\(\);[^\n]*\n?/, '\n')
+    // extra spot fallback for runners in regions where Binance's global hosts are blocked (Binance.US prices can differ slightly)
+    .replace("'https://data-api.binance.vision']", "'https://data-api.binance.vision','https://api.binance.us']");
 
   const el = () => new Proxy({}, { get: (t, k) => k === 'style' ? {} : k === 'querySelector' ? () => el() : () => {}, set: () => true });
   const sandbox = {
@@ -61,10 +77,10 @@ async function run(opts = {}) {
       try { await doFetch('https://ntfy.sh/' + encodeURIComponent(topic), { method: 'POST', body: n, headers: { Title: 'Crypto G dashboard' } }); } catch (e) {}
     }
   }
+  res.errs.forEach(e => console.log('ASSET ERROR ' + e));
   console.log(`OK: ${Object.keys(res.out).length} assets, ${res.errs.length} errors, ${res.notes.length} alerts`);
   return res;
 }
 
 module.exports = { run };
 if (require.main === module) run().catch(e => { console.error(e); process.exit(1); });
-
