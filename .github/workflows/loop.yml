@@ -8,11 +8,18 @@ permissions:
 jobs:
   run:
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: 24
+      - name: Check files
+        run: |
+          ls -la
+          for f in index.html config.json server/run.js; do
+            if [ -f "$f" ]; then echo "found $f"; else echo "MISSING $f"; fi
+          done
       - name: Run the loop
         run: node server/run.js
         env:
