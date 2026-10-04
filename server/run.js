@@ -52,6 +52,8 @@ async function run(opts = {}) {
   sandbox.window = sandbox;
   const ctx = vm.createContext(sandbox);
   vm.runInContext(js, ctx);
+  if (!vm.runInContext("typeof posTrack==='function'&&typeof posAct==='function'", ctx))
+    console.log('WARNING: index.html in this repo is older than server/run.js (position tracking is missing). Upload the latest index.html to get position calls on the server.');
 
   const driver = `(async()=>{
     A=(CFG.list||DEF).map(mk);const now=Date.now(),out={},errs=[],notes=[];notify=m=>{notes.push(m)};
@@ -60,7 +62,7 @@ async function run(opts = {}) {
       const x=analyze(a,RAW[a.s],'1d',ST_.bias[a.s]||0);
       feedback(a,x,now);ltTrack(a,x,now);alertCheck(a,x);
       await gRun(a,now,x);
-      const y=analyze(a,RAW[a.s],'1d',ST_.bias[a.s]||0);AN[a.s]=y;posTrack(a,y,now);const pv=posAct(a,y);
+      const y=analyze(a,RAW[a.s],'1d',ST_.bias[a.s]||0);AN[a.s]=y;if(typeof posTrack==='function')posTrack(a,y,now);const pv=typeof posAct==='function'?posAct(a,y):null;
       const g=GX[a.s],b=BT[a.s]&&BT[a.s].res,sl=q=>({g:q.g,th:q.th,s:q.s,cf:q.cf}),bs=q=>({score:q.OOS.score,rating:rate(q.OOS),oos:q.OOS,fs:q.fs,v:q.v,fib:q.fib});
       out[a.s]={p:y.p,chg:y.chg,s:y.s,cf:y.cf,pUp:y.pUp,derivs:y.topr!=null,
         G:g?{ST:sl(g.ST),MT:sl(g.MT)}:null,bt:b?{days:b.days,ST:bs(b.ST),MT:bs(b.MT)}:null,
