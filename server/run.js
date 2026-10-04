@@ -19,7 +19,9 @@ async function run(opts = {}) {
       throw e;
     }
   };
-  const cfg = JSON.parse(fs.readFileSync(path.join(root, 'config.json'), 'utf8'));
+  let cfg = {};
+  try { cfg = JSON.parse(fs.readFileSync(path.join(root, 'config.json'), 'utf8')); }
+  catch (e) { console.log('config.json missing or unreadable (' + e.message + '); using the default asset list'); }
   let state = {};
   try { state = JSON.parse(fs.readFileSync(path.join(root, 'data/state.json'), 'utf8')); } catch (e) {}
 
@@ -28,6 +30,12 @@ async function run(opts = {}) {
   if (state.cid_al) store.cid_al = JSON.stringify(state.cid_al);
   store.cid_cfg = JSON.stringify({ list: cfg.assets || undefined, fib: cfg.fib || 'auto', gk: env.GLASSNODE_KEY || undefined, pos: cfg.positions || undefined });
 
+  if (!fs.existsSync(path.join(root, 'index.html'))) throw new Error('index.html not found in the repo root (' + root + '); the loop reads the algorithm from it');
+  // connectivity check: shows in the Actions log which Binance hosts this runner can reach
+  for (const h of ['https://api.binance.com/api/v3/ping', 'https://data-api.binance.vision/api/v3/ping', 'https://api.binance.us/api/v3/ping', 'https://fapi.binance.com/fapi/v1/ping']) {
+    try { const p = await baseFetch(h); console.log('PING ' + new URL(h).host + ' -> HTTP ' + p.status); }
+    catch (e) { console.log('PING ' + new URL(h).host + ' -> ' + e.message); }
+  }
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const js = html.split('<script>')[1].split('</script>')[0]
     .replace(/\nboot\(\);[^\n]*\n?/, '\n')
