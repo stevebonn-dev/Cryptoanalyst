@@ -117,7 +117,8 @@ const vwp=(i,w)=>(Ptv[i+1]-Ptv[i+1-w])/((Pv[i+1]-Pv[i+1-w])||1);
 const fl=(i,w)=>i>=w-1?(Pd[i+1]-Pd[i+1-w])/(Pv[i+1]-Pv[i+1-w]):0;
 const dp=(i,w)=>{let H=-1e18,L=1e18;for(let j=i-w+1;j<=i;j++){H=Math.max(H,h[j]);L=Math.min(L,l[j])}return H>L?(c[i]-L)/(H-L):.5};
 const ST=new Array(n).fill(null),MT=new Array(n).fill(null),ST0=new Array(n).fill(null),MT0=new Array(n).fill(null);
-const cS=[0,1,2,3].map(()=>new Array(n).fill(0)),cM=[0,1,2,3].map(()=>new Array(n).fill(0));
+const cS=[0,1,2,3,4].map(()=>new Array(n).fill(0)),cM=[0,1,2,3,4].map(()=>new Array(n).fill(0));
+const cOF=new Array(n).fill(0);{const sgs=ofSig(D),raw=new Array(n).fill(0);sgs.sg.forEach(q=>{const w=q.q/7;raw[q.i]+=q.dir*.5*w;if(q.conf===true&&q.i+1<n)raw[q.i+1]+=q.dir*w});let pv=0;for(let i=0;i<n;i++){pv=raw[i]+.6*pv;cOF[i]=cl_(pv,-1,1)}}
 let lastB=null;const bcl=D.map(k=>{const q=BM&&BM.get(k.t);if(q!=null)lastB=q;return lastB}),bok=!!BM&&bcl.every(q=>q!=null);
 const atr10=em(tr,1/10),fu=[],fb=[],sdr=[];for(let i=0;i<n;i++){const m2=(h[i]+l[i])/2,bu=m2+3*atr10[i],bl=m2-3*atr10[i];fu[i]=(i&&!(bu<fu[i-1]||c[i-1]>fu[i-1]))?fu[i-1]:bu;fb[i]=(i&&!(bl>fb[i-1]||c[i-1]<fb[i-1]))?fb[i-1]:bl;sdr[i]=i?(sdr[i-1]===1?(c[i]<fb[i]?-1:1):(c[i]>fu[i]?1:-1)):1}
 const mu20=[],sqz=new Array(n).fill(false);for(let i=19;i<n;i++){let s=0,q=0;for(let j=i-19;j<=i;j++)s+=c[j];const m=s/20;for(let j=i-19;j<=i;j++)q+=(c[j]-m)**2;mu20[i]=m;sqz[i]=4*Math.sqrt(q/20)<3*atr[i]}
@@ -131,21 +132,21 @@ const w50=wmaAt(c,i,50),w100=wmaAt(c,i,100),w200=wmaAt(c,i,200),al=([c[i]>w50,c[
 const ext=c[i]/w200-1,rt=th(roc/(atr[i]/c[i]*Math.sqrt(30)*1.2)),ea=-(ext>.8?.25:0)+(ext<-.5?.15:0),mV=.5*th((c[i]-vwp(i,60))/(3*atr[i]))+.5*(c[i]>pf.vah?1:c[i]<pf.val?-1:cl_(pos*2,-1,1));
 if(bok){const rs=th((c[i]/c[i-20]-bcl[i]/bcl[i-20])/(atr[i]/c[i]*Math.sqrt(20)*1.2)),bt_=bcl[i]>wmaAt(bcl,i,50)?1:-1;cS[0][i]=.10*rs+.08*bt_;cM[0][i]=.12*rs+.10*bt_}
 let rel=0;for(let k=0;k<3;k++){if(!sqz[i-k]&&sqz[i-k-1]&&sqz[i-k-2]&&sqz[i-k-3]&&sqz[i-k-4]){rel=1;break}}const sq=rel*Math.sign(c[i]-mu20[i]);cS[1][i]=.22*sq;cM[1][i]=.10*sq;
-cS[2][i]=.15*sdr[i];cM[2][i]=.20*sdr[i];
+cS[2][i]=.15*sdr[i];cM[2][i]=.20*sdr[i];cS[4][i]=.20*cOF[i];cM[4][i]=.10*cOF[i];
 {let fh=i-89,fl2=i-89;for(let j=i-89;j<=i;j++){if(h[j]>h[fh])fh=j;if(l[j]<l[fl2])fl2=j}const frg=h[fh]-l[fl2];
 if(frg>3*atr[i]){const up=fl2<fh,retr=up?(h[fh]-c[i])/frg:(c[i]-l[fl2])/frg;let sp=0;for(const q of[.382,.5,.618])sp=Math.max(sp,Math.exp(-(((retr-q)/.06)**2)));
 const cf=[w50,w100,w200].some(m=>Math.abs(m-c[i])<atr[i])?1:.7,fv=cl_((up?1:-1)*sp*cf+(retr>.9?(up?-1:1)*.5:0),-1,1);cS[3][i]=.18*fv;cM[3][i]=.15*fv}}
 MT0[i]=cl_(.35*al+.25*(2*dp(i,55)-1)+.2*rt+.2*th(fl(i,30)*6)+ea,-1,1);MT[i]=cl_(.3*al+.2*(2*dp(i,55)-1)+.2*rt+.15*th(fl(i,30)*6)+.15*mV+ea,-1,1)}
 return{t:D.map(k=>k.t),c,atr,G:{ST,MT,ST0,MT0},C:{ST:cS,MT:cM},sc:{}}}
-const FN=['BTC relative strength','Squeeze breakout','Supertrend','Fibonacci confluence'];
-function ser(I,hz,v,fs){fs=fs||0;const k=hz+v+'_'+fs;if(I.sc[k])return I.sc[k];const b=v?I.G[hz]:I.G[hz+'0'],C=I.C[hz],o=b.map((g,i)=>{if(g==null)return null;let s=g;for(let q=0;q<4;q++)if(fs>>q&1)s+=C[q][i];return cl_(s,-1,1)});I.sc[k]=o;return o}
+const FN=['BTC relative strength','Squeeze breakout','Supertrend','Fibonacci confluence','Order-flow signals'];
+function ser(I,hz,v,fs){fs=fs||0;const k=hz+v+'_'+fs;if(I.sc[k])return I.sc[k];const b=v?I.G[hz]:I.G[hz+'0'],C=I.C[hz],o=b.map((g,i)=>{if(g==null)return null;let s=g;for(let q=0;q<5;q++)if(fs>>q&1)s+=C[q][i];return cl_(s,-1,1)});I.sc[k]=o;return o}
 function trades(I,hz,t,i0,i1,f,v,fs){const g=ser(I,hz,v,fs),M=ser(I,'MT',v,fs),c=I.c,{H,gap}=HZ[hz],o=[];let st=0,li=-99;
 for(let i=200;i<=i1;i++){const s=g[i]>t?1:g[i]<-t?-1:0;if(s!==0&&s!==st&&i-li>=gap&&(!f||s*M[i]>-.15)){li=i;if(i>=i0)o.push(s*(c[i+H]/c[i]-1)-.002)}st=s}return o}
 const stats=t=>{const n=t.length;if(!n)return{n:0,hit:0,avg:0,pf:0,score:0};const w=sum(t.filter(x=>x>0)),l=-sum(t.filter(x=>x<=0)),hit=t.filter(x=>x>0).length/n,pf=l?Math.min(w/l,3):(w?3:0);return{n,hit,avg:mean(t),pf,score:Math.min(mean(t)>0?100:45,Math.round(100*(.45*cl_((hit-.45)/.25,0,1)+.35*cl_((pf-.8)/1.4,0,1)+.2*cl_(n/20,0,1))))}};
 function gBack(I){const nC=I.c.length-2,w0=Math.max(200,nC-1094),ie=w0+Math.min(729,Math.floor((nC-w0)*2/3)),res={days:nC-w0+1};
 for(const hz of['ST','MT']){const H=HZ[hz].H;let b=null;
 for(const v of[1,0])for(const f of hz==='ST'?[0,1]:[0])for(const t of GRID){const s=stats(trades(I,hz,t,w0,ie-H,f,v));if(!b||s.score>b.s.score||(s.score===b.s.score&&s.pf>b.s.pf))b={t,f,v,s}}
-let cu={...b,fs:0};for(let rd=0;rd<4;rd++){let bc=null;for(let k=0;k<4;k++){if(cu.fs>>k&1)continue;const nf=cu.fs|1<<k;for(const f of hz==='ST'?[0,1]:[0])for(const t of GRID){const s=stats(trades(I,hz,t,w0,ie-H,f,cu.v,nf));if(!bc||s.score>bc.s.score)bc={t,f,v:cu.v,s,fs:nf}}}if(bc&&bc.s.score>=cu.s.score+3)cu=bc;else break}
+let cu={...b,fs:0};for(let rd=0;rd<5;rd++){let bc=null;for(let k=0;k<5;k++){if(cu.fs>>k&1)continue;const nf=cu.fs|1<<k;for(const f of hz==='ST'?[0,1]:[0])for(const t of GRID){const s=stats(trades(I,hz,t,w0,ie-H,f,cu.v,nf));if(!bc||s.score>bc.s.score)bc={t,f,v:cu.v,s,fs:nf}}}if(bc&&bc.s.score>=cu.s.score+3)cu=bc;else break}
 const fbest=fs0=>{let q=null;for(const f of hz==='ST'?[0,1]:[0])for(const t of GRID){const s=stats(trades(I,hz,t,w0,ie-H,f,cu.v,fs0));if(!q||s.score>q.s.score)q={t,f,s}}return q};
 const fW=fbest(cu.fs|8),fO=fbest(cu.fs&~8),oW=stats(trades(I,hz,fW.t,ie+1,nC-H,fW.f,cu.v,cu.fs|8)),oO=stats(trades(I,hz,fO.t,ie+1,nC-H,fO.f,cu.v,cu.fs&~8));
 const fib={isW:fW.s.score,isO:fO.s.score,oosW:oW.score,oosO:oO.score,nW:oW.n,value:fW.s.score>=fO.s.score+3&&oW.n>=6&&oW.score>=oO.score};
@@ -164,7 +165,7 @@ function review(I,bt){const n=I.c.length-1,nC=n-1,rows=[];for(let k=0;k<14;k++){
 async function gRun(a,now,x){const R=RAW[a.s],p=+R.t.lastPrice,D=R.k1.map(k=>({...k})),L=D[D.length-1];if(D.length<260)return;L.c=p;L.h=Math.max(L.h,p);L.l=Math.min(L.l,p);
 let BM=a.s==='BTC'?null:await btcMap();if(BM&&RAW.BTC){BM=new Map(BM);BM.set(L.t,+RAW.BTC.t.lastPrice)}
 const I=gInd(D,BM),key=D[D.length-2].t+'|'+(BM?1:0);if(!BT[a.s]||BT[a.s].key!==key)BT[a.s]={key,res:gBack(I)};
-const cm=x?x.comp:null,has=cm&&(cm.top!=null||cm.ptk!=null||cm.crowd!=null),ov=has?.5*(cm.top||0)+.3*(cm.ptk||0)+.2*(cm.crowd||0):null;GX[a.s]=gTrack(a,I,BT[a.s].res,now,ov);GX[a.s].rev=review(I,BT[a.s].res)}
+const cm=x?x.comp:null,has=cm&&(cm.top!=null||cm.ptk!=null||cm.crowd!=null);let ov=has?.5*(cm.top||0)+.3*(cm.ptk||0)+.2*(cm.crowd||0):null;const oc=OFSC[a.s];if(oc&&Date.now()-oc.t<6e5)ov=(ov==null?0:ov*.7)+.3*oc.score;GX[a.s]=gTrack(a,I,BT[a.s].res,now,ov);GX[a.s].rev=review(I,BT[a.s].res)}
 
 const sgp=s=>`<span class="pill" style="background:${s>0?'#1d4a46':s<0?'#5a2a35':'#2b3448'}">${s>0?'BUY':s<0?'SELL':'NEUTRAL'}</span>`;
 const gp=(s,hz)=>{const g=GX[s]?.[hz];return g?`${sgp(g.s)} <span class="mu">${BT[s].res[hz].OOS.score}</span>`:'<span class="mu">n/a</span>'};
@@ -201,7 +202,7 @@ const put=await fetch(api,{method:'PUT',headers:hd,body:JSON.stringify({message:
 if(!put.ok)throw new Error('GitHub '+put.status+' (token needs Contents write)');
 let ran='';if(g.run){const d=await fetch(`https://api.github.com/repos/${g.repo}/actions/workflows/loop.yml/dispatches`,{method:'POST',headers:hd,body:JSON.stringify({ref:br})});ran=d.ok?' · server run started':' · could not start the run (token needs Actions write)'}
 set('Synced '+new Date().toLocaleTimeString()+ran)}catch(e){set('Sync failed: '+e.message)}}
-const VW0={n:120,off:0,pz:1,pc:0};let VW={...VW0};
+const VW0={n:120,off:-14,pz:1,pc:0};let VW={...VW0};
 const IVMS={'5m':3e5,'15m':9e5,'1h':36e5,'4h':144e5,'1d':864e5,'1w':6048e5,'1M':2592e6};
 let rqf=0;const redraw=()=>{if(rqf||typeof requestAnimationFrame!=='function')return;rqf=requestAnimationFrame(()=>{rqf=0;const x=AN[SEL];if(x){drawChart(x);drawOF(x)}})};
 function vwDo(k){const V=VW;if(k==='t+')V.n*=.75;else if(k==='t-')V.n*=1.33;else if(k==='p+')V.pz*=1.3;else if(k==='p-')V.pz/=1.3;else if(k==='pu')V.pc+=.15/V.pz;else if(k==='pd')V.pc-=.15/V.pz;else if(k==='l')V.off+=V.n*.25;else if(k==='r')V.off-=V.n*.25;else if(k==='rs')VW={...VW0};redraw()}
@@ -234,62 +235,91 @@ ${v?`<div class="k"><b>Performance and action</b><span class="big n" style="font
 ${lg.length?`<div class="sc"><table style="margin-top:8px"><tr><th>When</th><th>Call</th><th>Price</th><th>Score</th></tr>${lg.slice(-5).reverse().map(r=>`<tr><td>${new Date(r.t).toLocaleDateString()}</td><td>${r.act}</td><td class="n">${f(r.p)}</td><td>${r.q==null?'pending':r.q<0?'n/a':r.q}</td></tr>`).join('')}</table></div><div class="mu">Calls scored after 5 days: ${sc.length?Math.round(mean(sc.map(r=>r.q)))+'/100 (n='+sc.length+')':'pending'}${tn?` · learned shifts: take-profit ${tn.tp>=0?'+':''}${tn.tp.toFixed(2)} ATR, stop ${tn.st>=0?'+':''}${tn.st.toFixed(2)} ATR`:''}</div>`:''}</div>`}
 
 // ===== order flow charts =====
-const OF={sym:null,ws:null,tr:[],depth:null,rg:.015,live:true,tm:null},PM={'5m':'5m','15m':'15m','1h':'1h','4h':'4h','1d':'1d'},OFC={};
+const OF={sym:null,ws:null,tr:[],dh:[],depth:null,rg:.015,live:true,tm:null},PM={'5m':'5m','15m':'15m','1h':'1h','4h':'4h','1d':'1d'},OFC={};
 const fmtK=v=>{const a=Math.abs(v);return(v<0?'-':'')+(a>=1e9?(a/1e9).toFixed(2)+'B':a>=1e6?(a/1e6).toFixed(2)+'M':a>=1e3?(a/1e3).toFixed(1)+'K':a.toFixed(2))};
 async function ofFut(a,iv){const p=PM[iv];if(!p)return null;const k=a.s+iv,c=OFC[k];if(c&&Date.now()-c.t<6e4)return c.v;
 const [tk,oi]=await Promise.all([fu(`/futures/data/takerlongshortRatio?symbol=${a.p}&period=${p}&limit=500`),fu(`/futures/data/openInterestHist?symbol=${a.p}&period=${p}&limit=500`)]);
 const v=(tk||oi)?{tk:(tk||[]).map(q=>({t:+q.timestamp,b:+q.buyVol,s:+q.sellVol})),oi:(oi||[]).map(q=>({t:+q.timestamp,v:+q.sumOpenInterestValue}))}:null;OFC[k]={t:Date.now(),v};return v}
 function ofAdd(p,q,buy,t){OF.tr.push([t,p,q,buy]);if(OF.tr.length>8000)OF.tr.splice(0,OF.tr.length-6000)}
 async function ofSeed(a){try{const r=await sp(`/api/v3/aggTrades?symbol=${a.p}&limit=1000`);OF.tr=r.map(q=>[q.T,+q.p,+q.q,!q.m])}catch(e){}}
-async function ofDepth(a){try{OF.depth=await sp(`/api/v3/depth?symbol=${a.p}&limit=1000`)}catch(e){}}
+async function ofDepth(a){try{const d=await sp(`/api/v3/depth?symbol=${a.p}&limit=1000`);OF.depth=d;const mid=(+d.bids[0][0]+ +d.asks[0][0])/2,bs=d.bids.filter(b=>+b[0]>=mid*.99),as=d.asks.filter(b=>+b[0]<=mid*1.01),bN=sum(bs.map(b=>+b[0]*+b[1])),aN=sum(as.map(b=>+b[0]*+b[1]));let bw=0,bwn=0;bs.forEach(b=>{if(+b[0]*+b[1]>bwn){bwn=+b[0]*+b[1];bw=+b[0]/mid}});
+OF.dh.push({t:Date.now(),imb:(bN-aN)/(bN+aN||1),bw});if(OF.dh.length>40)OF.dh.shift()}catch(e){}}
 function ofWS(a){const hs=['wss://stream.binance.com:9443/ws/','wss://data-stream.binance.vision/ws/'];let hi=0;
 const open=()=>{if(OF.sym!==a.s||!OF.live)return;let w;try{w=new WebSocket(hs[hi]+a.p.toLowerCase()+'@aggTrade')}catch(e){return}OF.ws=w;let got=false;
 w.onmessage=m=>{try{const d=JSON.parse(m.data);got=true;ofAdd(+d.p,+d.q,!d.m,d.T);ofRedraw()}catch(e){}};
 w.onclose=()=>{if(OF.ws===w){OF.ws=null;if(OF.sym===a.s&&OF.live){if(!got)hi=(hi+1)%hs.length;setTimeout(open,got?1500:4000)}}};w.onerror=()=>{try{w.close()}catch(e){}}};open()}
 function ofStop(){OF.sym=null;clearInterval(OF.tm);if(OF.ws){const w=OF.ws;OF.ws=null;try{w.close()}catch(e){}}}
-function ofAttach(a){if(OF.sym!==a.s){ofStop();OF.sym=a.s;OF.tr=[];OF.depth=null;ofSeed(a).then(ofRedraw);ofDepth(a).then(ofRedraw);if(OF.live)ofWS(a);
+function ofAttach(a){if(OF.sym!==a.s){ofStop();OF.sym=a.s;OF.tr=[];OF.depth=null;OF.dh=[];ofSeed(a).then(ofRedraw);ofDepth(a).then(ofRedraw);if(OF.live)ofWS(a);
 OF.tm=setInterval(async()=>{if(OF.sym!==a.s||!OF.live)return;await ofDepth(a);if(!OF.ws)await ofSeed(a);ofRedraw()},4000)}else if(OF.live&&!OF.ws)ofWS(a)}
 let ofl=0,oft=0;function ofRedraw(){const n=Date.now();if(n-ofl<350){if(!oft)oft=setTimeout(()=>{oft=0;ofRedraw()},360);return}ofl=n;const x=AN[SEL];if(x)drawOF(x)}
-const LAY0={mwa:1,dmwa:1,zones:1,sr:1,walls:1,vwap:1,vp:1,pos:1,sig:1,gb:1,detail:0,h:0,ofdl:1,ofcv:1,ofoi:1,ofpv:1,ofperp:1,ofsg:1,ofdd:1,oftr:1,ofwl:1,ofpoc:1},CHH=[340,440,560];
+const LAY0={mwa:1,dmwa:1,zones:1,sr:1,walls:1,vwap:1,vp:1,pos:1,sig:1,gb:1,detail:0,h:1,ofc3:0,ofdl:1,ofcv:1,ofoi:1,ofpv:1,ofperp:1,ofsg:1,ofdd:1,oftr:1,ofwl:1,ofpoc:1},CHH=[420,520,640];
 const lay=k=>(CFG.lay&&CFG.lay[k]!=null)?CFG.lay[k]:LAY0[k];
 const chips=l=>l.map(([k,t,col])=>`<button data-ly="${k}" class="${lay(k)?'on':''}" style="padding:3px 8px;font-size:12px">${col?`<i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${col};margin-right:5px"></i>`:''}${t}</button>`).join('');
 function placeLabels(items,y0,y1,gap){const pl=[];items.sort((a,b)=>b.pri-a.pri);for(const it of items){let ok=null;for(const o of[0,-1,1,-2,2,-3,3,-4,4,-5,5,-6,6]){const ly=it.y+o*gap;if(ly<y0||ly>y1)continue;if(pl.every(p=>Math.abs(p.ly-ly)>=gap-.5)){ok=ly;break}}if(ok!=null){it.ly=ok;pl.push(it)}}return pl}
 function pillAt(g,txt,x,y,col,right){const w=g.measureText(txt).width+8,x0=right?x-w:x;g.fillStyle='rgba(14,20,32,.88)';g.fillRect(x0,y-7,w,14);g.fillStyle=col;g.textAlign='left';g.fillText(txt,x0+4,y+3.5);return x0}
 function drawLabels(g,items,xEdge,right,y0,y1){placeLabels(items,y0,y1,13).forEach(it=>{g.font='10.5px system-ui';const x0=pillAt(g,it.txt,xEdge,it.ly,it.col,right);if(it.y!=null&&Math.abs(it.ly-it.y)>2){g.strokeStyle=it.col;g.globalAlpha=.5;g.beginPath();g.moveTo(right?x0:xEdge,it.ly);g.lineTo(right?x0-6:xEdge-6,it.y);g.stroke();g.globalAlpha=1}})}
 const OFT={'Buy absorption':'ABS','Sell absorption':'ABS','Bullish CVD divergence':'DIV','Bearish CVD divergence':'DIV','Flow breakout up':'BRK','Flow breakdown':'BRK'};
-function ofSig(F){const n=F.length,dl=F.map(k=>2*k.tb-k.v),dr=F.map((k,i)=>k.v?dl[i]/k.v:0),cs=[];let s=0;dl.forEach(d=>{s+=d;cs.push(s)});const sg=[],last={};
+function ofSig(F){const n=F.length,cl=F.map(k=>k.c),dl=F.map(k=>2*k.tb-k.v),dr=F.map((k,i)=>k.v?dl[i]/k.v:0),cs=[];let s_=0;dl.forEach(d=>{s_+=d;cs.push(s_)});
+const tr=F.map((k,i)=>i?Math.max(k.h-k.l,Math.abs(k.h-F[i-1].c),Math.abs(k.l-F[i-1].c)):k.h-k.l),atr=em(tr,1/14),sg=[],last={};
 for(let i=30;i<n;i++){const w=dr.slice(i-30,i),z=(dr[i]-mean(w))/sd(w),vr=F[i].v/(mean(F.slice(i-20,i).map(k=>k.v))||1),rg=F[i].h-F[i].l||1e-9,cp=(F[i].c-F[i].l)/rg;let t=null;
 if(z<-1.2&&vr>1.1&&cp>.6)t=['Buy absorption',1];else if(z>1.2&&vr>1.1&&cp<.4)t=['Sell absorption',-1];
 else{const l10=Math.min(...F.slice(i-10,i).map(k=>k.l)),h10=Math.max(...F.slice(i-10,i).map(k=>k.h)),cw_=cs.slice(i-10,i),cmin=Math.min(...cw_),cmax=Math.max(...cw_),sp=(cmax-cmin)*.15;
 if(F[i].l<=l10&&cs[i]>cmin+sp)t=['Bullish CVD divergence',1];else if(F[i].h>=h10&&cs[i]<cmax-sp)t=['Bearish CVD divergence',-1];
 else if(z>1.5&&vr>1.3&&F[i].c>Math.max(...F.slice(i-20,i).map(k=>k.h)))t=['Flow breakout up',1];else if(z<-1.5&&vr>1.3&&F[i].c<Math.min(...F.slice(i-20,i).map(k=>k.l)))t=['Flow breakdown',-1]}
-if(t&&(last[t[0]]==null||i-last[t[0]]>=4)){last[t[0]]=i;sg.push({i,dir:t[1],type:t[0]})}}
-return{sg,cs,dr,dl}}
-function ofTrack(F,SG){const n=F.length,H=5,by={},all=[];for(const q of SG.sg){if(q.i+H>n-2)continue;const r=q.dir*(F[q.i+H].c/F[q.i].c-1)-.001,k=OFT[q.type];(by[k]=by[k]||[]).push(r);all.push(r)}
-const st=a=>a.length?{n:a.length,hit:a.filter(v=>v>0).length/a.length,avg:mean(a)}:null;const o={all:st(all)};for(const k in by)o[k]=st(by[k]);return o}
-function ofCall(x,F,SG,fv){const n=F.length,S=OF.sum||{},W=[],add=(k,w,v,txt)=>{if(v!=null&&!isNaN(v))W.push({k,w,v,txt})};
+if(t&&(last[t[0]]==null||i-last[t[0]]>=4)){last[t[0]]=i;const dir=t[1],a=atr[i],c=cl[i],lv=[dir>0?Math.min(...F.slice(i-20,i).map(k=>k.l)):Math.max(...F.slice(i-20,i).map(k=>k.h))];
+[50,100,200].forEach(m=>{if(i>=m){const v=wmaAt(cl,i,m);if(v!=null)lv.push(v)}});
+const vs=F.slice(i-19,i+1),vq=sum(vs.map(k=>k.v))||1;lv.push(sum(vs.map(k=>(k.h+k.l+k.c)/3*k.v))/vq-dir*a);
+const loc=lv.some(v=>Math.abs(c-v)<=.6*a),vol=vr>=1.3,b0=Math.max(0,i-99),ap=atr.slice(b0,i+1).map((v,j)=>v/cl[b0+j]).sort((p,q)=>p-q),calm=atr[i]/c<=2.2*ap[Math.floor(ap.length/2)];
+const m50=i>=50?wmaAt(cl,i,50):null,tOK=t[0].startsWith('Flow')?(m50==null||dir*(c-m50)>0):true;
+let cf=null;if(i+1<=n-2){const nx=F[i+1];cf=dir*(nx.c-c)>0&&dir*dr[i+1]>-.05}
+const q=(loc?2:0)+(vol?1:0)+(calm?1:0)+(tOK?1:0)+(cf?2:0),g=cf===null?(loc&&calm&&tOK?'P':'C'):(loc&&cf&&calm&&tOK&&q>=6?'A':q>=4?'B':'C');
+sg.push({i,dir,type:t[0],q,g,conf:cf,loc,vol,calm,tOK})}}
+return{sg,cs,dr,dl,n}}
+const wil=(k,n)=>{if(!n)return 0;const z=1.96,p=k/n,d=1+z*z/n,c=p+z*z/(2*n),a=z*Math.sqrt(p*(1-p)/n+z*z/(4*n*n));return(c-a)/d};
+function ofVerify(list){const H=5,rec=[];for(const{F,SG}of list){const n=F.length;for(const q of SG.sg){if(q.conf!==true)continue;const e=q.i+1;if(e+H>n-2)continue;rec.push({r:q.dir*(F[e+H].c/F[e].c-1)-.001,t:F[e].t,g:q.g})}}
+const st=a=>{if(!a.length)return null;const n=a.length,k=a.filter(v=>v.r>0).length,sr=[...a].sort((p,q)=>p.t-q.t),m=Math.floor(n/2),h1=mean(sr.slice(0,m).map(v=>v.r)),h2=mean(sr.slice(m).map(v=>v.r)),avg=mean(a.map(v=>v.r)),hit=k/n,lb=wil(k,n);
+return{n,k,hit,avg,lb,h1,h2,verified:n>=20&&lb>.5&&avg>0&&h1>0&&h2>0,cand:n>=10&&hit>.55&&avg>0}};
+return{A:st(rec.filter(v=>v.g==='A')),B:st(rec.filter(v=>v.g==='B')),all:st(rec)}}
+const OFV={},OFSC={};
+async function ofPool(a){const ivs=['1h','4h','1d'],Ks=await Promise.all(ivs.map(iv=>chartData(a,iv).catch(()=>null))),key=a.s+Ks.map(K=>K?K[K.length-2].t:0).join('|');
+if(OFV[a.s]&&OFV[a.s].key===key)return OFV[a.s].v;const v=ofVerify(Ks.filter(Boolean).map(K=>{const F=K.map(k=>({...k}));return{F,SG:ofSig(F)}}));OFV[a.s]={key,v};return v}
+async function ofMTF(a){const r=[];for(const iv of['1h','4h','1d']){try{const K=await chartData(a,iv),b=K.slice(-11,-1),v=sum(b.map(k=>k.v))||1;r.push([iv,sum(b.map(k=>2*k.tb-k.v))/v])}catch(e){}}return r}
+const ofOff=s=>((ST_.of||{}).tune||{})[s]||0;
+function ofLive(s){const q=((ST_.of||{}).sig||[]).filter(r=>r.s===s&&r.q!=null&&r.q>=0);return q.length?{n:q.length,hit:q.filter(r=>r.ret>0).length/q.length,q:mean(q.map(r=>r.q))}:null}
+function ofLog(a,x,call){const O=ST_.of||(ST_.of={sig:[],tune:{}});O.tune[a.s]=O.tune[a.s]||0;const now=Date.now();
+for(const r of O.sig){if(r.s!==a.s||r.q!=null)continue;const age=(now-r.t)/36e5;if(age<24)continue;if(age>48){r.q=-1;continue}r.ret=r.dir*(x.p/r.p-1)-.001;r.q=Math.round(50+50*th(r.ret/(r.atrp*1.2)));O.tune[a.s]=cl_(O.tune[a.s]+a.a*(.5-r.q/100)*.3,0,.2)}
+if(call.act!=='WAIT'&&(call.grade==='A'||call.grade==='B')){const last=[...O.sig].reverse().find(r=>r.s===a.s);if(!last||now-last.t>216e5||(last.act!==call.act&&now-last.t>36e5))O.sig.push({s:a.s,t:now,p:x.p,dir:call.score>0?1:-1,act:call.act,g:call.grade,atrp:x.atrp,q:null})}
+O.sig=O.sig.slice(-300);save()}
+function ofCall(x,F,SG,fv,X_){X_=X_||{};const n=F.length,S=OF.sum||{},fam={},add=(f_,k,w,v,txt)=>{if(v==null||isNaN(v))return;(fam[f_]=fam[f_]||[]).push({k,w,v,txt})},off=ofOff(x.a.s);
 const n20=Math.min(20,n),dsum=sum(SG.dl.slice(-n20)),vs=sum(F.slice(-n20).map(k=>k.v))||1;
-add('delta',.22,th(dsum/vs*6),`spot delta ${(dsum/vs*100).toFixed(1)}% of volume over ${n20} bars`);
-const rs=SG.sg.filter(s=>s.i>=n-3).slice(-1)[0];add('signal',.2,rs?rs.dir*.8:0,rs?rs.type+' on the latest bars':'no fresh bar signal');
-const tape=(S.nB||0)+(S.nS||0);if(tape>=100)add('tape',.15,th((S.nB/tape-.5)*5),`tape ${(S.nB/tape*100).toFixed(0)}% buys`);
-const tot=(S.bN||0)+(S.aN||0);if(tot>0)add('depth',.12,th((S.bN-S.aN)/tot*3),`bids ${(S.bN/tot*100).toFixed(0)}% of near depth`);
-if(fv&&fv.tk.length>=20){const l=fv.tk.slice(-20),b=sum(l.map(q=>q.b)),s=sum(l.map(q=>q.s)),r=(b-s)/(b+s||1);add('perp',.12,th(r*8),`perp taker flow ${(r*100).toFixed(1)}%`)}
-if(fv&&fv.oi.length>=20){const o=fv.oi,oc=o[o.length-1].v/o[o.length-20].v-1,pr=F[n-1].c/F[Math.max(0,n-20)].c-1;add('oi',.1,Math.abs(oc)>.005&&Math.abs(pr)>x.atrp*.3&&oc>0?Math.sign(pr)*.5:0,`OI ${pc(oc*100)} with price ${pc(pr*100)}`)}
-add('trend',.09,x.s.ST,'composite short-term score '+x.s.ST.toFixed(2));
-const tw=sum(W.map(q=>q.w)),score=tw?sum(W.map(q=>q.w*q.v))/tw:0,miss=7-W.length,sg=Math.sign(score),ag=tw?sum(W.filter(q=>sg!==0&&Math.sign(q.v)===sg).map(q=>q.w))/tw:0;
-const act=score>.35?'BUY':score>.15?'LEAN BUY':score<-.35?'SELL':score<-.15?'LEAN SELL':'WAIT',conf=Math.round(cl_(48+40*Math.abs(score)+8*(ag-.5)-3*miss,45,85));
-const why=[...W].filter(q=>sg===0||Math.sign(q.v)===sg).sort((a,b)=>Math.abs(b.w*b.v)-Math.abs(a.w*a.v)).slice(0,3).map(q=>q.txt);
-const S1=x.sup[0]?x.sup[0].v:x.p-1.5*x.atr,R1=x.res[0]?x.res[0].v:x.p+1.5*x.atr,sm=act.startsWith('LEAN')?' Use smaller size.':'';
-const txt=act.includes('BUY')?`Look to buy pullbacks into ${f(S1)}; invalid below ${f(S1-.5*x.atr)}; first target ${f(R1)}.${sm}`:act.includes('SELL')?`Sell or trim into bounces toward ${f(R1)}; invalid above ${f(R1+.5*x.atr)}; first target ${f(S1)}.${sm}`:'Flow is mixed: wait until delta, tape and depth agree before acting.';
-return{score,act,conf,why,txt}}
+add('flow','delta',.18,th(dsum/vs*6),`spot delta ${(dsum/vs*100).toFixed(1)}% of volume over ${n20} bars`);
+const tape=(S.nB||0)+(S.nS||0);if(tape>=100)add('flow','tape',.10,th((S.nB/tape-.5)*5),`tape ${(S.nB/tape*100).toFixed(0)}% buys`);
+if(OF.tr.length>=200){const qs=OF.tr.map(q=>q[2]).sort((a,b)=>a-b),thr=qs[Math.floor(qs.length*.95)],big=OF.tr.filter(q=>q[2]>=thr),bv=sum(big.filter(q=>q[3]).map(q=>q[2])),sv=sum(big.filter(q=>!q[3]).map(q=>q[2])),r=(bv-sv)/(bv+sv||1);add('flow','whale',.10,th(r*3),`large trades ${(r*100).toFixed(0)}% net ${r>0?'buying':'selling'}`)}
+const rs=SG.sg.filter(s=>s.i>=n-3).slice(-1)[0];if(rs)add('struct','signal',.16,rs.dir*({A:1,B:.6,P:.4,C:.2}[rs.g]),`${rs.type} (grade ${rs.g}) on the latest bars`);else add('struct','signal',.16,0,'no fresh bar signal');
+const dh=OF.dh.slice(-12);if(dh.length>=6){const im=mean(dh.map(q=>q.imb)),sgn=Math.sign(im),pst=dh.filter(q=>Math.sign(q.imb)===sgn&&Math.abs(q.imb)>.05).length/dh.length,fl=new Set(dh.map(q=>Math.round(q.bw*1e4))).size>5?.5:1;add('depth','depth',.10*Math.max(.2,pst)*fl,th(im*3),`bids ${((.5+im/2)*100).toFixed(0)}% of near depth, held ${(pst*100).toFixed(0)}% of snapshots${fl<1?' (walls flickering)':''}`)}
+if(fv&&fv.tk.length>=20){const l=fv.tk.slice(-20),b=sum(l.map(q=>q.b)),s=sum(l.map(q=>q.s)),r=(b-s)/(b+s||1);add('deriv','perp',.10,th(r*8),`perp taker flow ${(r*100).toFixed(1)}%`)}
+if(fv&&fv.oi.length>=20){const o=fv.oi,oc=o[o.length-1].v/o[o.length-20].v-1,pr=F[n-1].c/F[Math.max(0,n-20)].c-1;add('deriv','oi',.08,Math.abs(oc)>.005&&Math.abs(pr)>x.atrp*.3&&oc>0?Math.sign(pr)*.5:0,`OI ${pc(oc*100)} with price ${pc(pr*100)}`)}
+if(X_.mtf&&X_.mtf.length)add('mtf','mtf',.14,mean(X_.mtf.map(q=>th(q[1]*6))),'delta '+X_.mtf.map(q=>q[0]+' '+(q[1]>0?'+':'')+(q[1]*100).toFixed(0)+'%').join(', '));
+add('ctx','trend',.06,x.s.ST,'composite short-term score '+x.s.ST.toFixed(2));
+const all=Object.values(fam).flat(),tw=sum(all.map(q=>q.w)),score=tw?sum(all.map(q=>q.w*q.v))/tw:0,sg=Math.sign(score);
+const fv_=Object.entries(fam).map(([k,a])=>[k,sum(a.map(q=>q.w*q.v))/(sum(a.map(q=>q.w))||1)]),agree=fv_.filter(([k,v])=>sg!==0&&Math.sign(v)===sg&&Math.abs(v)>.05).length,fams=fv_.length;
+const lv=[...x.sup.slice(0,2).map(l=>[l.v,'buy zone '+f(l.v)]),...x.res.slice(0,2).map(l=>[l.v,'sell zone '+f(l.v)]),[x.vww,'weekly VWAP'],[x.vp30&&x.vp30.val,'value-area low'],[x.vp30&&x.vp30.vah,'value-area high'],[x.vp30&&x.vp30.poc,'POC']].filter(q=>q[0]!=null),
+nr=lv.find(q=>Math.abs(x.p-q[0])<=.6*x.atr&&((sg>0&&q[0]<=x.p+.3*x.atr)||(sg<0&&q[0]>=x.p-.3*x.atr))),near=nr?nr[1]:null;
+const P=X_.pool||{},strong=.35+off,leanT=.15+off/2,ver=!!(P.A&&P.A.verified),grade=Math.abs(score)>=strong&&agree>=4&&near&&ver?'A':Math.abs(score)>=.2&&agree>=3?'B':'C';
+const act=grade==='A'?(score>0?'BUY':'SELL'):Math.abs(score)>=leanT?(score>0?'LEAN BUY':'LEAN SELL'):'WAIT';
+const st=grade==='A'?P.A:grade==='B'?P.B:null,lvv=ofLive(x.a.s);let p=st?(st.k+5)/(st.n+10):.5+Math.min(.06,Math.abs(score)*.1);if(lvv&&lvv.n>=8)p=(p*10+lvv.hit*lvv.n)/(10+lvv.n);if(grade!=='A')p=Math.min(p,.66);
+const conf=act==='WAIT'?null:Math.round(100*cl_(p,.4,.9)),why=all.filter(q=>sg===0||Math.sign(q.v)===sg).sort((a,b)=>Math.abs(b.w*b.v)-Math.abs(a.w*a.v)).slice(0,3).map(q=>q.txt);
+const S1=x.sup[0]?x.sup[0].v:x.p-1.5*x.atr,R1=x.res[0]?x.res[0].v:x.p+1.5*x.atr,sm=act.startsWith('LEAN')?' Use smaller size; this setup is not verified at the top grade.':'';
+const txt=act.includes('BUY')?`Look to buy pullbacks into ${f(S1)}; invalid below ${f(S1-.5*x.atr)}; first target ${f(R1)}.${sm}`:act.includes('SELL')?`Sell or trim into bounces toward ${f(R1)}; invalid above ${f(R1+.5*x.atr)}; first target ${f(S1)}.${sm}`:'Flow is mixed or unconfirmed: wait until delta, tape, depth and higher timeframes agree.';
+return{score,act,conf,why,txt,grade,verified:ver,agree,fams,near,p}}
 function ofCard(){return`<div class="card"><h2>Order flow</h2><div class="tabs" style="margin:0 0 8px"><button data-of="live" class="${OF.live?'on':''}">Live: ${OF.live?'on':'off'}</button><button data-of="r-">Range −</button><button data-of="r+">Range +</button></div>
 <div id="ofcall" style="margin-bottom:10px"></div>
-<div class="tabs" style="margin:0 0 8px">${chips([['ofsg','Signals','#e8b04a'],['ofpv','Levels','#ffffff'],['ofdl','Delta','#3fb6a8'],['ofcv','CVD','#6c9cff'],['ofperp','Perp','#ffa94d'],['ofoi','Open interest','#b98cf0']])}</div>
+<div class="tabs" style="margin:0 0 8px">${chips([['ofsg','Signals','#e8b04a'],['ofc3','Weak signals','#5b6882'],['ofpv','Levels','#ffffff'],['ofdl','Delta','#3fb6a8'],['ofcv','CVD','#6c9cff'],['ofperp','Perp','#ffa94d'],['ofoi','Open interest','#b98cf0']])}</div>
 <canvas id="ofc" style="height:470px;touch-action:pan-y"></canvas><div id="xh2" class="mu" style="margin:6px 0;min-height:18px"></div>
-<div class="lg"><span>Markers: ABS absorption · DIV CVD divergence · BRK flow breakout (▲ buy, ▼ sell)</span><span>Panes follow the chart interval, zoom and pan above</span></div>
-<div id="ofs" class="g" style="margin:10px 0"></div><div id="oft" class="mu"></div>
+<div class="lg"><span>Markers: ABS absorption · DIV CVD divergence · BRK flow breakout, with grade A/B (hollow P = awaiting confirmation)</span><span>Panes follow the chart interval, zoom and pan above</span></div>
+<div id="ofs" class="g" style="margin:10px 0"></div><div id="oft" style="margin-bottom:6px"></div>
 <h2 style="margin-top:10px">Depth and trades by price (live, ±${(OF.rg*100).toFixed(1)}% around price)</h2>
-<div class="tabs" style="margin:0 0 8px">${chips([['ofdd','Depth','#6c9cff'],['oftr','Trades','#3fb6a8'],['ofwl','Walls','#e5677a'],['ofpoc','POC','#e8b04a']])}</div><canvas id="ofd" style="height:400px"></canvas>
+<div class="tabs" style="margin:0 0 8px">${chips([['ofdd','Depth','#6c9cff'],['oftr','Trades','#3fb6a8'],['ofwl','Walls','#e5677a'],['ofpoc','POC','#e8b04a']])}</div><canvas id="ofd" style="height:480px"></canvas>
 <div class="mu">Left: cumulative resting orders. Right: executed volume by price from the latest trades, sells to the left and buys to the right; solid bars mark a 3:1 imbalance. Spot data from Binance; perp delta and open interest cover about the last 30 days and are unavailable on weekly and monthly intervals. Signals are rule-based reads of order flow, not guarantees.</div></div>`}
 function drawOF(x){drawOFD(x);drawOFC(x)}
 function drawOFD(x){const c=$('ofd');if(!c)return;const dpr=devicePixelRatio||1,W=c.clientWidth,H=c.clientHeight;c.width=W*dpr;c.height=H*dpr;const g=c.getContext('2d');g.scale(dpr,dpr);g.font='10.5px system-ui';
@@ -314,11 +344,11 @@ const y=Y(p);g.setLineDash([4,3]);g.strokeStyle='#e9edf5';g.beginPath();g.moveTo
 OF.sum={nB,nS,bN,aN,r5,r5b,n:OF.tr.length,rg:OF.rg}}
 async function drawOFC(x){const a=x.a;let K,fv;try{K=await chartData(a,CIV);fv=await ofFut(a,CIV)}catch(e){return}
 const c=$('ofc');if(!c||SEL!==a.s)return;
-const F=K.map(k=>({...k}));F[F.length-1].c=x.p;const N=cl_(Math.round(VW.n),15,F.length),eo=cl_(Math.round(VW.off),0,F.length-N),end=F.length-eo,s0=end-N,V=F.slice(s0,end),SG=ofSig(F);
-const panes=['price',lay('ofdl')&&'delta',lay('ofcv')&&'cvd',lay('ofoi')&&'oi'].filter(Boolean),hw={price:1.5,delta:1,cvd:1,oi:.8},tw=sum(panes.map(q=>hw[q])),fac=[1,1.25,1.5,1.9][lay('h')]||1;
-c.style.height=Math.round((150+105*(panes.length-1))*fac)+'px';
+const F=K.map(k=>({...k}));F[F.length-1].c=x.p;const N=cl_(Math.round(VW.n),15,F.length),eo=cl_(Math.round(VW.off),-Math.round(N*.75),F.length-N),fut=Math.max(0,-eo),end=F.length-Math.max(0,eo),s0=end-(N-fut),V=F.slice(s0,end),SG=ofSig(F);
+const panes=['price',lay('ofdl')&&'delta',lay('ofcv')&&'cvd',lay('ofoi')&&'oi'].filter(Boolean),hw={price:1.5,delta:1,cvd:1,oi:.8},tw=sum(panes.map(q=>hw[q])),fac=[.85,1,1.25,1.7][lay('h')]||1;
+c.style.height=Math.round((200+120*(panes.length-1))*fac)+'px';
 const dpr=devicePixelRatio||1,Wd=c.clientWidth,Ht=c.clientHeight;c.width=Wd*dpr;c.height=Ht*dpr;const g=c.getContext('2d');g.scale(dpr,dpr);g.font='10.5px system-ui';g.lineWidth=1;
-const L=6,Rr=70,B=16,cw=(Wd-L-Rr)/V.length,X=i=>L+i*cw+cw/2,ivm=IVMS[CIV],hg=Ht-B,pb={};let acc=0;panes.forEach(q=>{pb[q]=[acc/tw*hg,(acc+hw[q])/tw*hg];acc+=hw[q]});
+const L=6,Rr=70,B=16,cw=(Wd-L-Rr)/N,X=i=>L+i*cw+cw/2,ivm=IVMS[CIV],hg=Ht-B,pb={};let acc=0;panes.forEach(q=>{pb[q]=[acc/tw*hg,(acc+hw[q])/tw*hg];acc+=hw[q]});
 const xt=t=>{let i=-1;for(let j=0;j<V.length;j++){if(V[j].t<=t)i=j;else break}if(i<0||t>=V[i].t+ivm)return null;return L+i*cw+(t-V[i].t)/ivm*cw};
 const pane=(k,title)=>{g.strokeStyle='#25314a';g.beginPath();g.moveTo(L,pb[k][1]);g.lineTo(Wd-Rr,pb[k][1]);g.stroke();g.fillStyle='#8e9bb3';g.fillText(title,L+4,pb[k][0]+11)};
 const msg=(k,t)=>{g.fillStyle='#5b6882';g.textAlign='center';g.fillText(t,(L+Wd-Rr)/2,(pb[k][0]+pb[k][1])/2+4);g.textAlign='left'};
@@ -326,7 +356,7 @@ const dl=V.map(k=>2*k.tb-k.v),dm=Math.max(1e-12,...dl.map(Math.abs)),cs=SG.cs,ba
 {const y0=pb.price[0]+14,y1=pb.price[1]-4;let lo=Math.min(...V.map(k=>k.l)),hi=Math.max(...V.map(k=>k.h));const pd_=(hi-lo)*.06||1;lo-=pd_;hi+=pd_;const Y=v=>y0+(hi-v)/(hi-lo)*(y1-y0);pane('price','Price');
 const RL=[];if(lay('ofpv'))[[x.vww,'VWAP W','#f78c6b'],[x.vp30&&x.vp30.poc,'POC','#ffffff'],[x.vp30&&x.vp30.val,'VAL','#a0a8b8'],[x.vp30&&x.vp30.vah,'VAH','#a0a8b8'],[x.sup[0]&&x.sup[0].v,'S1','#3fb6a8'],[x.res[0]&&x.res[0].v,'R1','#e5677a']].forEach(([v,t,col])=>{if(v==null||v<lo||v>hi)return;g.setLineDash([2,4]);g.strokeStyle=col;g.globalAlpha=.75;g.beginPath();g.moveTo(L,Y(v));g.lineTo(Wd-Rr,Y(v));g.stroke();g.setLineDash([]);g.globalAlpha=1;RL.push({y:Y(v),txt:t+' '+f(v),col,pri:t[0]==='S'||t[0]==='R'?6:4})});
 V.forEach((k,i)=>{const u=k.c>=k.o;g.strokeStyle=g.fillStyle=u?'#3fb6a8':'#e5677a';g.beginPath();g.moveTo(X(i),Y(k.h));g.lineTo(X(i),Y(k.l));g.stroke();g.fillRect(X(i)-cw*.35,Math.min(Y(k.o),Y(k.c)),Math.max(1,cw*.7),Math.max(1,Math.abs(Y(k.o)-Y(k.c))))});
-if(lay('ofsg'))SG.sg.filter(q=>q.i>=s0&&q.i<end).forEach(q=>{const i=q.i-s0,k=V[i],up=q.dir>0,xx=X(i),yy=up?Y(k.l)+8:Y(k.h)-8,col=up?'#3fb6a8':'#e5677a';g.fillStyle=col;g.beginPath();if(up){g.moveTo(xx,yy-6);g.lineTo(xx-5,yy+3);g.lineTo(xx+5,yy+3)}else{g.moveTo(xx,yy+6);g.lineTo(xx-5,yy-3);g.lineTo(xx+5,yy-3)}g.fill();g.font='9px system-ui';g.textAlign='center';g.fillText(OFT[q.type],xx,up?yy+13:yy-8);g.textAlign='left';g.font='10.5px system-ui'});
+if(lay('ofsg'))SG.sg.filter(q=>q.i>=s0&&q.i<s0+V.length&&(q.g!=='C'||lay('ofc3'))).forEach(q=>{const i=q.i-s0,k=V[i],up=q.dir>0,xx=X(i),yy=up?Y(k.l)+8:Y(k.h)-8,col=up?'#3fb6a8':'#e5677a';g.fillStyle=col;g.strokeStyle=col;g.beginPath();if(up){g.moveTo(xx,yy-6);g.lineTo(xx-5,yy+3);g.lineTo(xx+5,yy+3)}else{g.moveTo(xx,yy+6);g.lineTo(xx-5,yy-3);g.lineTo(xx+5,yy-3)}g.closePath();q.g==='P'?g.stroke():g.fill();g.font='9px system-ui';g.textAlign='center';g.fillText(OFT[q.type]+q.g,xx,up?yy+13:yy-8);g.textAlign='left';g.font='10.5px system-ui'});
 const py=Y(x.p);g.fillStyle='#e9edf5';g.fillRect(Wd-Rr,py-8,Rr,16);g.fillStyle='#0e1420';g.fillText(f(x.p),Wd-Rr+4,py+4);g.fillStyle='#8e9bb3';g.fillText(f(hi),Wd-Rr+4,y0+8);g.fillText(f(lo),Wd-Rr+4,y1);
 drawLabels(g,RL,Wd-Rr-3,true,y0+4,y1-4)}
 if(pb.delta){const y0=pb.delta[0]+14,y1=pb.delta[1]-3,zy=(y0+y1)/2;pane('delta','Delta: spot taker buy − sell (bars)'+(lay('ofperp')?' and perp (line)':''));g.strokeStyle='#25314a';g.beginPath();g.moveTo(L,zy);g.lineTo(Wd-Rr,zy);g.stroke();
@@ -344,19 +374,23 @@ if(xi>=0){g.strokeStyle='rgba(233,237,245,.55)';g.setLineDash([3,3]);g.beginPath
 const k=V[xi],at=a=>a&&a.find(q=>q.t>=k.t&&q.t<k.t+ivm),pt=fv&&at(fv.tk),po=fv&&at(fv.oi),sn=SG.sg.filter(q=>q.i===s0+xi).map(q=>q.type).join(', ');
 if(x2)x2.innerHTML=`<b>${new Date(k.t).toLocaleString([],intra?{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}:{year:'numeric',month:'short',day:'numeric'})}</b> · Spot delta ${fmtK(dl[xi])} · CVD ${fmtK(cv[xi])}${pt?` · Perp delta ${fmtK(pt.b-pt.s)}`:''}${po?` · OI ${fmtK(po.v)}`:''}${sn?` · Signal: ${sn}`:''} <button data-xhc="1" style="padding:1px 7px;font-size:11px">Clear</button>`}else if(x2)x2.textContent='Tap or hover a candle to read its order-flow values.'}
 // recommendation, summary cards, track record
-const T_=ofTrack(F,SG),call=ofCall(x,F,SG,fv),oc_=$('ofcall');if(T_.all&&T_.all.n>=15&&T_.all.hit<.45){call.conf=Math.max(45,call.conf-8);call.txt+=' Order-flow signals on this interval hit under 45% historically, so confidence is reduced.'}
-if(oc_){const col=call.act.includes('BUY')?'#3fb6a8':call.act.includes('SELL')?'#e5677a':'#5b6882';oc_.innerHTML=`<div class="k" style="border-left:3px solid ${col}"><b>Order-flow signal</b><span class="pill" style="background:${col};color:#0e1420;font-weight:600">${call.act}</span> <span class="n" style="color:var(--go)">${call.conf}% confidence</span> <span class="mu">score ${call.score.toFixed(2)}</span><div style="margin-top:6px">${call.txt}</div><div class="mu" style="margin-top:4px">${call.why.length?'Because: '+call.why.join('; ')+'.':'No strong driver right now.'}</div></div>`}
+let pool=null,mtf=null;try{[pool,mtf]=await Promise.all([ofPool(a),ofMTF(a)])}catch(e){}
+const call=ofCall(x,F,SG,fv,{pool,mtf}),oc_=$('ofcall');OFSC[a.s]={score:call.score,act:call.act,t:Date.now()};try{ofLog(a,x,call)}catch(e){}
+if(oc_){const col=call.act.includes('BUY')?'#3fb6a8':call.act.includes('SELL')?'#e5677a':'#5b6882',gc=call.grade==='A'?'#3fb6a8':call.grade==='B'?'#e8b04a':'#5b6882';
+oc_.innerHTML=`<div class="k" style="border-left:3px solid ${col}"><b>Order-flow signal</b><span class="pill" style="background:${col};color:#0e1420;font-weight:600">${call.act}</span> <span class="pill" style="background:${gc};color:#0e1420">Grade ${call.grade}${call.verified?' · verified':''}</span> ${call.conf==null?'':`<span class="n" style="color:var(--go)">${call.conf}% estimated win probability</span>`}<div style="margin-top:6px">${call.txt}</div><div class="mu" style="margin-top:4px">${call.why.length?'Because: '+call.why.join('; ')+'.':'No strong driver right now.'}</div><div class="mu">${call.agree} of ${call.fams} signal families agree${call.near?' · price is at the '+call.near:' · not at a key level'}</div></div>`}
 const so=$('ofs');if(so){const n20=Math.min(20,V.length),ds=sum(dl.slice(-n20)),vs=sum(V.slice(-n20).map(k=>k.v))||1,pr=V[V.length-1].c/V[0].c-1,cvE=cv[cv.length-1],wv=sum(V.map(k=>k.v))||1,
 div=Math.abs(pr)>x.atrp*.5&&Math.abs(cvE)/wv>.02&&Math.sign(pr)!==Math.sign(cvE),S=OF.sum||{},tot=(S.bN||0)+(S.aN||0),tape=(S.nB||0)+(S.nS||0);let pdl='n/a';if(fv&&fv.tk.length)pdl=fmtK(sum(fv.tk.slice(-20).map(q=>q.b-q.s)));
 so.innerHTML=`<div class="k"><b>Spot delta (last ${n20} bars)</b>${fmtK(ds)} (${(ds/vs*100).toFixed(1)}% of volume) · ${ds>0?'buyers':'sellers'} in control</div>
 <div class="k"><b>Price vs CVD in view</b>${div?(pr>0?'<span class="dn">Bearish divergence: price up, CVD down</span>':'<span class="up">Bullish divergence: price down, CVD up</span>'):'Price and CVD move together'}<div class="mu">Perp delta (last 20): ${pdl}</div></div>
 <div class="k"><b>Tape (live)</b>${tape?`Buys ${(S.nB/tape*100).toFixed(0)}% of ${S.n} recent trades${S.r5?` · last 5 min ${(S.r5b/S.r5*100).toFixed(0)}% buys`:''}`:'Waiting for trades'}<div class="mu">Depth ±${((S.rg||OF.rg)*100).toFixed(1)}%: ${tot?`bids ${(S.bN/tot*100).toFixed(0)}% / asks ${(S.aN/tot*100).toFixed(0)}%`:'n/a'}</div></div>
 <div class="k"><b>Open interest</b>${oiTxt}</div>`}
-const ot=$('oft');if(ot){const pr=k=>T_[k]?`${k} ${Math.round(T_[k].hit*100)}% (n=${T_[k].n})`:null,parts=['ABS','DIV','BRK'].map(pr).filter(Boolean);ot.textContent=T_.all?`Track record on this interval (last ${F.length} bars, 5-bar hold, after 0.1% costs): ${parts.join(' · ')} · all ${Math.round(T_.all.hit*100)}% hit, avg ${pc(T_.all.avg*100)} per signal. Small samples; treat as context only.`:'No completed order-flow signals on this interval yet.'}}
+const ot=$('oft');if(ot){const fm_=(n,s)=>s?`${n}-grade: ${s.n} confirmed signals, ${Math.round(s.hit*100)}% hit (95% lower bound ${Math.round(s.lb*100)}%), avg ${pc(s.avg*100)}, halves ${s.h1>0?'✓':'✗'}${s.h2>0?'✓':'✗'} → <b>${s.verified?'VERIFIED':s.cand?'candidate':'unverified'}</b>`:`${n}-grade: no completed signals`,L_=ofLive(a.s);
+ot.innerHTML=`<div class="k"><b>Signal verification</b><div class="mu">Pooled over 1h, 4h and 1d candles. A signal counts only after the next bar confirms it; 5-bar hold, 0.1% costs. VERIFIED needs 20+ signals, a 95% lower bound above 50%, positive average and both halves profitable.</div><div style="margin-top:4px">${fm_('A',pool&&pool.A)}</div><div>${fm_('B',pool&&pool.B)}</div><div class="mu" style="margin-top:4px">Live forward record of calls on this device: ${L_?`${L_.n} scored, ${Math.round(L_.hit*100)}% hit, avg score ${Math.round(L_.q)}/100`:'none scored yet (each is scored after 24 hours)'} · learned strictness +${ofOff(a.s).toFixed(2)}</div></div>`}}
+
 let XH=null;
 const chh=()=>{const k=lay('h');return k<3?CHH[k]:Math.round((typeof innerHeight==='number'?innerHeight:800)*.78)};
-function setXH(e,tap){const c=e.target,K=CH[SEL+CIV]&&CH[SEL+CIV].K;if(!K||!c||!c.getBoundingClientRect)return;const N=cl_(Math.round(VW.n),15,K.length),eo=cl_(Math.round(VW.off),0,K.length-N),i=Math.floor((e.clientX-c.getBoundingClientRect().left-6)/((c.clientWidth-76)/N));
-if(i<0||i>=N){XH=null}else{const t=K[K.length-eo-N+i].t;XH=(tap&&XH===t)?null:t}redraw()}
+function setXH(e,tap){const c=e.target,K=CH[SEL+CIV]&&CH[SEL+CIV].K;if(!K||!c||!c.getBoundingClientRect)return;const N=cl_(Math.round(VW.n),15,K.length),eo=cl_(Math.round(VW.off),-Math.round(N*.75),K.length-N),fut=Math.max(0,-eo),i=Math.floor((e.clientX-c.getBoundingClientRect().left-6)/((c.clientWidth-76)/N));
+if(i<0||i>=N-fut){XH=null}else{const t=K[K.length-Math.max(0,eo)-(N-fut)+i].t;XH=(tap&&XH===t)?null:t}redraw()}
 const AL=JSON.parse(localStorage.getItem('cid_al')||'{"in":{},"t":{},"log":[]}');
 function notify(m){const b=document.createElement('div');b.className='card al';b.innerHTML=m+' <button>Dismiss</button>';b.querySelector('button').onclick=()=>b.remove();$('al').prepend(b);
 if(CFG.al&&'Notification'in window&&Notification.permission==='granted'){try{new Notification('Zone alert',{body:m,icon:'icon.svg'})}catch(e){navigator.serviceWorker&&navigator.serviceWorker.ready.then(r=>r.showNotification('Zone alert',{body:m,icon:'icon.svg'}))}}}
@@ -394,13 +428,13 @@ async function chartData(a,iv){const k=a.s+iv,c=CH[k];if(c&&Date.now()-c.t<TTL[i
 async function drawChart(x){let K;try{K=await chartData(x.a,CIV)}catch(e){return}
 const c=$('cv');if(!c||SEL!==x.a.s)return;
 const F=K.map(k=>({...k})),Ln=F[F.length-1];Ln.c=x.p;Ln.h=Math.max(Ln.h,x.p);Ln.l=Math.min(Ln.l,x.p);
-const cl=F.map(k=>k.c),N=cl_(Math.round(VW.n),15,F.length),eo=cl_(Math.round(VW.off),0,F.length-N),V=F.slice(F.length-eo-N,F.length-eo),off=F.length-eo-N,dpr=devicePixelRatio||1,Wd=c.clientWidth,Ht=c.clientHeight;
+const cl=F.map(k=>k.c),N=cl_(Math.round(VW.n),15,F.length),eo=cl_(Math.round(VW.off),-Math.round(N*.75),F.length-N),fut=Math.max(0,-eo),endI=F.length-Math.max(0,eo),V=F.slice(endI-(N-fut),endI),off=endI-(N-fut),dpr=devicePixelRatio||1,Wd=c.clientWidth,Ht=c.clientHeight;
 VW.n=N;VW.off=eo;c.width=Wd*dpr;c.height=Ht*dpr;const g=c.getContext('2d');g.scale(dpr,dpr);
 let lo=Math.min(...V.map(k=>k.l)),hi=Math.max(...V.map(k=>k.h));const rg=(hi-lo)||x.p*.01,u=Math.min(x.atr,.25*rg),ON=lay;
 const zn=ON('zones')?[...x.sup.slice(0,2).map((l,i)=>({...l,t:'BUY ZONE '+(i+1),c:'63,182,168',a:i?.07:.15,b0:-.5*u,b1:.25*u})),...x.res.slice(0,2).map((l,i)=>({...l,t:'SELL ZONE '+(i+1),c:'229,103,122',a:i?.07:.15,b0:-.25*u,b1:.5*u}))]:[];
 zn.forEach(l=>{if(l.v>lo-rg&&l.v<hi+rg){lo=Math.min(lo,l.v+l.b0);hi=Math.max(hi,l.v+l.b1)}});
 const pad=(hi-lo)*.04;lo-=pad;hi+=pad;{const r0=hi-lo,md=(lo+hi)/2+VW.pc*r0,hf=r0/2/VW.pz;lo=md-hf;hi=md+hf}
-const L=6,Rr=70,T=6,B=18,cw=(Wd-L-Rr)/V.length,Y=v=>T+(hi-v)/(hi-lo)*(Ht-T-B),X=i=>L+i*cw+cw/2;
+const L=6,Rr=70,T=6,B=18,cw=(Wd-L-Rr)/N,Y=v=>T+(hi-v)/(hi-lo)*(Ht-T-B),X=i=>L+i*cw+cw/2;
 g.font='10.5px system-ui';g.lineWidth=1;g.strokeStyle='#25314a';g.fillStyle='#8e9bb3';
 for(let i=0;i<=5;i++){const v=lo+(hi-lo)*i/5,y=Y(v);g.beginPath();g.moveTo(L,y);g.lineTo(Wd-Rr,y);g.stroke();g.fillText(f(v),Wd-Rr+4,y+4)}
 const intra=['5m','15m','1h','4h'].includes(CIV);[0,.33,.66,.98].forEach(q=>{const k=V[Math.floor((V.length-1)*q)];g.fillStyle='#8e9bb3';g.fillText(new Date(k.t).toLocaleString([],intra?{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}:{year:'2-digit',month:'short',day:'numeric'}),L+q*(Wd-Rr-L)-(q>.9?90:0),Ht-4)});
@@ -419,6 +453,7 @@ const P=ON('pos')?posAct(x.a,x):null;
 if(P)[[P.e,'Entry '+f(P.e)+' ('+pc(P.pnl*100)+')','#ffffff',[]],[P.tp1,'Target 1 '+f(P.tp1),'#3fb6a8',[3,3]],[P.tp2,'Target 2 '+f(P.tp2),'#3fb6a8',[3,3]],[P.stop,'Stop '+f(P.stop),'#e5677a',[3,3]]].forEach(([v,t,col,d])=>line(v,t,col,9,{w:1.4,a:.95,dash:d}));
 if(x.p<lo||x.p>hi)RL.push({y:x.p>hi?T+8:Ht-B-8,txt:(x.p>hi?'▲ ':'▼ ')+'Price '+f(x.p),col:'#e9edf5',pri:10});
 // ---- draw: shading and bands, lines, candles, MWA ----
+if(fut>0){const fx=X(V.length-1)+cw/2;g.fillStyle='rgba(255,255,255,.02)';g.fillRect(fx,T,Wd-Rr-fx,Ht-T-B);g.fillStyle='#5b6882';g.fillText('future →',fx+4,Ht-B-4)}
 if(ON('vp')&&x.vp30){const a=Math.max(lo,x.vp30.val),b=Math.min(hi,x.vp30.vah);if(b>a){g.fillStyle='rgba(160,168,184,.06)';g.fillRect(L,Y(b),Wd-Rr-L,Y(a)-Y(b))}}
 zn.forEach(l=>{const a0=l.v+l.b0,a1=l.v+l.b1;if(a1<lo||a0>hi)return;g.fillStyle=`rgba(${l.c},${l.a})`;g.fillRect(L,Y(a1),Wd-Rr-L,Math.max(2,Y(a0)-Y(a1)));LL.push({y:Y(a1)+8,txt:l.t,col:`rgb(${l.c})`,pri:7})});
 LN.forEach(o=>{g.setLineDash(o.dash||[]);g.globalAlpha=o.a||.8;g.strokeStyle=o.col;g.lineWidth=o.w||1;g.beginPath();g.moveTo(L,Y(o.v));g.lineTo(Wd-Rr,Y(o.v));g.stroke()});g.setLineDash([]);g.globalAlpha=1;g.lineWidth=1;
@@ -442,6 +477,7 @@ const nt=$('cvn');if(nt){const ms=[50,100,200].filter(n=>F.length<n);nt.textCont
 
 document.addEventListener('click',e=>{const fbn=e.target.closest('[data-fib]');if(fbn){CFG.fib={auto:'on',on:'off',off:'auto'}[CFG.fib||'auto'];localStorage.setItem('cid_cfg',JSON.stringify(CFG));render();return}
 const iv=e.target.closest('[data-iv]');if(iv){CIV=iv.dataset.iv;VW={...VW0};render();return}
+const fa=document.activeElement;if(fa&&fa.blur&&!e.target.closest('input,select,textarea'))fa.blur();
 const xcb=e.target.closest('[data-xhc]');if(xcb){XH=null;redraw();return}
 const lyb=e.target.closest('[data-ly]');if(lyb){const k=lyb.dataset.ly;CFG.lay=CFG.lay||{};CFG.lay[k]=k==='h'?((lay('h')+1)%4):(lay(k)?0:1);cfgSave();render();return}
 const lpb=e.target.closest('[data-lp]');if(lpb){const ks=['mwa','dmwa','zones','sr','walls','vwap','vp','pos','sig','gb'],on={clean:['mwa','zones','sr','pos','sig','gb'],all:ks,none:[]}[lpb.dataset.lp];CFG.lay=CFG.lay||{};ks.forEach(k=>{CFG.lay[k]=on.includes(k)?1:0});cfgSave();render();return}
@@ -471,7 +507,7 @@ document.addEventListener('wheel',e=>{const id=e.target.id;if(id!=='cv'&&id!=='a
 $('rf').onclick=loadAll;addEventListener('resize',()=>{const x=AN[SEL];if(x)drawChart(x)});
 let SRV=null;
 async function srvLoad(){try{const cr=await fetch('config.json?t='+Date.now());if(cr.ok){const c=await cr.json();if(!CFG.list&&Array.isArray(c.assets)&&c.assets.length)saveList(c.assets,1)}}catch(e){}
-if(CFG.srv==='off')return;try{const [s,l]=await Promise.all([fetch('data/state.json?t='+Date.now()),fetch('data/latest.json?t='+Date.now())]);if(!s.ok||!l.ok)return;const S=await s.json(),Lt=await l.json();if(S&&S.cid1){ST_=S.cid1;ST_.rec=ST_.rec||[];ST_.bias=ST_.bias||{};Object.assign(AL,S.cid_al||{});SRV={S,L:Lt};save()}}catch(e){}}
+if(CFG.srv==='off')return;try{const [s,l]=await Promise.all([fetch('data/state.json?t='+Date.now()),fetch('data/latest.json?t='+Date.now())]);if(!s.ok||!l.ok)return;const S=await s.json(),Lt=await l.json();if(S&&S.cid1){const loc=ST_;ST_=S.cid1;ST_.rec=ST_.rec||[];if(loc.of)ST_.of=loc.of;if(loc.pos&&(!ST_.pos||(ST_.pos.log||[]).length<loc.pos.log.length))ST_.pos=loc.pos;ST_.bias=ST_.bias||{};Object.assign(AL,S.cid_al||{});SRV={S,L:Lt};save()}}catch(e){}}
 function srvHtml(){if(!SRV)return'<div class="card mu"><b>Server loop:</b> not connected. Set up the GitHub Action (see README) so signals keep being scored and alerts keep firing while this page is closed.</div>';
 const L=SRV.L,age=(Date.now()-new Date(L.updated))/36e5,rows=Object.keys(L.assets).map(s=>{const o=L.assets[s],g=o.G;return`<tr><td>${s}</td><td>${g?sgp(g.ST.s):'-'}</td><td>${g?sgp(g.MT.s):'-'}</td><td>${o.live.ST}</td><td>${o.live.MT}</td><td>${o.live.LT}</td></tr>`}).join('');
 return`<div class="card sc"><h2>Server loop</h2><div class="mu" style="margin-bottom:6px">Last run ${new Date(L.updated).toLocaleString()} (${age<1?Math.round(age*60)+' min':age.toFixed(1)+' h'} ago)${age>3?' — <span class="dn">stale, check the Action</span>':''}${L.errors&&L.errors.length?' · '+L.errors.length+' asset error(s)':''}. Scoring history and tuned thresholds on this page come from the server state.</div><table><tr><th>Asset</th><th>G-ST</th><th>G-MT</th><th>Live ST</th><th>Live MT</th><th>Live LT</th></tr>${rows}</table></div>`}
