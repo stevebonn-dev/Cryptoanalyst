@@ -58,7 +58,7 @@ async function run(opts = {}) {
   const driver = `(async()=>{
     A=(CFG.list||DEF).map(mk);const now=Date.now(),out={},errs=[],notes=[];notify=m=>{notes.push(m)};
     for(const a of A){try{
-      RAW[a.s]=await fetchAsset(a);
+      RAW[a.s]=await fetchAsset(a);if(typeof patLoad==='function'){try{await patLoad(a)}catch(e){}}
       const x=analyze(a,RAW[a.s],'1d',ST_.bias[a.s]||0);
       feedback(a,x,now);ltTrack(a,x,now);alertCheck(a,x);
       await gRun(a,now,x);
