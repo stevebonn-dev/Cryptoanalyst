@@ -62,7 +62,7 @@ async function run(opts = {}) {
       const x=analyze(a,RAW[a.s],'1d',ST_.bias[a.s]||0);
       feedback(a,x,now);ltTrack(a,x,now);alertCheck(a,x);
       await gRun(a,now,x);
-      const y=analyze(a,RAW[a.s],'1d',ST_.bias[a.s]||0);AN[a.s]=y;if(typeof posTrack==='function')posTrack(a,y,now);const pv=typeof posAct==='function'?posAct(a,y):null;
+      const y=analyze(a,RAW[a.s],'1d',ST_.bias[a.s]||0);AN[a.s]=y;if(typeof posTrack==='function')posTrack(a,y,now);if(typeof advLog==='function'){try{advLog(a,y,now)}catch(e){}}const pv=typeof posAct==='function'?posAct(a,y):null;
       const g=GX[a.s],b=BT[a.s]&&BT[a.s].res,sl=q=>({g:q.g,th:q.th,s:q.s,cf:q.cf}),bs=q=>({score:q.OOS.score,rating:rate(q.OOS),oos:q.OOS,fs:q.fs,v:q.v,fib:q.fib});
       out[a.s]={p:y.p,chg:y.chg,s:y.s,cf:y.cf,pUp:y.pUp,derivs:y.topr!=null,
         G:g?{ST:sl(g.ST),MT:sl(g.MT)}:null,bt:b?{days:b.days,ST:bs(b.ST),MT:bs(b.MT)}:null,
