@@ -28,7 +28,7 @@ async function run(opts = {}) {
   const store = {};
   if (state.cid1) store.cid1 = JSON.stringify(state.cid1);
   if (state.cid_al) store.cid_al = JSON.stringify(state.cid_al);
-  store.cid_cfg = JSON.stringify({ list: cfg.assets || undefined, fib: cfg.fib || 'auto', gk: env.GLASSNODE_KEY || undefined, pos: cfg.positions || undefined });
+  store.cid_cfg = JSON.stringify({ list: cfg.assets || undefined, fib: cfg.fib || 'auto', gk: env.GLASSNODE_KEY || undefined, pos: cfg.positions || undefined, pfInit: cfg.pfInit || undefined });
 
   if (!fs.existsSync(path.join(root, 'index.html'))) throw new Error('index.html not found in the repo root (' + root + '); the loop reads the algorithm from it');
   // connectivity check: shows in the Actions log which Binance hosts this runner can reach
@@ -58,7 +58,7 @@ async function run(opts = {}) {
   const driver = `(async()=>{
     A=(CFG.list||DEF).map(mk);const now=Date.now(),out={},errs=[],notes=[];notify=m=>{notes.push(m)};
     for(const a of A){try{
-      RAW[a.s]=await fetchAsset(a);if(typeof patLoad==='function'){try{await patLoad(a)}catch(e){}}if(typeof sfpLoad==='function'){try{await sfpLoad(a)}catch(e){}}
+      RAW[a.s]=await fetchAsset(a);if(typeof patLoad==='function'){try{await patLoad(a)}catch(e){}}if(typeof sfpLoad==='function'){try{await sfpLoad(a)}catch(e){}}if(typeof volLoad==='function'){try{await volLoad(a)}catch(e){}}
       const x=analyze(a,RAW[a.s],'1d',ST_.bias[a.s]||0);
       feedback(a,x,now);ltTrack(a,x,now);alertCheck(a,x);
       await gRun(a,now,x);
@@ -69,6 +69,7 @@ async function run(opts = {}) {
         live:{ST:liveQ(a.s,'ST'),MT:liveQ(a.s,'MT'),LT:ltQ(a.s)},pos:pv?{act:pv.act,pnl:pv.pnl}:null,sup:y.sup.slice(0,3),res:y.res.slice(0,3)};
       for(const r of ((ST_.g&&ST_.g.sig)||[]))if(r.s===a.s&&r.t===now)notes.push(a.s+' G-'+r.hz+' '+(r.dir>0?'BUY':'SELL')+' @ '+f(r.p)+(r.cf>0?' (derivatives confirm)':r.cf<0?' (derivatives conflict)':''));
     }catch(e){errs.push(a.s+': '+e.message)}}
+    if(typeof pfUpdate==='function'){try{pfUpdate(now)}catch(e){errs.push('portfolio: '+e.message)}}
     return{out,errs,notes}})()`;
   const res = await vm.runInContext(driver, ctx);
   if (!Object.keys(res.out).length) throw new Error('No asset could be loaded: ' + res.errs.join('; '));
