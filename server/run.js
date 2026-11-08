@@ -58,7 +58,7 @@ async function run(opts = {}) {
   const driver = `(async()=>{
     A=(CFG.list||DEF).map(mk);const now=Date.now(),out={},errs=[],notes=[];notify=m=>{notes.push(m)};
     for(const a of A){try{
-      RAW[a.s]=await fetchAsset(a);if(typeof patLoad==='function'){try{await patLoad(a)}catch(e){}}if(typeof sfpLoad==='function'){try{await sfpLoad(a)}catch(e){}}if(typeof volLoad==='function'){try{await volLoad(a)}catch(e){}}
+      RAW[a.s]=await fetchAsset(a);if(typeof patLoad==='function'){try{await patLoad(a)}catch(e){}}if(typeof sfpLoad==='function'){try{await sfpLoad(a)}catch(e){}}if(typeof volLoad==='function'){try{await volLoad(a)}catch(e){}}if(typeof chainLoad==='function'){try{await chainLoad(a)}catch(e){}}
       const x=analyze(a,RAW[a.s],'1d',ST_.bias[a.s]||0);
       feedback(a,x,now);ltTrack(a,x,now);alertCheck(a,x);
       await gRun(a,now,x);
@@ -69,8 +69,12 @@ async function run(opts = {}) {
         live:{ST:liveQ(a.s,'ST'),MT:liveQ(a.s,'MT'),LT:ltQ(a.s)},pos:pv?{act:pv.act,pnl:pv.pnl}:null,sup:y.sup.slice(0,3),res:y.res.slice(0,3)};
       for(const r of ((ST_.g&&ST_.g.sig)||[]))if(r.s===a.s&&r.t===now)notes.push(a.s+' G-'+r.hz+' '+(r.dir>0?'BUY':'SELL')+' @ '+f(r.p)+(r.cf>0?' (derivatives confirm)':r.cf<0?' (derivatives conflict)':''));
     }catch(e){errs.push(a.s+': '+e.message)}}
+    if(typeof ctxLoad==='function'){try{await ctxLoad()}catch(e){}}
     if(typeof pfUpdate==='function'){try{pfUpdate(now)}catch(e){errs.push('portfolio: '+e.message)}}
-    return{out,errs,notes}})()`;
+    const snap={t:now,a:{}},L=v=>v&&v.length?v[v.length-1]:null;
+    for(const a of A){const R=RAW[a.s];if(!R)continue;const fr=L(R.fr),oi=L(R.oi),tl=L(R.tl),gl=L(R.gl),tk=L(R.tk);let imb=null;try{const d=R.d,mid=(+d.bids[0][0]+ +d.asks[0][0])/2,bN=sum(d.bids.filter(b=>+b[0]>=mid*.99).map(b=>+b[0]*+b[1])),aN=sum(d.asks.filter(b=>+b[0]<=mid*1.01).map(b=>+b[0]*+b[1]));imb=(bN-aN)/(bN+aN||1)}catch(e){}
+      snap.a[a.s]={p:+R.t.lastPrice,fr:fr?+fr.fundingRate:null,oi:oi?+oi.sumOpenInterestValue:null,tl:tl?+tl.longShortRatio:null,gl:gl?+gl.longShortRatio:null,tk:tk?+tk.buySellRatio:null,pm:R.pm&&+R.pm.indexPrice?(+R.pm.markPrice/+R.pm.indexPrice-1)*100:null,imb}}
+    return{out,errs,notes,snap}})()`;
   const res = await vm.runInContext(driver, ctx);
   if (!Object.keys(res.out).length) throw new Error('No asset could be loaded: ' + res.errs.join('; '));
 
@@ -82,6 +86,17 @@ async function run(opts = {}) {
     cid1: JSON.parse(store.cid1 || '{"rec":[],"bias":{}}'), cid_al: store.cid_al ? JSON.parse(store.cid_al) : null
   }));
 
+  if (res.snap) {   // hourly log of derivatives and depth readings, so order-flow signals can be backtested later
+    const day = new Date(res.snap.t).toISOString().slice(0, 10), dir = path.join(root, 'data/hist');
+    fs.mkdirSync(dir, { recursive: true });
+    const fp = path.join(dir, day + '.json');
+    let arr = []; try { arr = JSON.parse(fs.readFileSync(fp, 'utf8')); } catch (e) {}
+    arr.push(res.snap); fs.writeFileSync(fp, JSON.stringify(arr));
+    let ix = { days: [] }; try { ix = JSON.parse(fs.readFileSync(path.join(dir, 'index.json'), 'utf8')); } catch (e) {}
+    ix.days = [...new Set([...ix.days, day])].sort();
+    while (ix.days.length > 150) { const d = ix.days.shift(); try { fs.unlinkSync(path.join(dir, d + '.json')); } catch (e) {} }
+    fs.writeFileSync(path.join(dir, 'index.json'), JSON.stringify(ix));
+  }
   const topic = env.NTFY_TOPIC;
   if (topic && res.notes.length) {
     for (const n of [...new Set(res.notes)]) {
