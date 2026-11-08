@@ -21,3 +21,25 @@ server/run.js
 - GitHub may pause scheduled workflows after about 60 days without repository activity; re-enable them in the Actions tab if needed.
 - Each run makes a commit, so history grows. Change the cron in loop.yml (for example '7 */4 * * *') to commit less often.
 - Not financial advice. Backtests and scores do not guarantee future results.
+
+## Keeping the server's asset list and positions in step with the page
+In the page, Settings > "Sync to server (GitHub)": enter owner/repo, branch and a fine-grained token
+(Contents: read/write on this repo only; add Actions: read/write if you want it to start the loop right away).
+After that, adding or removing an asset (and, if you tick the box, saving an entry price) updates config.json in the repo,
+and the next server run analyses exactly those assets. Entry prices in config.json are public if the repo is public.
+
+## Free on-chain data (instead of Glassnode)
+The dashboard now reads these free, key-free sources: Coin Metrics Community API (BTC and ETH: MVRV, active addresses, transactions),
+DefiLlama (value locked and stablecoins per network for ETH, SOL, XRP, SUI, SEI, HBAR), alternative.me (Fear and Greed), CoinGecko (dominance),
+Deribit (Bitcoin implied volatility), Binance (ETH/BTC, premium). Exchange netflow is not free anywhere; the Glassnode key option stays available.
+Coin Metrics Community data is licensed for non-commercial use and rate limited; if a source cannot be reached, its rows show n/a.
+
+## Event calendar
+Settings > Event calendar: one event per line as YYYY-MM-DD|name. It is pre-filled with FOMC decision days (2027 dates are tentative).
+Within 48 hours of an event the sample portfolio reduces exposure by 20% and the reports add a warning.
+
+## Derivatives history
+The server loop saves an hourly snapshot to data/hist/ (kept for 150 days). GitHub's US runners cannot reach Binance futures, so those
+fields are empty there. Optional fix: deploy worker/logger.js as a Cloudflare Worker with a cron trigger of "0 * * * *" and these variables:
+REPO (owner/repo), GITHUB_TOKEN (fine-grained, Contents read/write on this repo, set as a secret), optional BRANCH and SYMBOLS.
+The page merges data/hist/derivs/ with data/hist/ automatically. Model health then shows how each logged signal related to the next 24 hours.
