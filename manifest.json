@@ -1,1 +1,18 @@
-{"name":"Crypto Intelligence Dashboard","short_name":"CryptoIntel","start_url":".","scope":".","display":"standalone","background_color":"#0e1420","theme_color":"#0e1420","icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}]}
+{
+  "name": "Master Crypto Intelligence Dashboard",
+  "short_name": "CryptoIntel",
+  "description": "Institutional-grade quantitative crypto market intelligence, Binance Spot feeds, and self-improving feedback loop engine.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#0b0e14",
+  "theme_color": "#0b0e14",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
