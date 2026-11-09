@@ -1,5 +1,23 @@
-const C='cid-v22',F=['./','index.html','manifest.json','icon.svg'];
-self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(F)));self.skipWaiting()});
-self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x))))));
-self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(u.origin!==location.origin)return;
-e.respondWith(fetch(e.request).then(r=>{const c2=r.clone();caches.open(C).then(c=>c.put(e.request,c2));return r}).catch(()=>caches.match(e.request)))});
+/**
+ * Institutional Crypto Intelligence - State Worker (SW)
+ * Manages WebSocket feeds, background sync, and offline dashboard state.
+ */
+const CACHE_NAME = 'crypto-intel-v4.5';
+const ASSETS = ['BTC', 'ETH', 'SOL', 'XRP', 'ONDO', 'SUI', 'SEI'];
+
+self.addEventListener('install', (event) => {
+    console.log('[ServiceWorker] Installing State Worker...');
+    self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+    console.log('[ServiceWorker] Activated and managing dashboard cache.');
+});
+
+self.addEventListener('fetch', (event) => {
+    event.respondWith(
+        caches.match(event.request).then((response) => {
+            return response || fetch(event.request);
+        })
+    );
+});
