@@ -1,5 +1,3 @@
-Here is the complete, fully updated run.py Python backend script. It includes universal asset onboarding, adaptive learning rate coefficients (\alpha = 0.08 for macro anchors, \alpha = 0.12 for high-beta altcoins), the SFP & Failed Auction indicator logic, and the self-improving feedback loop telemetry engine.
-You can copy and paste this code directly into your run.py file in the root directory of your repository:
 """
 Universal Institutional Crypto Intelligence Engine - Run Module
 Dynamically processes assets, learning rates, SFP indicators, and feedback telemetry.
@@ -70,4 +68,3 @@ if __name__ == "__main__":
     # Test execution verification for BTC
     test_log = engine.run_feedback_loop("BTC", 85500.0, 85934.11, "24h")
     print(f"[TELEMETRY TEST] Recorded: {json.dumps(test_log, indent=2)}")
-
