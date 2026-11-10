@@ -28,7 +28,7 @@ jobs:
             pip install numpy pandas requests
           fi
 
-      - name: Execute Crypto Intelligence & Self-Improving Loop Engine
+      - name: Execute Universal Crypto Intelligence & Feedback Loop
         run: |
           python run.py
         env:
