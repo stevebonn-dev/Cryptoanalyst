@@ -1,33 +1,35 @@
 name: G loop
+
 on:
   schedule:
-    - cron: '7 * * * *'
-  workflow_dispatch:
-permissions:
-  contents: write
+    - cron: '0 8,15,22 * * *' # Runs at 08:00, 15:00, and 22:00 CET daily
+  workflow_dispatch: # Allows manual triggering from the GitHub Actions tab
+
 jobs:
   run:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          node-version: 24
-      - name: Check files
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install Dependencies
         run: |
-          ls -la
-          for f in index.html config.json server/run.js; do
-            if [ -f "$f" ]; then echo "found $f"; else echo "MISSING $f"; fi
-          done
-      - name: Run the loop
-        run: node server/run.js
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          else
+            pip install numpy pandas requests
+          fi
+
+      - name: Execute Crypto Intelligence & Self-Improving Loop Engine
+        run: |
+          python run.py
         env:
-          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
-          GLASSNODE_KEY: ${{ secrets.GLASSNODE_KEY }}
-      - name: Commit results
-        run: |
-          git config user.name "g-loop"
-          git config user.email "g-loop@users.noreply.github.com"
-          git add data
-          git diff --cached --quiet || (git commit -m "G loop update" && git push)
+          PYTHONUNBUFFERED: '1'
