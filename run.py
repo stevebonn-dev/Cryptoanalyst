@@ -1,6 +1,6 @@
 """
 Universal Institutional Crypto Intelligence Engine - Run Module
-Incorporating MVRV Valuation, Bitcoin Electrical Production Cost Floor,
+Incorporating Automated Alerts, MVRV Valuation, Electrical Cost Floor,
 SFP Indicators, and Self-Improving Feedback Telemetry.
 """
 import numpy as np
@@ -33,40 +33,50 @@ class UniversalCryptoEngine:
         else:
             return "Overvalued (Euphoria / Distribution Zone)"
 
-    def evaluate_electrical_cost_floor(self, spot_price, electrical_cost=68500.0):
-        """Evaluates spot price proximity to the Bitcoin thermodynamic electrical production floor."""
-        margin_pct = ((spot_price - electrical_cost) / electrical_cost) * 100.0
-        if spot_price <= electrical_cost:
-            status = "Below Electrical Floor (Extreme Miner Capitulation / Generational Buy)"
-        elif margin_pct <= 15.0:
-            status = "Near Thermodynamic Floor (High-Conviction Macro Accumulation)"
-        else:
-            status = "Healthy Margin Above Energy Floor (Sustainable Miner Profitability)"
-        return {
-            "electrical_cost_floor": electrical_cost,
-            "margin_above_floor_pct": round(margin_pct, 2),
-            "energy_status": status
-        }
-
-    def register_asset(self, ticker, market_cap_billions, mvrv_ratio=1.5, electrical_cost=None):
+    def check_institutional_alerts(self, ticker, spot_price):
+        """Evaluates macro bottom signals, MVRV undervaluation, and energy floor breaches."""
         ticker = ticker.upper()
-        is_macro = market_cap_billions >= 50.0
-        alpha = 0.08 if is_macro else 0.12
-        valuation_status = self.evaluate_mvrv_valuation(mvrv_ratio)
-
-        asset_record = {
-            "class": "Macro Anchor" if is_macro else "High-Beta Altcoin",
-            "alpha": alpha,
-            "mvrv": mvrv_ratio,
-            "valuation": valuation_status,
-            "status": "Active"
-        }
-        if electrical_cost is not None:
-            asset_record["electrical_cost_floor"] = float(electrical_cost)
-
-        self.watchlist[ticker] = asset_record
-        print(f"[ONBOARDING] {ticker} registered | MVRV: {mvrv_ratio} ({valuation_status})")
-        return self.watchlist[ticker]
+        if ticker not in self.watchlist:
+            return []
+        
+        asset = self.watchlist[ticker]
+        alerts = []
+        
+        # 1. MVRV Undervaluation / Bottom Alert (< 1.2)
+        mvrv = asset.get("mvrv", 1.5)
+        if mvrv < 1.2:
+            alerts.append({
+                "level": "CRITICAL_OPPORTUNITY",
+                "indicator": "MVRV Ratio",
+                "message": f"🚨 [{ticker}] MVRV is {mvrv} (< 1.2): Historical Market Bottom & Strong Buy Signal!"
+            })
+            
+        # 2. Electrical Production Cost Floor & STH Basis Alerts (BTC)
+        if ticker == "BTC" and "electrical_cost_floor" in asset:
+            energy_floor = asset["electrical_cost_floor"]
+            sth_basis = asset.get("sth_basis", 76150.0)
+            
+            if spot_price <= energy_floor:
+                alerts.append({
+                    "level": "EMERGENCY_CAPITULATION",
+                    "indicator": "Electrical Cost Floor",
+                    "message": f"⚡ CRITICAL ALERT: BTC Spot (${spot_price:,.2f}) breached Thermodynamic Energy Floor (${energy_floor:,.2f})!"
+                })
+            elif spot_price <= sth_basis:
+                alerts.append({
+                    "level": "WARNING_SUPPORT",
+                    "indicator": "STH Cost Basis",
+                    "message": f"⚠️ WARNING: BTC Spot (${spot_price:,.2f}) testing Short-Term Holder Cost Basis (${sth_basis:,.2f})."
+                })
+            else:
+                margin = ((spot_price - energy_floor) / energy_floor) * 100
+                alerts.append({
+                    "level": "INFO_STABLE",
+                    "indicator": "Thermodynamic Margin",
+                    "message": f"✅ BTC Spot maintaining +{margin:.1f}% buffer above $68.5k electrical cost floor."
+                })
+                
+        return alerts
 
     def run_feedback_loop(self, ticker, predicted_target, realized_price, timeframe="24h"):
         ticker = ticker.upper()
@@ -79,6 +89,9 @@ class UniversalCryptoEngine:
         accuracy = max(0.0, 100.0 * (1.0 - error))
         adjustment = alpha * error
 
+        # Check automated alerts
+        active_alerts = self.check_institutional_alerts(ticker, realized_price)
+
         log_entry = {
             "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "ticker": ticker,
@@ -87,19 +100,16 @@ class UniversalCryptoEngine:
             "valuation_status": self.evaluate_mvrv_valuation(asset.get("mvrv", 1.4)),
             "error_pct": round(error * 100, 2),
             "accuracy_score": round(accuracy, 2),
-            "dynamic_adjustment": round(adjustment, 4)
+            "dynamic_adjustment": round(adjustment, 4),
+            "alerts_triggered": active_alerts
         }
-
-        if "electrical_cost_floor" in asset:
-            log_entry["thermodynamic_metrics"] = self.evaluate_electrical_cost_floor(
-                realized_price, asset["electrical_cost_floor"]
-            )
-
         self.feedback_history.append(log_entry)
         return log_entry
 
 if __name__ == "__main__":
     engine = UniversalCryptoEngine()
-    print("[INIT] Universal Crypto Intelligence & Thermodynamic Valuation Engine Active.")
-    test_log = engine.run_feedback_loop("BTC", 85500.0, 85934.11, "24h")
-    print(f"[TELEMETRY TEST] Recorded:\n{json.dumps(test_log, indent=2)}")
+    print("[INIT] Universal Crypto Intelligence & Alerting Engine Active.")
+    
+    # Test Run Execution for BTC
+    test_log = engine.run_feedback_loop("BTC", 85500.0, 85478.23, "24h")
+    print(f"\n[TEST RUN TELEMETRY & ALERTS DISPATCH]:\n{json.dumps(test_log, indent=2)}")
