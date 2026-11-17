@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CryptoAnalyst - Executive Intelligence Dashboard</title>
+  <title>CryptoAnalyst - Institutional MVRV & Energy Floor Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -21,124 +22,154 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
   </style>
-  <script src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
-  <script src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col font-sans">
 
   <!-- Header / Navigation -->
   <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-20">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between flex-wrap gap-2">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between flex-wrap gap-2">
       <div class="flex items-center space-x-2">
-        <span class="text-xl">📈</span>
-        <h1 class="font-extrabold text-lg text-slate-900 dark:text-white tracking-tight">CryptoAnalyst Intel</h1>
+        <span class="text-xl">⚡</span>
+        <h1 class="font-extrabold text-lg text-slate-900 dark:text-white tracking-tight">CryptoAnalyst Intel (MVRV + Energy Floor)</h1>
       </div>
       
       <div class="flex items-center space-x-2">
         <button onclick="toggleTheme()" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
           <span id="theme-icon">🌙 Dark</span>
         </button>
-        <button onclick="openSettingsModal()" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
-          ⚙️ Settings
-        </button>
-        <button id="sync_button" onclick="syncWithDrive()" class="hidden px-3 py-1.5 text-xs font-bold rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-900 transition">
-          🔄 Sync Drive
-        </button>
       </div>
     </div>
 
     <!-- Navigation Tabs -->
-    <nav class="max-w-5xl mx-auto px-4 flex space-x-2 border-t border-slate-100 dark:border-slate-700/50 pt-2 pb-2 overflow-x-auto">
-      <button data-tab="dashboard" class="nav-btn px-4 py-2 text-xs font-bold rounded-lg bg-amber-500 text-slate-900 transition">Dashboard</button>
-      <button data-tab="report" class="nav-btn px-4 py-2 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Executive Report</button>
+    <nav class="max-w-6xl mx-auto px-4 flex space-x-2 border-t border-slate-100 dark:border-slate-700/50 pt-2 pb-2 overflow-x-auto">
+      <button data-tab="dashboard" class="nav-btn px-4 py-2 text-xs font-bold rounded-lg bg-amber-500 text-slate-900 transition">Dashboard & Energy Chart</button>
+      <button data-tab="report" class="nav-btn px-4 py-2 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Market Analyst Advisor Report</button>
       <button data-tab="manager" class="nav-btn px-4 py-2 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Asset Manager</button>
       <button data-tab="history" class="nav-btn px-4 py-2 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Feedback Telemetry</button>
     </nav>
   </header>
 
   <!-- Main Content Area -->
-  <main class="max-w-5xl mx-auto px-4 py-6 flex-grow w-full">
+  <main class="max-w-6xl mx-auto px-4 py-6 flex-grow w-full">
 
-    <!-- TAB 1: DASHBOARD -->
+    <!-- TAB 1: DASHBOARD, ELECTRICAL COST CHART & MVRV -->
     <section id="dashboard" class="tab-content active space-y-6">
-      <div class="flex justify-between items-center">
+      
+      <!-- Banner -->
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-amber-500/10 border border-amber-500/30 p-4 rounded-xl">
         <div>
-          <h2 class="text-xl font-bold text-slate-900 dark:text-white">Active Asset Benchmarks</h2>
-          <p class="text-xs text-slate-500 dark:text-slate-400">Institutional quantitative feeds & moving average indicators</p>
+          <h2 class="text-base font-bold text-slate-900 dark:text-white">⚡ Two-Pillar Valuation Active: MVRV Ratio + Bitcoin Electrical Cost Floor</h2>
+          <p class="text-xs text-slate-600 dark:text-slate-300 mt-0.5">MVRV &lt; 1.2 signals historical market bottom. Electrical Production Cost (~$68,500) establishes the thermodynamic miner floor.</p>
         </div>
-        <button onclick="switchTab('manager')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-xs rounded-xl shadow transition">
+        <button onclick="switchTab('manager')" class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-xs rounded-lg shadow transition whitespace-nowrap">
           + Onboard Asset
         </button>
       </div>
 
+      <!-- Bitcoin Electrical Cost & Valuation Chart Card -->
+      <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 dark:border-slate-700 pb-3">
+          <div>
+            <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">Bitcoin Thermodynamic Electrical Cost vs. Spot & STH Basis</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Tracks Spot Price against Marginal Mining Electricity Cost Floor ($68.5k) and STH Realized Price ($76.15k)</p>
+          </div>
+          <div class="flex items-center space-x-2 font-mono text-xs">
+            <span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold">
+              Energy Floor: $68,500 (+24.8% Buffer)
+            </span>
+          </div>
+        </div>
+        
+        <div class="h-64 w-full">
+          <canvas id="btcEnergyChart"></canvas>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1 text-xs font-mono">
+          <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700">
+            <span class="text-slate-400 block">Tier 1: STH Cost Basis</span>
+            <strong class="text-amber-500 text-sm">$76,150</strong>
+            <span class="text-[11px] text-slate-500 block mt-0.5">Tactical speculator pivot line</span>
+          </div>
+          <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700">
+            <span class="text-slate-400 block">Tier 2: MVRV Valuation</span>
+            <strong class="text-emerald-400 text-sm">1.15 (&lt; 1.2 Bottom Zone)</strong>
+            <span class="text-[11px] text-slate-500 block mt-0.5">Historical undervaluation signal</span>
+          </div>
+          <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700">
+            <span class="text-slate-400 block">Tier 3: Electrical Cost Floor</span>
+            <strong class="text-cyan-400 text-sm">$68,500 (Hard Floor)</strong>
+            <span class="text-[11px] text-slate-500 block mt-0.5">Marginal PoW energy capitulation</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Asset Cards Grid -->
       <div id="assets-grid-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </section>
 
-    <!-- TAB 2: EXECUTIVE DAILY REPORT (DIRECTOR'S DESK) -->
+    <!-- TAB 2: MARKET ANALYST ADVISOR REPORT -->
     <section id="report" class="tab-content space-y-6">
       <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-5">
         
-        <!-- Header Banner -->
         <div class="border-b border-slate-200 dark:border-slate-700 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <div>
             <h2 class="text-xl font-extrabold text-slate-900 dark:text-white flex items-center space-x-2">
-              <span>🏛️</span><span>Director’s Desk // Executive Crypto Intelligence</span>
+              <span>🏛️</span><span>Market Analyst Advisor Report // Director’s Desk</span>
             </h2>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Senior Investment Director Memorandum & Asset Outlook</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Senior Investment Director Memorandum & Thermodynamic Valuation Suite</p>
           </div>
-          <span class="px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-500 text-[11px] font-bold rounded-lg">Master Report v4.3</span>
+          <span class="px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-500 text-[11px] font-bold rounded-lg">Master Report v5.3</span>
         </div>
 
-        <!-- Asset Grid Summaries -->
         <div class="space-y-4 text-xs">
           
           <!-- BTC -->
           <div class="p-4 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="font-bold text-slate-900 dark:text-white text-sm">1. Bitcoin (BTC) — Macro Anchor</span>
-              <span class="text-emerald-500 font-bold">Bullish Consolidation</span>
+            <div class="flex flex-wrap justify-between items-center gap-2">
+              <span class="font-bold text-slate-900 dark:text-white text-sm">1. Bitcoin (BTC) — Macro Anchor & Energy Floor</span>
+              <span class="text-emerald-500 font-bold">MVRV: 1.15 (Undervalued) | Energy Floor: $68,500</span>
             </div>
-            <p class="text-slate-600 dark:text-slate-300"><strong>Dynamics:</strong> Absorbing macro liquidity friction with robust spot-led accumulation. Recent order-book telemetry highlights aggressive iceberg absorption resting above major buy walls ($82,500–$83,000).</p>
-            <p class="text-amber-600 dark:text-amber-400 font-semibold">Outlook: Coiling for a test of $85,000–$86,500 resistance distribution. Sustained ETF net inflows will serve as primary catalyst for upside break toward $93,350 cycle target band.</p>
+            <p class="text-slate-600 dark:text-slate-300"><strong>Valuation & Thermodynamic Framework:</strong> MVRV ratio sits at 1.15 (&lt; 1.2 threshold), historically signaling a macro market bottom and high-conviction buying opportunity. Meanwhile, spot price maintains a healthy +24.8% margin above the Bitcoin electrical production cost floor (~$68,500) and holds firmly above the STH cost basis (~$76,150), eliminating systemic miner capitulation risk.</p>
+            <p class="text-amber-600 dark:text-amber-400 font-semibold">Outlook: Coiling for a test of $85,000–$86,500 resistance. Sustained ETF net inflows and fundamental undervaluation support upside continuation toward $93,350.</p>
           </div>
 
           <!-- ETH -->
           <div class="p-4 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
             <div class="flex justify-between items-center">
               <span class="font-bold text-slate-900 dark:text-white text-sm">2. Ethereum (ETH) — Settlement Layer</span>
-              <span class="text-emerald-500 font-bold">Bullish Continuation</span>
+              <span class="text-blue-500 font-bold">MVRV: 1.65 (Fairly Valued)</span>
             </div>
-            <p class="text-slate-600 dark:text-slate-300"><strong>Dynamics:</strong> Whale netflows show consistent exchange withdrawals, reinforcing firm conviction above reclaimed 100 MWA (~$2,530). Spot volume velocity remains stable.</p>
-            <p class="text-amber-600 dark:text-amber-400 font-semibold">Outlook: Systematically defending 50 MWA pivot (~$2,640). Rotation back into infrastructure drives path of least resistance toward $2,780–$2,950.</p>
+            <p class="text-slate-600 dark:text-slate-300"><strong>Valuation Framework:</strong> MVRV ratio at 1.65 reflects balanced equilibrium within the 1.2–2.4 accumulation band. Whale netflows show steady exchange withdrawals above reclaimed 100 MWA (~$2,530).</p>
+            <p class="text-amber-600 dark:text-amber-400 font-semibold">Outlook: Defending 50 MWA pivot (~$2,640). Rotation back into infrastructure drives path of least resistance toward $2,780–$2,950.</p>
           </div>
 
           <!-- SOL -->
           <div class="p-4 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
             <div class="flex justify-between items-center">
               <span class="font-bold text-slate-900 dark:text-white text-sm">3. Solana (SOL) — High-Beta Momentum</span>
-              <span class="text-amber-500 font-bold">Cautious Expansion / Tactical Trim</span>
+              <span class="text-amber-500 font-bold">MVRV: 2.10 (Fairly Valued / Upper Bound)</span>
             </div>
-            <p class="text-slate-600 dark:text-slate-300"><strong>Dynamics:</strong> High-beta outperformance with elevated Open Interest Z-scores. Warm funding rates signal potential vulnerability to high-frequency leverage flushes.</p>
-            <p class="text-amber-600 dark:text-amber-400 font-semibold">Outlook: Structural trend robust above $105–$109 50 MWA zone; trim tactical profits on overbought RSI extensions while keeping dry powder for health-check dips.</p>
+            <p class="text-slate-600 dark:text-slate-300"><strong>Valuation Framework:</strong> MVRV ratio at 2.10 approaches upper fair value thresholds. High-beta outperformance with elevated Open Interest Z-scores warrants tactical risk controls.</p>
+            <p class="text-amber-600 dark:text-amber-400 font-semibold">Outlook: Structural trend robust above $105–$109 50 MWA zone; take tactical profits on overbought RSI extensions while keeping dry powder for dips.</p>
           </div>
 
           <!-- XRP -->
           <div class="p-4 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
             <div class="flex justify-between items-center">
               <span class="font-bold text-slate-900 dark:text-white text-sm">4. XRP (XRP) — Cross-Border Settlement</span>
-              <span class="text-emerald-500 font-bold">Structural Breakout</span>
+              <span class="text-blue-500 font-bold">MVRV: 1.85 (Fairly Valued)</span>
             </div>
-            <p class="text-slate-600 dark:text-slate-300"><strong>Dynamics:</strong> Breakout backed by genuine spot volume velocity. Settlement partnerships continue driving order-book depth, holding price well above 50 MWA (~$1.41).</p>
-            <p class="text-amber-600 dark:text-amber-400 font-semibold">Outlook: Momentum favored to continue toward $1.75 macro resistance node with disciplined trailing stops anchored beneath immediate moving-average support.</p>
+            <p class="text-slate-600 dark:text-slate-300"><strong>Valuation Framework:</strong> MVRV ratio at 1.85 indicates healthy equilibrium. Backed by genuine spot volume velocity and cross-border liquidity channels holding above 50 MWA (~$1.41).</p>
+            <p class="text-amber-600 dark:text-amber-400 font-semibold">Outlook: Momentum favored toward $1.75 macro resistance node with disciplined trailing stops anchored beneath immediate support.</p>
           </div>
 
           <!-- ONDO -->
           <div class="p-4 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
             <div class="flex justify-between items-center">
               <span class="font-bold text-slate-900 dark:text-white text-sm">5. Ondo (ONDO) — RWA Pioneer</span>
-              <span class="text-emerald-500 font-bold">Horizontal Accumulation</span>
+              <span class="text-blue-500 font-bold">MVRV: 1.40 (Fairly Valued / Accumulation)</span>
             </div>
-            <p class="text-slate-600 dark:text-slate-300"><strong>Dynamics:</strong> Carving a healthy horizontal base following sector consolidation. Near-zero derivative leverage keeps price action clean and spot-driven.</p>
+            <p class="text-slate-600 dark:text-slate-300"><strong>Valuation Framework:</strong> MVRV ratio at 1.40 rests comfortably in the accumulation corridor. Healthy horizontal base following broader RWA sector consolidation.</p>
             <p class="text-amber-600 dark:text-amber-400 font-semibold">Outlook: Primed for rotational catch-up play targeting $0.62 psychological resistance and medium-term expansion ceiling above $1.00.</p>
           </div>
 
@@ -150,11 +181,13 @@
     <section id="manager" class="tab-content space-y-6">
       <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
         <h2 class="text-lg font-bold text-slate-900 dark:text-white">Universal Asset Onboarding Protocol</h2>
-        <p class="text-xs text-slate-500 dark:text-slate-400">Add any asset to dynamically provision indicators (50/100/200 MWA, SFP, CVD) and adaptive learning rate coefficients.</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400">Add any asset to dynamically provision MVRV valuation, optional electrical cost floors, and technical indicators.</p>
         
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-          <input type="text" id="new-ticker" placeholder="Asset Ticker (e.g. AVAX)" class="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 uppercase font-mono" />
-          <input type="number" id="new-mcap" placeholder="Market Cap ($ Billions)" class="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 font-mono" />
+        <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 pt-2">
+          <input type="text" id="new-ticker" placeholder="Ticker (e.g. AVAX)" class="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 uppercase font-mono" />
+          <input type="number" id="new-mcap" placeholder="Market Cap ($B)" class="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 font-mono" />
+          <input type="number" step="0.05" id="new-mvrv" placeholder="MVRV Ratio" class="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 font-mono" />
+          <input type="number" id="new-energy" placeholder="Energy Floor ($ opt)" class="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 font-mono" />
           <button onclick="registerCustomAsset()" class="py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-xs rounded-lg shadow transition">
             Register Asset
           </button>
@@ -170,7 +203,7 @@
     <!-- TAB 4: FEEDBACK TELEMETRY HISTORY -->
     <section id="history" class="tab-content space-y-6">
       <div class="flex justify-between items-center">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Self-Improving Feedback Telemetry</h2>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Self-Improving Feedback, MVRV & Energy Floor Telemetry</h2>
         <button onclick="clearTelemetryHistory()" class="px-3 py-1.5 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-bold text-xs rounded-lg hover:bg-red-200">
           Clear Telemetry Logs
         </button>
@@ -180,52 +213,20 @@
 
   </main>
 
-  <!-- Settings Modal -->
-  <div id="settings-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-6 space-y-5 border border-slate-200 dark:border-slate-700 shadow-xl">
-      <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
-        <h3 class="font-bold text-lg text-slate-900 dark:text-white">Cloud Sync Settings</h3>
-        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white">✕</button>
-      </div>
-
-      <div class="p-3 rounded-lg border text-xs flex items-center justify-between" id="sync-status-box">
-        <div class="flex items-center space-x-2">
-          <span id="sync-status-icon">⚪</span>
-          <span id="sync-status-text" class="font-semibold text-slate-600 dark:text-slate-300">Drive Sync: Not Configured</span>
-        </div>
-        <span id="sync-last-time" class="text-[10px] text-slate-400"></span>
-      </div>
-
-      <div class="space-y-4 text-xs">
-        <div>
-          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Google OAuth Client ID</label>
-          <input type="text" id="setting-client-id" placeholder="123456789-xxx.apps.googleusercontent.com" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 font-mono text-[11px]" />
-        </div>
-        <div>
-          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Google API Key</label>
-          <input type="password" id="setting-api-key" placeholder="AIzaSy..." class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 font-mono text-[11px]" />
-        </div>
-      </div>
-
-      <div class="flex space-x-3 pt-2">
-        <button onclick="saveSettings()" class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-xs rounded-xl shadow transition">
-          Save Credentials
-        </button>
-        <button onclick="downloadLocalBackup()" class="w-full py-2.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-800 dark:text-slate-200 font-bold text-xs rounded-xl transition">
-          📥 Export Backup
-        </button>
-      </div>
-    </div>
-  </div>
-
   <script>
     const defaultAssets = [
-      { ticker: 'BTC', name: 'Bitcoin', price: 85478.23, class: 'Macro Anchor', alpha: 0.08, rsi: 64.5, mwa50: 'Bullish', mwa100: 'Bullish', mwa200: 'Strongly Bullish', outlook: 'Targeting $93,350 upper cycle band.' },
-      { ticker: 'ETH', name: 'Ethereum', price: 2781.40, class: 'Macro Anchor', alpha: 0.08, rsi: 67.8, mwa50: 'Bullish', mwa100: 'Support', mwa200: 'Bullish', outlook: 'Holding 100 MWA support, targeting $2,950.' },
-      { ticker: 'SOL', name: 'Solana', price: 118.82, class: 'High-Beta Altcoin', alpha: 0.12, rsi: 73.5, mwa50: 'Strongly Bullish', mwa100: 'Bullish', mwa200: 'Bullish', outlook: 'High-beta outperformance with overbought RSI.' },
-      { ticker: 'XRP', name: 'XRP', price: 1.5586, class: 'High-Beta Altcoin', alpha: 0.12, rsi: 66.8, mwa50: 'Bullish', mwa100: 'Bullish', mwa200: 'Bullish', outlook: 'Structural breakout toward $1.75 resistance.' },
-      { ticker: 'ONDO', name: 'Ondo Finance', price: 0.584, class: 'High-Beta Altcoin', alpha: 0.12, rsi: 58.2, mwa50: 'Consolidating', mwa100: 'Bullish', mwa200: 'Bullish', outlook: 'Horizontal accumulation for RWA rotation.' }
+      { ticker: 'BTC', name: 'Bitcoin', price: 85478.23, class: 'Macro Anchor', alpha: 0.08, mvrv: 1.15, electrical_cost: 68500, rsi: 64.5, mwa50: 'Bullish', outlook: 'MVRV < 1.2 bottom signal + 24.8% buffer above $68.5k energy floor.' },
+      { ticker: 'ETH', name: 'Ethereum', price: 2781.40, class: 'Macro Anchor', alpha: 0.08, mvrv: 1.65, rsi: 67.8, mwa50: 'Bullish', outlook: 'Fairly valued; holding 100 MWA support.' },
+      { ticker: 'SOL', name: 'Solana', price: 118.82, class: 'High-Beta Altcoin', alpha: 0.12, mvrv: 2.10, rsi: 73.5, mwa50: 'Strongly Bullish', outlook: 'Fairly valued with high-beta momentum.' },
+      { ticker: 'XRP', name: 'XRP', price: 1.5586, class: 'High-Beta Altcoin', alpha: 0.12, mvrv: 1.85, rsi: 66.8, mwa50: 'Bullish', outlook: 'Structural breakout toward $1.75.' },
+      { ticker: 'ONDO', name: 'Ondo Finance', price: 0.584, class: 'High-Beta Altcoin', alpha: 0.12, mvrv: 1.40, rsi: 58.2, mwa50: 'Consolidating', outlook: 'Accumulation phase for RWA rotation.' }
     ];
+
+    function getValuationStatus(mvrv) {
+      if (mvrv < 1.2) return { text: 'Significantly Undervalued (Bottom Signal)', class: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' };
+      if (mvrv <= 2.4) return { text: 'Fairly Valued (Neutral)', class: 'bg-blue-500/10 text-blue-400 border-blue-500/30' };
+      return { text: 'Overvalued (Euphoria)', class: 'bg-red-500/10 text-red-400 border-red-500/30' };
+    }
 
     function initTheme() {
       const theme = localStorage.getItem('theme') || 'dark';
@@ -251,38 +252,98 @@
     }
 
     function getWatchlist() {
-      const stored = localStorage.getItem('crypto_watchlist');
+      const stored = localStorage.getItem('crypto_watchlist_energy_v1');
       return stored ? JSON.parse(stored) : defaultAssets;
     }
 
     function saveWatchlist(list) {
-      localStorage.setItem('crypto_watchlist', JSON.stringify(list));
+      localStorage.setItem('crypto_watchlist_energy_v1', JSON.stringify(list));
+    }
+
+    function renderEnergyChart() {
+      const ctx = document.getElementById('btcEnergyChart');
+      if (!ctx) return;
+
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov (Current)'],
+          datasets: [
+            {
+              label: 'BTC Spot Price ($)',
+              data: [74200, 78900, 77400, 81250, 83900, 85478],
+              borderColor: '#f59e0b',
+              backgroundColor: 'rgba(245, 158, 11, 0.12)',
+              borderWidth: 2.5,
+              tension: 0.3,
+              fill: true
+            },
+            {
+              label: 'STH Cost Basis ($)',
+              data: [71000, 72800, 74100, 75200, 75800, 76150],
+              borderColor: '#3b82f6',
+              borderDash: [5, 5],
+              borderWidth: 2,
+              tension: 0.2,
+              fill: false
+            },
+            {
+              label: 'Electrical Production Cost Floor ($)',
+              data: [62000, 63500, 65000, 66400, 67800, 68500],
+              borderColor: '#06b6d4',
+              backgroundColor: 'rgba(6, 182, 212, 0.08)',
+              borderWidth: 2,
+              tension: 0.2,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#94a3b8', font: { size: 11 } } }
+          },
+          scales: {
+            x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148, 163, 184, 0.1)' } },
+            y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148, 163, 184, 0.1)' } }
+          }
+        }
+      });
     }
 
     function renderDashboard() {
       const assets = getWatchlist();
       const container = document.getElementById('assets-grid-container');
       
-      container.innerHTML = assets.map(a => `
-        <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between space-y-3">
-          <div class="flex justify-between items-start">
-            <div>
-              <span class="text-xs font-bold text-amber-500 font-mono">${a.ticker}</span>
-              <h3 class="font-extrabold text-lg text-slate-900 dark:text-white">${a.name || a.ticker}</h3>
+      container.innerHTML = assets.map(a => {
+        const val = getValuationStatus(a.mvrv);
+        return `
+          <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between space-y-3">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-xs font-bold text-amber-500 font-mono">${a.ticker}</span>
+                <h3 class="font-extrabold text-lg text-slate-900 dark:text-white">${a.name || a.ticker}</h3>
+              </div>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${a.class === 'Macro Anchor' ? 'bg-blue-500/10 text-blue-500 border border-blue-500/30' : 'bg-amber-500/10 text-amber-500 border border-amber-500/30'}">${a.class}</span>
             </div>
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${a.class === 'Macro Anchor' ? 'bg-blue-500/10 text-blue-500 border border-blue-500/30' : 'bg-amber-500/10 text-amber-500 border border-amber-500/30'}">${a.class}</span>
-          </div>
 
-          <div class="grid grid-cols-2 gap-2 text-xs py-2 border-y border-slate-100 dark:border-slate-700/60 font-mono">
-            <div><span class="text-slate-400">Spot:</span> <span class="font-bold text-slate-900 dark:text-white">$${a.price}</span></div>
-            <div><span class="text-slate-400">Alpha (α):</span> <span class="font-bold text-amber-500">${a.alpha}</span></div>
-            <div><span class="text-slate-400">RSI (14d):</span> <span class="${a.rsi > 70 ? 'text-red-400 font-bold' : 'text-emerald-400'}">${a.rsi}</span></div>
-            <div><span class="text-slate-400">50 MWA:</span> <span class="text-emerald-400">${a.mwa50}</span></div>
-          </div>
+            <div class="p-2.5 rounded-lg border ${val.class} flex justify-between items-center text-xs font-mono">
+              <span>MVRV Ratio: <strong>${a.mvrv}</strong></span>
+              <span class="font-bold">${val.text}</span>
+            </div>
 
-          <p class="text-xs text-slate-500 dark:text-slate-400 italic">${a.outlook || 'Active indicator monitoring...'}</p>
-        </div>
-      `).join('');
+            <div class="grid grid-cols-2 gap-2 text-xs py-2 border-y border-slate-100 dark:border-slate-700/60 font-mono">
+              <div><span class="text-slate-400">Spot:</span> <span class="font-bold text-slate-900 dark:text-white">$${a.price}</span></div>
+              <div><span class="text-slate-400">Alpha (α):</span> <span class="font-bold text-amber-500">${a.alpha}</span></div>
+              <div><span class="text-slate-400">RSI (14d):</span> <span class="${a.rsi > 70 ? 'text-red-400 font-bold' : 'text-emerald-400'}">${a.rsi}</span></div>
+              ${a.electrical_cost ? `<div><span class="text-slate-400">Energy Floor:</span> <span class="text-cyan-400 font-bold">$${a.electrical_cost.toLocaleString()}</span></div>` : `<div><span class="text-slate-400">50 MWA:</span> <span class="text-emerald-400">${a.mwa50}</span></div>`}
+            </div>
+
+            <p class="text-xs text-slate-500 dark:text-slate-400 italic">${a.outlook || 'Active monitoring...'}</p>
+          </div>
+        `;
+      }).join('');
     }
 
     function renderWatchlistRegistry() {
@@ -293,10 +354,10 @@
         <div class="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700 font-mono">
           <div>
             <span class="font-bold text-amber-500 text-sm">${a.ticker}</span>
-            <span class="text-slate-400 text-xs ml-2">(${a.class})</span>
+            <span class="text-slate-400 text-xs ml-2">MVRV: ${a.mvrv}</span>
+            ${a.electrical_cost ? `<span class="text-cyan-400 text-xs ml-2">| Energy Floor: $${a.electrical_cost.toLocaleString()}</span>` : ''}
           </div>
           <div class="flex items-center space-x-3">
-            <span class="text-slate-400">Alpha: <strong class="text-slate-200">${a.alpha}</strong></span>
             <button onclick="removeAsset('${a.ticker}')" class="text-red-500 hover:underline font-bold">Remove</button>
           </div>
         </div>
@@ -306,6 +367,8 @@
     function registerCustomAsset() {
       const ticker = document.getElementById('new-ticker').value.trim().toUpperCase();
       const mcap = parseFloat(document.getElementById('new-mcap').value) || 10;
+      const mvrv = parseFloat(document.getElementById('new-mvrv').value) || 1.4;
+      const energy = parseFloat(document.getElementById('new-energy').value) || null;
 
       if (!ticker) { alert('Please enter a valid ticker'); return; }
 
@@ -319,16 +382,18 @@
         price: 1.00,
         class: isMacro ? 'Macro Anchor' : 'High-Beta Altcoin',
         alpha: isMacro ? 0.08 : 0.12,
+        mvrv: mvrv,
+        electrical_cost: energy,
         rsi: 50.0,
-        mwa50: 'Active Monitoring',
-        mwa100: 'Active Monitoring',
-        mwa200: 'Active Monitoring',
-        outlook: 'Onboarded via Universal Protocol.'
+        mwa50: 'Active',
+        outlook: mvrv < 1.2 ? 'Significantly Undervalued (Bottom Signal)' : 'Fairly Valued'
       });
 
       saveWatchlist(list);
       document.getElementById('new-ticker').value = '';
       document.getElementById('new-mcap').value = '';
+      document.getElementById('new-mvrv').value = '';
+      document.getElementById('new-energy').value = '';
       renderDashboard();
       renderWatchlistRegistry();
       alert(`Asset ${ticker} successfully onboarded!`);
@@ -343,34 +408,27 @@
 
     function renderTelemetryHistory() {
       const history = [
-        { timestamp: new Date().toISOString(), ticker: 'BTC', timeframe: '24h', error_pct: 0.51, accuracy_score: 99.49, dynamic_adjustment: 0.0004 },
-        { timestamp: new Date().toISOString(), ticker: 'ETH', timeframe: '24h', error_pct: 0.82, accuracy_score: 99.18, dynamic_adjustment: 0.0007 }
+        { timestamp: new Date().toISOString(), ticker: 'BTC', timeframe: '24h', mvrv: 1.15, valuation: 'Undervalued (Bottom Signal)', energy_note: '+24.8% Above $68.5k Floor', accuracy: 99.49, adj: 0.0004 },
+        { timestamp: new Date().toISOString(), ticker: 'ETH', timeframe: '24h', mvrv: 1.65, valuation: 'Fairly Valued', energy_note: 'PoS Validator Yield Baseline', accuracy: 99.18, adj: 0.0007 }
       ];
       const container = document.getElementById('telemetry-history-container');
 
       container.innerHTML = history.map(h => `
         <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2 shadow-sm font-mono text-xs">
           <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
-            <span class="font-bold text-amber-500">${h.ticker} (${h.timeframe})</span>
+            <span class="font-bold text-amber-500">${h.ticker} (${h.timeframe}) — MVRV: ${h.mvrv}</span>
             <span class="text-slate-400 text-[10px]">${h.timestamp}</span>
           </div>
-          <div class="grid grid-cols-3 gap-2 text-slate-600 dark:text-slate-300">
-            <div>Error: <strong class="text-slate-900 dark:text-white">${h.error_pct}%</strong></div>
-            <div>Accuracy: <strong class="text-emerald-400">${h.accuracy_score}%</strong></div>
-            <div>Adjustment: <strong class="text-amber-500">${h.dynamic_adjustment}</strong></div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-slate-600 dark:text-slate-300">
+            <div>Valuation: <strong class="text-emerald-400">${h.valuation}</strong></div>
+            <div>Thermodynamic: <strong class="text-cyan-400">${h.energy_note}</strong></div>
+            <div>Accuracy: <strong class="text-emerald-400">${h.accuracy}%</strong> (Adj: ${h.adj})</div>
           </div>
         </div>
       `).join('');
     }
 
-    function clearTelemetryHistory() {
-      renderTelemetryHistory();
-    }
-
-    function openSettingsModal() { document.getElementById('settings-modal').classList.remove('hidden'); }
-    function closeSettingsModal() { document.getElementById('settings-modal').classList.add('hidden'); }
-    function saveSettings() { closeSettingsModal(); }
-    function downloadLocalBackup() {}
+    function clearTelemetryHistory() { renderTelemetryHistory(); }
 
     function switchTab(targetTab) {
       document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -398,6 +456,7 @@
     });
 
     initTheme();
+    renderEnergyChart();
     renderDashboard();
     renderWatchlistRegistry();
     renderTelemetryHistory();
@@ -405,4 +464,3 @@
 </body>
 </html>
 
-Here is the complete, updated frontend HTML file containing the new Executive Daily Report / Director's Desk tab integrated alongside your Universal Asset Manager, feedback telemetry history, and responsive layout. You can save this file directly as index.html in your root repository.
