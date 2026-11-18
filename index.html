@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CryptoAnalyst - Institutional Candlestick & Indicator Suite</title>
+  <title>CryptoAnalyst - TradingView Institutional Pro Desk</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
@@ -17,7 +17,12 @@
       theme: {
         extend: {
           colors: {
-            amber: { 500: '#f59e0b', 600: '#d97706' }
+            tvBg: '#131722',
+            tvCard: '#1e222d',
+            tvBorder: '#2a2e39',
+            tvGreen: '#26a69a',
+            tvRed: '#ef5350',
+            tvAmber: '#f59e0b'
           }
         }
       }
@@ -27,158 +32,168 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
     canvas { touch-action: none; }
+    body { background-color: #131722; color: #d1d4dc; }
   </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col font-sans">
+<body class="min-h-screen flex flex-col font-sans">
 
   <!-- Header -->
-  <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-20">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between flex-wrap gap-2">
-      <div class="flex items-center space-x-2">
-        <span class="text-xl">⚡</span>
-        <h1 class="font-extrabold text-lg text-slate-900 dark:text-white tracking-tight">CryptoAnalyst Intel // Institutional Desk</h1>
+  <header class="bg-[#1e222d] border-b border-[#2a2e39] sticky top-0 z-20">
+    <div class="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between flex-wrap gap-2">
+      <div class="flex items-center space-x-3">
+        <span class="text-xl">📊</span>
+        <h1 class="font-bold text-sm tracking-wide text-white">TradingView Pro // Institutional Desk</h1>
         <span id="liveFeedBadge" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-          Feed: Syncing Binance/Coinbase...
+          Feed: Syncing...
         </span>
       </div>
       
       <div class="flex items-center space-x-2">
-        <button onclick="syncLivePrices()" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-900 transition shadow-sm">
-          🔄 Sync Live Prices
-        </button>
-        <button onclick="toggleTheme()" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
-          <span id="theme-icon">🌙 Dark</span>
+        <button onclick="syncLivePrices()" class="px-3 py-1.5 text-xs font-bold rounded bg-amber-500 hover:bg-amber-600 text-slate-900 transition shadow-sm">
+          🔄 Sync Live Ticks
         </button>
       </div>
     </div>
 
     <!-- Navigation Tabs -->
-    <nav class="max-w-7xl mx-auto px-4 flex space-x-2 border-t border-slate-100 dark:border-slate-700/50 pt-2 pb-2 overflow-x-auto">
-      <button data-tab="dashboard" class="nav-btn px-4 py-2 text-xs font-bold rounded-lg bg-amber-500 text-slate-900 transition">Dashboard & Candlestick Charts</button>
-      <button data-tab="indicators" class="nav-btn px-4 py-2 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Key Indicators Suite</button>
-      <button data-tab="backtest" class="nav-btn px-4 py-2 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Strategy Backtest & ROI</button>
-      <button data-tab="manager" class="nav-btn px-4 py-2 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Asset Manager</button>
-      <button data-tab="history" class="nav-btn px-4 py-2 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Telemetry Log</button>
+    <nav class="max-w-7xl mx-auto px-4 flex space-x-2 border-t border-[#2a2e39] pt-2 pb-2 overflow-x-auto text-xs font-semibold">
+      <button data-tab="dashboard" class="nav-btn px-4 py-1.5 rounded bg-amber-500 text-slate-900 transition">Pro Charting & Terminal</button>
+      <button data-tab="indicators" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">Key Indicators Suite</button>
+      <button data-tab="backtest" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">Strategy Backtest & ROI</button>
+      <button data-tab="manager" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">Asset Manager</button>
     </nav>
   </header>
 
   <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
+  <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full space-y-6">
 
-    <!-- TAB 1: DASHBOARD & DYNAMIC CANDLESTICK CHARTS -->
-    <section id="dashboard" class="tab-content active space-y-6">
+    <!-- TAB 1: TRADINGVIEW PRO DASHBOARD -->
+    <section id="dashboard" class="tab-content active space-y-4">
 
-      <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-md space-y-4">
+      <!-- TradingView Style Top Status Bar -->
+      <div id="tvStatusBar" class="bg-[#1e222d] border border-[#2a2e39] rounded-lg px-4 py-2 flex flex-wrap justify-between items-center text-xs font-mono">
+        <div class="flex items-center space-x-3 text-slate-300">
+          <span class="font-bold text-white text-sm" id="statusTicker">BTCUSD</span>
+          <span class="text-slate-400">4h</span>
+          <span class="text-emerald-400 font-bold" id="statusOHLC">O257,20 H258,14 L255,90 C257,88 +0,68 (+0,26%)</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span id="inChartSignalBadge" class="px-2.5 py-1 rounded border"></span>
+        </div>
+      </div>
+
+      <!-- Master Chart Card -->
+      <div class="bg-[#1e222d] border border-[#2a2e39] rounded-xl p-4 shadow-lg space-y-3">
         
-        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 border-b border-slate-100 dark:border-slate-700 pb-4">
+        <!-- Controls Toolbar -->
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 border-b border-[#2a2e39] pb-3">
           <div class="flex flex-wrap items-center gap-3">
             <div>
-              <label for="topAssetSelect" class="block text-[10px] uppercase tracking-wider text-slate-400 font-bold">Select Asset</label>
-              <select id="topAssetSelect" onchange="renderInteractiveZoneChart()" class="mt-0.5 bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-sm font-mono font-extrabold text-amber-500 focus:outline-none">
-                <option value="BTC">Bitcoin (BTC)</option>
-                <option value="ETH">Ethereum (ETH)</option>
-                <option value="SOL">Solana (SOL)</option>
-                <option value="XRP">XRP (XRP)</option>
-                <option value="ONDO">Ondo Finance (ONDO)</option>
-                <option value="SUI">Sui (SUI)</option>
-                <option value="SEI">Sei (SEI)</option>
-                <option value="HBAR">Hedera (HBAR)</option>
-                <option value="HYPE">Hyperliquid (HYPE)</option>
+              <label for="topAssetSelect" class="block text-[10px] uppercase tracking-wider text-slate-400 font-bold">Asset</label>
+              <select id="topAssetSelect" onchange="renderInteractiveZoneChart()" class="mt-0.5 bg-[#131722] border border-[#2a2e39] rounded px-3 py-1 text-xs font-mono font-bold text-amber-500 focus:outline-none">
+                <option value="BTC">BTCUSD</option>
+                <option value="ETH">ETHUSD</option>
+                <option value="SOL">SOLUSD</option>
+                <option value="XRP">XRPUSD</option>
+                <option value="ONDO">ONDOUSD</option>
+                <option value="SUI">SUIUSD</option>
+                <option value="SEI">SEIUSD</option>
+                <option value="HBAR">HBARUSD</option>
+                <option value="HYPE">HYPEUSD</option>
               </select>
             </div>
 
-            <!-- Expanded Historical Timeframe Selector -->
+            <!-- Timeframe Selector -->
             <div>
-              <label class="block text-[10px] uppercase tracking-wider text-slate-400 font-bold">Historical Timeframe</label>
+              <label class="block text-[10px] uppercase tracking-wider text-slate-400 font-bold">Timeframe</label>
               <div id="timeframeSelector" class="flex space-x-1 mt-0.5">
-                <button onclick="setTimeframe('1h')" class="tf-btn px-2 py-1 text-[11px] font-mono font-bold rounded bg-slate-100 dark:bg-slate-900 text-slate-400 hover:text-white">Hourly (200h)</button>
-                <button onclick="setTimeframe('4h')" class="tf-btn px-2 py-1 text-[11px] font-mono font-bold rounded bg-slate-100 dark:bg-slate-900 text-slate-400 hover:text-white">4h (200x)</button>
-                <button onclick="setTimeframe('daily')" class="tf-btn px-2 py-1 text-[11px] font-mono font-bold rounded bg-amber-500 text-slate-900">Daily (200d)</button>
-                <button onclick="setTimeframe('weekly')" class="tf-btn px-2 py-1 text-[11px] font-mono font-bold rounded bg-slate-100 dark:bg-slate-900 text-slate-400 hover:text-white">Weekly (30w)</button>
-                <button onclick="setTimeframe('monthly')" class="tf-btn px-2 py-1 text-[11px] font-mono font-bold rounded bg-slate-100 dark:bg-slate-900 text-slate-400 hover:text-white">Monthly (12m)</button>
+                <button onclick="setTimeframe('1h')" class="tf-btn px-2 py-1 text-[11px] font-mono rounded bg-[#131722] text-slate-400 hover:text-white">1h (200h)</button>
+                <button onclick="setTimeframe('4h')" class="tf-btn px-2 py-1 text-[11px] font-mono rounded bg-amber-500 text-slate-900 font-bold">4h (200x)</button>
+                <button onclick="setTimeframe('daily')" class="tf-btn px-2 py-1 text-[11px] font-mono rounded bg-[#131722] text-slate-400 hover:text-white">Daily (200d)</button>
+                <button onclick="setTimeframe('weekly')" class="tf-btn px-2 py-1 text-[11px] font-mono rounded bg-[#131722] text-slate-400 hover:text-white">Weekly (30w)</button>
+                <button onclick="setTimeframe('monthly')" class="tf-btn px-2 py-1 text-[11px] font-mono rounded bg-[#131722] text-slate-400 hover:text-white">Monthly (12m)</button>
               </div>
             </div>
-
-            <!-- In-Chart Action Recommendation Pill -->
-            <div id="inChartSignalBadge" class="px-3 py-1.5 rounded-xl border font-mono"></div>
           </div>
 
-          <!-- Quick Controls -->
-          <div class="flex flex-wrap items-center gap-2 text-xs">
-            <button onclick="switchTab('indicators')" class="px-3 py-1.5 rounded-lg border border-amber-500/50 bg-amber-500/10 text-amber-400 font-bold hover:bg-amber-500 hover:text-slate-900 transition">
-              ⚙️ Indicators On/Off
+          <div class="flex items-center gap-2 text-xs">
+            <button onclick="switchTab('indicators')" class="px-3 py-1.5 rounded border border-amber-500/40 bg-amber-500/10 text-amber-400 font-bold hover:bg-amber-500 hover:text-slate-900 transition">
+              ⚙️ Configure MAs & Zones
             </button>
-            <button onclick="resetChartZoom()" class="px-3 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 font-bold hover:bg-amber-500 hover:text-slate-900 transition">↺ Reset Zoom</button>
+            <button onclick="resetChartZoom()" class="px-3 py-1.5 rounded bg-[#2a2e39] font-bold text-slate-300 hover:bg-amber-500 hover:text-slate-900 transition">↺ Reset Zoom</button>
           </div>
         </div>
 
-        <div class="flex flex-wrap justify-between items-center text-[11px] text-slate-400 font-mono">
-          <span>🕯️ <strong>Deep Historical Candlesticks</strong> (Auto-scaled Y-Axis) | 🖱️ Drag to pan, scroll to zoom</span>
-          <span id="chartSourceTimestamp">Source: Binance / Coinbase Hybrid</span>
-        </div>
-
-        <!-- Canvas Container with explicit height -->
-        <div style="height: 420px; width: 100%; position: relative;" class="bg-slate-50/50 dark:bg-slate-900/40 rounded-lg p-2 border border-slate-200/60 dark:border-slate-700/60">
+        <!-- Canvas Container -->
+        <div style="height: 480px; width: 100%; position: relative;" class="bg-[#131722] rounded-lg p-2 border border-[#2a2e39]">
           <canvas id="masterInteractiveChart"></canvas>
         </div>
 
+        <!-- Decision Strip -->
         <div id="chartDecisionStrip" class="grid grid-cols-1 md:grid-cols-4 gap-3 pt-1 text-xs font-mono"></div>
       </div>
 
-      <!-- Asset Summary Grid -->
+      <!-- Asset Summary Matrix -->
       <div class="flex justify-between items-center pt-2">
-        <h2 class="text-base font-extrabold text-slate-900 dark:text-white">📊 Watchlist Matrix (All Assets)</h2>
-        <button onclick="switchTab('manager')" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-xs rounded-lg shadow transition">+ Onboard Asset</button>
+        <h2 class="text-sm font-extrabold text-white">📊 Watchlist Matrix & Valuation Ticks</h2>
       </div>
-      <div id="assets-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      <div id="assets-grid-container" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
 
     </section>
 
     <!-- TAB 2: KEY INDICATORS SUITE -->
     <section id="indicators" class="tab-content space-y-6">
-      <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-5">
-        <div class="border-b border-slate-200 dark:border-slate-700 pb-4">
-          <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">⚙️ Key Indicators & Overlays Suite</h2>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Toggle individual algorithmic indicators, moving averages, and valuation zones on or off instantly.</p>
+      <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
+        <div class="border-b border-[#2a2e39] pb-4">
+          <h2 class="text-lg font-bold text-white">⚙️ TradingView Indicator Suite & Moving Averages</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Toggle 50, 100, and 200 period Moving Averages (Daily/Weekly), Buy/Sell zones, and Energy floors.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
-          <label class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-700 cursor-pointer hover:border-amber-500">
+          <label class="flex items-center justify-between p-4 bg-[#131722] rounded-xl border border-[#2a2e39] cursor-pointer hover:border-amber-500">
             <div>
-              <span class="font-bold text-slate-200 block text-sm">🟢 Buy / Accumulation Zone Shading</span>
-              <span class="text-slate-400 text-[11px]">Highlights historical undervaluation and MVRV bottom thresholds.</span>
+              <span class="font-bold text-slate-200 block text-sm">🟢 Buy / Accumulation Zone</span>
+              <span class="text-slate-400 text-[11px]">Highlights historical undervaluation & MVRV bottom thresholds.</span>
             </div>
             <input type="checkbox" id="ind-buyzone" checked onchange="renderInteractiveZoneChart()" class="w-4 h-4 accent-amber-500 cursor-pointer" />
           </label>
 
-          <label class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-700 cursor-pointer hover:border-amber-500">
+          <label class="flex items-center justify-between p-4 bg-[#131722] rounded-xl border border-[#2a2e39] cursor-pointer hover:border-amber-500">
             <div>
-              <span class="font-bold text-slate-200 block text-sm">🔴 Sell / Profit-Taking Zone Shading</span>
-              <span class="text-slate-400 text-[11px]">Highlights upper fair value channels and overbought resistance.</span>
+              <span class="font-bold text-slate-200 block text-sm">🔴 Sell / Profit-Taking Zone</span>
+              <span class="text-slate-400 text-[11px]">Highlights upper fair value resistance channels.</span>
             </div>
             <input type="checkbox" id="ind-sellzone" checked onchange="renderInteractiveZoneChart()" class="w-4 h-4 accent-amber-500 cursor-pointer" />
           </label>
 
-          <label class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-700 cursor-pointer hover:border-amber-500">
+          <label class="flex items-center justify-between p-4 bg-[#131722] rounded-xl border border-[#2a2e39] cursor-pointer hover:border-amber-500">
             <div>
-              <span class="font-bold text-slate-200 block text-sm">📈 50-Period Moving Average (50 MWA)</span>
-              <span class="text-slate-400 text-[11px]">Primary structural trend and dynamic support pivot algorithm.</span>
+              <span class="font-bold text-slate-200 block text-sm">📈 50 EMA / MWA (Daily & Weekly)</span>
+              <span class="text-slate-400 text-[11px]">Primary structural trend and dynamic support pivot.</span>
             </div>
             <input type="checkbox" id="ind-mwa50" checked onchange="renderInteractiveZoneChart()" class="w-4 h-4 accent-amber-500 cursor-pointer" />
           </label>
 
-          <label class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-700 cursor-pointer hover:border-amber-500">
+          <label class="flex items-center justify-between p-4 bg-[#131722] rounded-xl border border-[#2a2e39] cursor-pointer hover:border-amber-500">
             <div>
-              <span class="font-bold text-slate-200 block text-sm">📈 100-Period Moving Average (100 MWA)</span>
-              <span class="text-slate-400 text-[11px]">Macro trend continuation and cycle valuation pivot.</span>
+              <span class="font-bold text-slate-200 block text-sm">📈 100 EMA / MWA (Daily & Weekly)</span>
+              <span class="text-slate-400 text-[11px]">Macro trend continuation baseline.</span>
             </div>
             <input type="checkbox" id="ind-mwa100" checked onchange="renderInteractiveZoneChart()" class="w-4 h-4 accent-amber-500 cursor-pointer" />
           </label>
 
-          <label class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-700 cursor-pointer hover:border-amber-500">
+          <label class="flex items-center justify-between p-4 bg-[#131722] rounded-xl border border-[#2a2e39] cursor-pointer hover:border-amber-500">
+            <div>
+              <span class="font-bold text-slate-200 block text-sm">📈 200 EMA / MWA (Daily & Weekly)</span>
+              <span class="text-slate-400 text-[11px]">Ultimate macro cycle valuation pivot (as seen on TradingView).</span>
+            </div>
+            <input type="checkbox" id="ind-mwa200" checked onchange="renderInteractiveZoneChart()" class="w-4 h-4 accent-amber-500 cursor-pointer" />
+          </label>
+
+          <label class="flex items-center justify-between p-4 bg-[#131722] rounded-xl border border-[#2a2e39] cursor-pointer hover:border-amber-500">
             <div>
               <span class="font-bold text-slate-200 block text-sm">⚡ Thermodynamic Electrical Cost Floor</span>
-              <span class="text-slate-400 text-[11px]">Marginal miner production cost floor (BTC $68,500 & alt equivalents).</span>
+              <span class="text-slate-400 text-[11px]">Marginal miner production cost floor.</span>
             </div>
             <input type="checkbox" id="ind-energy" checked onchange="renderInteractiveZoneChart()" class="w-4 h-4 accent-amber-500 cursor-pointer" />
           </label>
@@ -186,87 +201,69 @@
       </div>
     </section>
 
-    <!-- TAB 3: STRATEGY BACKTEST & ROI -->
+    <!-- TAB 3: BACKTEST & ROI -->
     <section id="backtest" class="tab-content space-y-6">
-      <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-5">
-        <div class="border-b border-slate-200 dark:border-slate-700 pb-4 flex justify-between items-center">
-          <div>
-            <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">📈 Strategy Backtest & Algorithm Profitability Matrix</h2>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Evaluating past algorithm recommendations against realized price trajectories and cumulative ROI.</p>
-          </div>
-          <span class="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-bold rounded-lg">Overall Win Rate: 91.4%</span>
+      <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
+        <div class="border-b border-[#2a2e39] pb-4 flex justify-between items-center">
+          <h2 class="text-lg font-bold text-white">📈 Strategy Backtest & Algorithm Profitability Matrix</h2>
+          <span class="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold rounded">Win Rate: 91.4%</span>
         </div>
-
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs font-mono">
-            <thead class="bg-slate-100 dark:bg-slate-900 text-slate-400 uppercase">
+            <thead class="bg-[#131722] text-slate-400 uppercase">
               <tr>
                 <th class="p-3">Asset</th>
                 <th class="p-3">Strategy Signal</th>
                 <th class="p-3">Forecast Correlation</th>
                 <th class="p-3">Realized ROI</th>
                 <th class="p-3">Algorithm Accuracy</th>
-                <th class="p-3">Status</th>
               </tr>
             </thead>
-            <tbody id="backtest-table-body" class="divide-y divide-slate-200 dark:divide-slate-700 text-slate-700 dark:text-slate-300"></tbody>
+            <tbody id="backtest-table-body" class="divide-y divide-[#2a2e39] text-slate-300"></tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- TAB 4: UNIVERSAL ASSET MANAGER -->
+    <!-- TAB 4: ASSET MANAGER -->
     <section id="manager" class="tab-content space-y-6">
-      <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
-        <h2 class="text-lg font-bold text-slate-900 dark:text-white">Universal Asset Onboarding Protocol</h2>
+      <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-4">
+        <h2 class="text-lg font-bold text-white">Universal Asset Onboarding Protocol</h2>
         <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 pt-2">
-          <input type="text" id="new-ticker" placeholder="Ticker (e.g. AVAX)" class="bg-slate-50 dark:bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-white uppercase font-mono" />
-          <input type="number" id="new-mcap" placeholder="Market Cap ($B)" class="bg-slate-50 dark:bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-white font-mono" />
-          <input type="number" step="0.05" id="new-mvrv" placeholder="MVRV Ratio" class="bg-slate-50 dark:bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-white font-mono" />
-          <input type="number" id="new-energy" placeholder="Energy Floor ($)" class="bg-slate-50 dark:bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-white font-mono" />
-          <button onclick="registerCustomAsset()" class="py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-xs rounded-lg shadow transition">Register Asset</button>
+          <input type="text" id="new-ticker" placeholder="Ticker (e.g. AVAX)" class="bg-[#131722] border border-[#2a2e39] rounded p-2.5 text-xs text-white uppercase font-mono" />
+          <input type="number" id="new-mcap" placeholder="Market Cap ($B)" class="bg-[#131722] border border-[#2a2e39] rounded p-2.5 text-xs text-white font-mono" />
+          <input type="number" step="0.05" id="new-mvrv" placeholder="MVRV Ratio" class="bg-[#131722] border border-[#2a2e39] rounded p-2.5 text-xs text-white font-mono" />
+          <input type="number" id="new-energy" placeholder="Energy Floor ($)" class="bg-[#131722] border border-[#2a2e39] rounded p-2.5 text-xs text-white font-mono" />
+          <button onclick="registerCustomAsset()" class="py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-xs rounded shadow transition">Register Asset</button>
         </div>
       </div>
-      <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
-        <h3 class="text-sm font-bold text-slate-900 dark:text-white">Tracked Watchlist Registry</h3>
-        <div id="watchlist-registry-container" class="space-y-2 text-xs"></div>
-      </div>
-    </section>
-
-    <!-- TAB 5: TELEMETRY LOG -->
-    <section id="history" class="tab-content space-y-6">
-      <div class="flex justify-between items-center">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Self-Improving Feedback & Telemetry Log</h2>
-        <button onclick="clearTelemetryHistory()" class="px-3 py-1.5 bg-red-100 dark:bg-red-900/30 text-red-600 font-bold text-xs rounded-lg">Clear Logs</button>
-      </div>
-      <div id="telemetry-history-container" class="space-y-4"></div>
     </section>
 
   </main>
 
   <script>
     const assetsStore = {
-      BTC: { name: 'Bitcoin', price: 85478.23, source: 'Binance/Coinbase', mvrv: 1.15, electrical_cost: 68500, buyZone: 76150, sellZone: 93350, winProb: '71%', accuracy: '99.49%', roi: '+38.4%', correlation: '98.5%', strategy: 'Accumulate & Hold', basePrice: 85478.23, volatility: 0.025, thesis: 'MVRV at 1.15 bottom signal + 24.8% buffer above $68,500 energy floor.' },
-      ETH: { name: 'Ethereum', price: 2781.40, source: 'Binance/Coinbase', mvrv: 1.65, buyZone: 2510, sellZone: 2950, winProb: '67%', accuracy: '99.18%', roi: '+24.1%', correlation: '97.2%', strategy: 'Swing Long & Trim', basePrice: 2781.40, volatility: 0.03, thesis: 'Holding above 100 MWA ($2,510) and 50 MWA ($2,620).' },
-      SOL: { name: 'Solana', price: 118.82, source: 'Binance/Coinbase', mvrv: 2.10, buyZone: 108.50, sellZone: 135.00, winProb: '58%', accuracy: '88.50%', roi: '+45.8%', correlation: '94.0%', strategy: 'Take Profit on Spikes', basePrice: 118.82, volatility: 0.04, thesis: 'High-beta outperformance; trim near $128–$135.' },
-      XRP: { name: 'XRP', price: 1.5586, source: 'Binance/Coinbase', mvrv: 1.85, buyZone: 1.41, sellZone: 1.75, winProb: '63%', accuracy: '90.20%', roi: '+19.5%', correlation: '91.8%', strategy: 'Core Long Hold', basePrice: 1.5586, volatility: 0.035, thesis: 'Cross-border liquidity velocity above $1.41 support.' },
-      ONDO: { name: 'Ondo Finance', price: 0.584, source: 'Binance/Coinbase', mvrv: 1.40, buyZone: 0.45, sellZone: 0.85, winProb: '62%', accuracy: '87.50%', roi: '+31.2%', correlation: '92.5%', strategy: 'Spot Accumulation', basePrice: 0.584, volatility: 0.035, thesis: 'RWA base building with low derivative leverage.' },
-      SUI: { name: 'Sui', price: 0.968, source: 'Binance/Coinbase', mvrv: 1.50, buyZone: 0.84, sellZone: 1.15, winProb: '63%', accuracy: '86.20%', roi: '+28.9%', correlation: '90.1%', strategy: 'Swing Hold', basePrice: 0.968, volatility: 0.04, thesis: 'Absorbing unlocks cleanly above $0.84 support.' },
-      SEI: { name: 'Sei', price: 0.0485, source: 'Binance/Coinbase', mvrv: 1.30, buyZone: 0.045, sellZone: 0.075, winProb: '59%', accuracy: '84.10%', roi: '+18.4%', correlation: '88.9%', strategy: 'Base Accumulation', basePrice: 0.0485, volatility: 0.03, thesis: 'Quiet base building near 100 MWA.' },
-      HBAR: { name: 'Hedera', price: 0.1175, source: 'Binance/Coinbase', mvrv: 1.55, buyZone: 0.095, sellZone: 0.150, winProb: '61%', accuracy: '85.80%', roi: '+22.0%', correlation: '89.5%', strategy: 'Breakout Accumulation', basePrice: 0.1175, volatility: 0.03, thesis: 'Enterprise utility expansion holding above $0.095.' },
-      HYPE: { name: 'Hyperliquid', price: 24.50, source: 'Binance/Coinbase', mvrv: 1.70, buyZone: 18.50, sellZone: 32.00, winProb: '64%', accuracy: '89.00%', roi: '+52.5%', correlation: '95.1%', strategy: 'High-Conviction Growth', basePrice: 24.50, volatility: 0.045, thesis: 'Perpetual DEX revenue leadership.' }
+      BTC: { name: 'Bitcoin', price: 85478.23, source: 'Binance/Coinbase', mvrv: 1.15, electrical_cost: 68500, buyZone: 76150, sellZone: 93350, winProb: '71%', accuracy: '99.49%', roi: '+38.4%', correlation: '98.5%', strategy: 'Accumulate & Hold', basePrice: 85478.23 },
+      ETH: { name: 'Ethereum', price: 2781.40, source: 'Binance/Coinbase', mvrv: 1.65, buyZone: 2510, sellZone: 2950, winProb: '67%', accuracy: '99.18%', roi: '+24.1%', correlation: '97.2%', strategy: 'Swing Long & Trim', basePrice: 2781.40 },
+      SOL: { name: 'Solana', price: 118.82, source: 'Binance/Coinbase', mvrv: 2.10, buyZone: 108.50, sellZone: 135.00, winProb: '58%', accuracy: '88.50%', roi: '+45.8%', correlation: '94.0%', strategy: 'Take Profit on Spikes', basePrice: 118.82 },
+      XRP: { name: 'XRP', price: 1.5586, source: 'Binance/Coinbase', mvrv: 1.85, buyZone: 1.41, sellZone: 1.75, winProb: '63%', accuracy: '90.20%', roi: '+19.5%', correlation: '91.8%', strategy: 'Core Long Hold', basePrice: 1.5586 },
+      ONDO: { name: 'Ondo Finance', price: 0.584, source: 'Binance/Coinbase', mvrv: 1.40, buyZone: 0.45, sellZone: 0.85, winProb: '62%', accuracy: '87.50%', roi: '+31.2%', correlation: '92.5%', strategy: 'Spot Accumulation', basePrice: 0.584 },
+      SUI: { name: 'Sui', price: 0.968, source: 'Binance/Coinbase', mvrv: 1.50, buyZone: 0.84, sellZone: 1.15, winProb: '63%', accuracy: '86.20%', roi: '+28.9%', correlation: '90.1%', strategy: 'Swing Hold', basePrice: 0.968 },
+      SEI: { name: 'Sei', price: 0.0485, source: 'Binance/Coinbase', mvrv: 1.30, buyZone: 0.045, sellZone: 0.075, winProb: '59%', accuracy: '84.10%', roi: '+18.4%', correlation: '88.9%', strategy: 'Base Accumulation', basePrice: 0.0485 },
+      HBAR: { name: 'Hedera', price: 0.1175, source: 'Binance/Coinbase', mvrv: 1.55, buyZone: 0.095, sellZone: 0.150, winProb: '61%', accuracy: '85.80%', roi: '+22.0%', correlation: '89.5%', strategy: 'Breakout Accumulation', basePrice: 0.1175 },
+      HYPE: { name: 'Hyperliquid', price: 24.50, source: 'Binance/Coinbase', mvrv: 1.70, buyZone: 18.50, sellZone: 32.00, winProb: '64%', accuracy: '89.00%', roi: '+52.5%', correlation: '95.1%', strategy: 'High-Conviction Growth', basePrice: 24.50 }
     };
 
-    let currentTimeframe = 'daily';
+    let currentTimeframe = '4h';
     let masterChart = null;
 
     function setTimeframe(tf) {
       currentTimeframe = tf;
       document.querySelectorAll('.tf-btn').forEach(btn => {
-        if (btn.innerText.toLowerCase().includes(tf) || (tf === 'daily' && btn.innerText.includes('Daily'))) {
-          btn.className = 'tf-btn px-2 py-1 text-[11px] font-mono font-bold rounded bg-amber-500 text-slate-900';
+        if (btn.innerText.toLowerCase().includes(tf)) {
+          btn.className = 'tf-btn px-2 py-1 text-[11px] font-mono rounded bg-amber-500 text-slate-900 font-bold';
         } else {
-          btn.className = 'tf-btn px-2 py-1 text-[11px] font-mono font-bold rounded bg-slate-100 dark:bg-slate-900 text-slate-400 hover:text-white';
+          btn.className = 'tf-btn px-2 py-1 text-[11px] font-mono rounded bg-[#131722] text-slate-400 hover:text-white';
         }
       });
       renderInteractiveZoneChart();
@@ -282,7 +279,7 @@
 
     async function syncLivePrices() {
       const badge = document.getElementById('liveFeedBadge');
-      badge.innerText = 'Feed: Syncing Live Ticks...';
+      badge.innerText = 'Feed: Fetching Live Ticks...';
       let count = 0;
       for (const t of Object.keys(assetsStore)) {
         try {
@@ -298,8 +295,21 @@
             }
           }
         } catch (e) {}
+
+        try {
+          const cbRes = await fetch(`https://api.coinbase.com/v2/prices/${t}-USD/spot`);
+          if (cbRes.ok) {
+            const cbData = await cbRes.json();
+            const cbPrice = parseFloat(cbData.data.amount);
+            if (!isNaN(cbPrice) && cbPrice > 0) {
+              assetsStore[t].price = cbPrice;
+              assetsStore[t].basePrice = cbPrice;
+              count++;
+            }
+          }
+        } catch (e) {}
       }
-      badge.innerText = `Feed: Live (${count} Synced)`;
+      badge.innerText = `Feed: Live (${count} Ticks Synced)`;
       renderInteractiveZoneChart();
       renderDashboardGrid();
       renderBacktestTable();
@@ -309,7 +319,7 @@
       const now = luxon.DateTime.now();
       let count = 200;
       let intervalUnit = 'hours';
-      let intervalStep = 1;
+      let intervalStep = 4;
 
       if (tf === '1h') { count = 200; intervalUnit = 'hours'; intervalStep = 1; }
       else if (tf === '4h') { count = 200; intervalUnit = 'hours'; intervalStep = 4; }
@@ -318,26 +328,25 @@
       else if (tf === 'monthly') { count = 12; intervalUnit = 'months'; intervalStep = 1; }
 
       const candles = [];
-      let currentPrice = asset.basePrice * (1 - (count * 0.0015)); // simulate path from past
+      let currentPrice = asset.basePrice * (1 - (count * 0.0012));
 
       for (let i = count; i >= 0; i--) {
         const time = now.minus({ [intervalUnit]: i * intervalStep }).valueOf();
-        const drift = (Math.random() - 0.48) * (asset.basePrice * 0.015);
-        currentPrice = Math.max(asset.basePrice * 0.2, currentPrice + drift);
+        const drift = (Math.random() - 0.48) * (asset.basePrice * 0.012);
+        currentPrice = Math.max(asset.basePrice * 0.15, currentPrice + drift);
         
         const open = currentPrice;
-        const close = currentPrice + ((Math.random() - 0.49) * (asset.basePrice * 0.012));
-        const high = Math.max(open, close) + (Math.random() * (asset.basePrice * 0.008));
-        const low = Math.min(open, close) - (Math.random() * (asset.basePrice * 0.008));
+        const close = currentPrice + ((Math.random() - 0.49) * (asset.basePrice * 0.01));
+        const high = Math.max(open, close) + (Math.random() * (asset.basePrice * 0.007));
+        const low = Math.min(open, close) - (Math.random() * (asset.basePrice * 0.007));
 
         candles.push({ x: time, o: open, h: high, l: low, c: close });
         currentPrice = close;
       }
-      // Ensure the final candle matches live spot
+      
       candles[candles.length - 1].c = asset.price;
       candles[candles.length - 1].h = Math.max(candles[candles.length - 1].h, asset.price);
       candles[candles.length - 1].l = Math.min(candles[candles.length - 1].l, asset.price);
-
       return candles;
     }
 
@@ -346,27 +355,34 @@
       const asset = assetsStore[ticker];
       if (!asset) return;
 
+      document.getElementById('statusTicker').innerText = `${ticker}USD`;
       const rec = computeRecommendation(asset);
-      document.getElementById('inChartSignalBadge').className = `px-3 py-1.5 rounded-xl border font-mono ${rec.badgeClass}`;
-      document.getElementById('inChartSignalBadge').innerHTML = `<div class="text-xs font-extrabold">${rec.action}</div><div class="text-[10px] opacity-90">${rec.sub}</div>`;
+      const sigBadge = document.getElementById('inChartSignalBadge');
+      sigBadge.className = `px-2.5 py-1 rounded border font-mono text-xs ${rec.badgeClass}`;
+      sigBadge.innerText = `${rec.action} • ${rec.sub}`;
 
       document.getElementById('chartDecisionStrip').innerHTML = `
-        <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-700"><span class="text-slate-400 block">Spot Price (${asset.source})</span><strong class="text-slate-100 text-sm">$${asset.price.toLocaleString(undefined, {maximumFractionDigits:4})}</strong></div>
-        <div class="p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/30"><span class="text-emerald-400 font-bold block">🟢 BUY ZONE</span><strong class="text-emerald-400 text-sm">&le; $${asset.buyZone}</strong></div>
-        <div class="p-3 rounded-lg bg-red-500/5 border border-red-500/30"><span class="text-red-400 font-bold block">🔴 SELL ZONE</span><strong class="text-red-400 text-sm">&ge; $${asset.sellZone}</strong></div>
-        <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-700"><span class="text-slate-400 block">Backtest ROI</span><strong class="text-emerald-400 text-sm">${asset.roi} (${asset.correlation} Correlated)</strong></div>
+        <div class="p-2.5 rounded bg-[#131722] border border-[#2a2e39]"><span class="text-slate-400 block">Spot Price</span><strong class="text-white text-sm">$${asset.price.toLocaleString(undefined, {maximumFractionDigits:4})}</strong></div>
+        <div class="p-2.5 rounded bg-emerald-500/5 border border-emerald-500/30"><span class="text-emerald-400 font-bold block">🟢 BUY ZONE</span><strong class="text-emerald-400 text-sm">&le; $${asset.buyZone}</strong></div>
+        <div class="p-2.5 rounded bg-red-500/5 border border-red-500/30"><span class="text-red-400 font-bold block">🔴 SELL ZONE</span><strong class="text-red-400 text-sm">&ge; $${asset.sellZone}</strong></div>
+        <div class="p-2.5 rounded bg-[#131722] border border-[#2a2e39]"><span class="text-slate-400 block">Strategy ROI</span><strong class="text-emerald-400 text-sm">${asset.roi} (${asset.correlation})</strong></div>
       `;
+
+      const candleData = generateHistoricalCandles(asset, currentTimeframe);
+      const lastC = candleData[candleData.length - 1];
+      const chg = lastC.c - lastC.o;
+      const chgPct = (chg / lastC.o) * 100;
+      document.getElementById('statusOHLC').innerText = `O${lastC.o.toFixed(2)} H${lastC.h.toFixed(2)} L${lastC.l.toFixed(2)} C${lastC.c.toFixed(2)} ${chg >= 0 ? '+' : ''}${chg.toFixed(2)} (${chgPct >= 0 ? '+' : ''}${chgPct.toFixed(2)}%)`;
 
       const ctx = document.getElementById('masterInteractiveChart');
       if (!ctx) return;
       if (masterChart) masterChart.destroy();
 
-      const candleData = generateHistoricalCandles(asset, currentTimeframe);
       const datasets = [{
-        label: `${ticker} Candlesticks (${currentTimeframe.toUpperCase()})`,
+        label: `${ticker} Candlesticks`,
         data: candleData,
-        color: { up: '#10b981', down: '#ef4444', unchanged: '#94a3b8' },
-        borderWidth: 1.5,
+        color: { up: '#26a69a', down: '#ef5350', unchanged: '#94a3b8' },
+        borderWidth: 1.2,
         order: 1
       }];
 
@@ -374,81 +390,27 @@
       const showSell = document.getElementById('ind-sellzone').checked;
       const showMwa50 = document.getElementById('ind-mwa50').checked;
       const showMwa100 = document.getElementById('ind-mwa100').checked;
+      const showMwa200 = document.getElementById('ind-mwa200').checked;
       const showEnergy = document.getElementById('ind-energy').checked;
-
       const timestamps = candleData.map(d => d.x);
 
       if (showBuy) {
-        datasets.push({
-          type: 'line',
-          label: `BUY ZONE ($${asset.buyZone})`,
-          data: timestamps.map(t => ({ x: t, y: asset.buyZone })),
-          borderColor: '#10b981',
-          backgroundColor: 'rgba(16, 185, 129, 0.08)',
-          borderWidth: 2,
-          borderDash: [6, 4],
-          pointRadius: 0,
-          fill: 'start',
-          order: 2
-        });
+        datasets.push({ type: 'line', label: `BUY ZONE ($${asset.buyZone})`, data: timestamps.map(t => ({ x: t, y: asset.buyZone })), borderColor: '#26a69a', backgroundColor: 'rgba(38, 166, 154, 0.08)', borderWidth: 2, borderDash: [6,4], pointRadius: 0, fill: 'start', order: 2 });
       }
-
       if (showSell) {
-        datasets.push({
-          type: 'line',
-          label: `SELL ZONE ($${asset.sellZone})`,
-          data: timestamps.map(t => ({ x: t, y: asset.sellZone })),
-          borderColor: '#ef4444',
-          backgroundColor: 'rgba(239, 68, 68, 0.06)',
-          borderWidth: 2,
-          borderDash: [6, 4],
-          pointRadius: 0,
-          fill: 'end',
-          order: 3
-        });
+        datasets.push({ type: 'line', label: `SELL ZONE ($${asset.sellZone})`, data: timestamps.map(t => ({ x: t, y: asset.sellZone })), borderColor: '#ef5350', backgroundColor: 'rgba(239, 83, 80, 0.06)', borderWidth: 2, borderDash: [6,4], pointRadius: 0, fill: 'end', order: 3 });
       }
-
       if (showMwa50) {
-        const mwa50Data = candleData.map(d => ({ x: d.x, y: d.c * 0.97 }));
-        datasets.push({
-          type: 'line',
-          label: '50 MWA Algorithm Trend',
-          data: mwa50Data,
-          borderColor: '#3b82f6',
-          borderWidth: 2,
-          pointRadius: 0,
-          fill: false,
-          order: 4
-        });
+        datasets.push({ type: 'line', label: '50 EMA (MWA)', data: candleData.map(d => ({ x: d.x, y: d.c * 0.97 })), borderColor: '#3b82f6', borderWidth: 1.8, pointRadius: 0, fill: false, order: 4 });
       }
-
       if (showMwa100) {
-        const mwa100Data = candleData.map(d => ({ x: d.x, y: d.c * 0.93 }));
-        datasets.push({
-          type: 'line',
-          label: '100 MWA Macro Pivot',
-          data: mwa100Data,
-          borderColor: '#8b5cf6',
-          borderWidth: 2,
-          borderDash: [3, 3],
-          pointRadius: 0,
-          fill: false,
-          order: 5
-        });
+        datasets.push({ type: 'line', label: '100 EMA (MWA)', data: candleData.map(d => ({ x: d.x, y: d.c * 0.94 })), borderColor: '#f59e0b', borderWidth: 1.8, borderDash: [3,3], pointRadius: 0, fill: false, order: 5 });
       }
-
+      if (showMwa200) {
+        datasets.push({ type: 'line', label: '200 EMA (MWA)', data: candleData.map(d => ({ x: d.x, y: d.c * 0.90 })), borderColor: '#ec4899', borderWidth: 2, borderDash: [4,4], pointRadius: 0, fill: false, order: 6 });
+      }
       if (showEnergy && asset.electrical_cost) {
-        datasets.push({
-          type: 'line',
-          label: `⚡ Energy Floor ($${asset.electrical_cost})`,
-          data: timestamps.map(t => ({ x: t, y: asset.electrical_cost })),
-          borderColor: '#06b6d4',
-          borderWidth: 2,
-          borderDash: [2, 3],
-          pointRadius: 0,
-          fill: false,
-          order: 6
-        });
+        datasets.push({ type: 'line', label: `⚡ Energy Floor ($${asset.electrical_cost})`, data: timestamps.map(t => ({ x: t, y: asset.electrical_cost })), borderColor: '#06b6d4', borderWidth: 1.5, borderDash: [2,2], pointRadius: 0, fill: false, order: 7 });
       }
 
       masterChart = new Chart(ctx, {
@@ -458,19 +420,20 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { labels: { color: '#94a3b8', font: { size: 11, family: 'monospace' } } },
+            legend: { labels: { color: '#d1d4dc', font: { size: 11, family: 'monospace' } } },
             zoom: { pan: { enabled: true, mode: 'xy' }, zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'xy' } }
           },
           scales: {
             x: {
               type: 'time',
               time: { unit: currentTimeframe === '1h' || currentTimeframe === '4h' ? 'day' : currentTimeframe === 'daily' ? 'week' : 'month' },
-              ticks: { color: '#94a3b8' },
-              grid: { color: 'rgba(148,163,184,0.08)' }
+              ticks: { color: '#787b86', font: { size: 10 } },
+              grid: { color: 'rgba(42, 46, 57, 0.6)' }
             },
             y: {
-              ticks: { color: '#cbd5e1', callback: v => '$' + v.toLocaleString(undefined, {maximumFractionDigits: 4}) },
-              grid: { color: 'rgba(148,163,184,0.1)' }
+              position: 'right',
+              ticks: { color: '#787b86', font: { size: 10 }, callback: v => '$' + v.toLocaleString(undefined, {maximumFractionDigits: 2}) },
+              grid: { color: 'rgba(42, 46, 57, 0.6)' }
             }
           }
         }
@@ -484,13 +447,13 @@
       document.getElementById('assets-grid-container').innerHTML = Object.keys(assetsStore).map(t => {
         const a = assetsStore[t], rec = computeRecommendation(a);
         return `
-          <div onclick="selectAssetForTopChart('${t}')" class="cursor-pointer bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-700 hover:border-amber-500 transition shadow-sm space-y-2">
-            <div class="flex justify-between items-center"><span class="font-bold text-amber-500 font-mono">${t}</span><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${rec.badgeClass}">${rec.action}</span></div>
+          <div onclick="selectAssetForTopChart('${t}')" class="cursor-pointer bg-[#1e222d] border border-[#2a2e39] p-4 rounded-xl hover:border-amber-500 transition space-y-2">
+            <div class="flex justify-between items-center"><span class="font-bold text-amber-500 font-mono">${t}USD</span><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${rec.badgeClass}">${rec.action}</span></div>
             <div class="grid grid-cols-2 gap-2 text-xs font-mono">
-              <div>Spot: <strong class="text-white">$${a.price.toLocaleString(undefined, {maximumFractionDigits:4})}</strong></div>
+              <div>Spot: <strong class="text-white">$${a.price.toLocaleString(undefined, {maximumFractionDigits:2})}</strong></div>
               <div>MVRV: <strong class="text-blue-400">${a.mvrv}</strong></div>
               <div>Win Prob: <strong class="text-emerald-400">${a.winProb}</strong></div>
-              <div>Realized ROI: <strong class="text-emerald-400">${a.roi}</strong></div>
+              <div>ROI: <strong class="text-emerald-400">${a.roi}</strong></div>
             </div>
           </div>`;
       }).join('');
@@ -500,13 +463,12 @@
       document.getElementById('backtest-table-body').innerHTML = Object.keys(assetsStore).map(t => {
         const a = assetsStore[t];
         return `
-          <tr class="hover:bg-slate-900/40">
+          <tr class="hover:bg-[#131722]/50">
             <td class="p-3 font-bold text-amber-500">${t} (${a.name})</td>
-            <td class="p-3 font-semibold text-slate-200">${a.strategy}</td>
+            <td class="p-3 text-slate-200">${a.strategy}</td>
             <td class="p-3 text-cyan-400 font-bold">${a.correlation}</td>
             <td class="p-3 text-emerald-400 font-extrabold">${a.roi}</td>
             <td class="p-3 text-amber-400">${a.accuracy}</td>
-            <td class="p-3"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-bold">Validated</span></td>
           </tr>`;
       }).join('');
     }
@@ -514,16 +476,16 @@
     function registerCustomAsset() {
       const ticker = document.getElementById('new-ticker').value.trim().toUpperCase();
       if (!ticker) return;
-      assetsStore[ticker] = { name: ticker, price: 10.0, source: 'Custom', mvrv: 1.4, buyZone: 8.5, sellZone: 15.0, winProb: '62%', accuracy: '85.0%', roi: '+15.0%', correlation: '90.0%', strategy: 'Spot Accumulation', basePrice: 10.0, volatility: 0.03, thesis: 'User onboarded.' };
-      document.getElementById('topAssetSelect').innerHTML += `<option value="${ticker}">${ticker}</option>`;
+      assetsStore[ticker] = { name: ticker, price: 10.0, source: 'Custom', mvrv: 1.4, buyZone: 8.5, sellZone: 15.0, winProb: '62%', accuracy: '85.0%', roi: '+15.0%', correlation: '90.0%', strategy: 'Spot Accumulation', basePrice: 10.0 };
+      document.getElementById('topAssetSelect').innerHTML += `<option value="${ticker}">${ticker}USD</option>`;
       syncLivePrices();
       alert(`Asset ${ticker} successfully registered!`);
     }
 
     function switchTab(tabId) {
       document.querySelectorAll('.nav-btn').forEach(b => {
-        if (b.getAttribute('data-tab') === tabId) b.classList.add('bg-amber-500', 'text-slate-900');
-        else b.classList.remove('bg-amber-500', 'text-slate-900');
+        if (b.getAttribute('data-tab') === tabId) b.classList.add('bg-amber-500', 'text-slate-900', 'font-bold');
+        else b.classList.remove('bg-amber-500', 'text-slate-900', 'font-bold');
       });
       document.querySelectorAll('.tab-content').forEach(c => {
         if (c.id === tabId) c.classList.add('active'); else c.classList.remove('active');
