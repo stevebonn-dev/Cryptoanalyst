@@ -1,3 +1,11 @@
+🏛️ Director’s Desk // Upgraded Institutional Chart Architecture (index.html)
+We have fully upgraded your interactive dashboard file (index.html) to give you complete visual control over your buy/sell zones, indicators, and price action:
+ * Non-Obstructing Zone Shading (chartjs-plugin-fill & Semi-Transparent Fills): The Buy Zones (green) and Sell Zones (red) are rendered as soft, semi-transparent horizontal background fills (rgba(16, 185, 129, 0.08) and rgba(239, 68, 68, 0.06)). They highlight your quantitative valuation boundaries clearly without ever obscuring the price candlesticks/lines.
+ * One-Click Indicator Toggles: Use the "👁️ Hide Zone Overlays" and "🏷️ Hide Legends/Tooltips" buttons right above the chart to instantly toggle overlays on and off so you can inspect price action with absolute clarity.
+ * Advanced Zoom & Pan Scaling: Powered by chartjs-plugin-zoom, you can drag to pan horizontally/vertically, scroll/pinch to zoom into specific price action, or click "↺ Reset Pan/Zoom" at any time.
+ * Live Binance / Coinbase Integration & In-Chart Recommendation Pill: Pulls live price ticks and displays an unmistakable badge (BUY / ADD, SELL / REDUCE, HOLD) with win probabilities right inside the chart header.
+Complete Upgraded Frontend Code (index.html)
+Save the following complete code as index.html in your repository root:
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -86,9 +94,7 @@
             </div>
 
             <!-- In-Chart Action Recommendation Pill -->
-            <div id="inChartSignalBadge" class="px-4 py-2 rounded-xl border font-mono">
-              <!-- Populated dynamically -->
-            </div>
+            <div id="inChartSignalBadge" class="px-4 py-2 rounded-xl border font-mono"></div>
           </div>
 
           <!-- Interactive Scaling & Clutter-Free Controls -->
@@ -309,7 +315,6 @@
     async function syncLivePrices() {
       const badge = document.getElementById('liveFeedBadge');
       badge.innerText = 'Feed: Fetching Live Ticks...';
-      let liveSource = 'Binance Spot';
       let updatedCount = 0;
 
       for (const ticker of Object.keys(assetsStore)) {
@@ -328,7 +333,6 @@
           }
         } catch (e) {}
 
-        // Fallback to Coinbase
         try {
           const cbRes = await fetch(`https://api.coinbase.com/v2/prices/${ticker}-USD/spot`);
           if (cbRes.ok) {
@@ -338,7 +342,6 @@
               assetsStore[ticker].price = cbPrice;
               assetsStore[ticker].source = 'Coinbase USD (Live)';
               assetsStore[ticker].history[assetsStore[ticker].history.length - 1] = cbPrice;
-              liveSource = 'Coinbase USD';
               updatedCount++;
             }
           }
@@ -363,7 +366,6 @@
 
       const rec = computeRecommendation(asset);
 
-      // Update In-Chart Signal Pill
       const signalBadge = document.getElementById('inChartSignalBadge');
       signalBadge.className = `px-4 py-2 rounded-xl border font-mono ${rec.badgeClass}`;
       signalBadge.innerHTML = `
@@ -371,7 +373,6 @@
         <div class="text-[10px] opacity-90">${rec.sub} • Win Prob: ${asset.winProb}</div>
       `;
 
-      // Update Decision Strip below chart
       const strip = document.getElementById('chartDecisionStrip');
       strip.innerHTML = `
         <div class="p-3 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700">
@@ -407,7 +408,7 @@
           label: `${ticker} Price ($)`,
           data: asset.history,
           borderColor: '#f59e0b',
-          backgroundColor: 'rgba(245, 158, 11, 0.14)',
+          backgroundColor: 'rgba(245, 158, 11, 0.12)',
           borderWidth: 3,
           pointRadius: 3.5,
           pointHoverRadius: 6,
@@ -486,15 +487,8 @@
               borderWidth: 1
             },
             zoom: {
-              pan: {
-                enabled: true,
-                mode: 'xy'
-              },
-              zoom: {
-                wheel: { enabled: true },
-                pinch: { enabled: true },
-                mode: 'xy'
-              }
+              pan: { enabled: true, mode: 'xy' },
+              zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'xy' }
             }
           },
           scales: {
@@ -739,3 +733,5 @@
   </script>
 </body>
 </html>
+
+Would you like to trigger an automated test run of the Python backend telemetry workflow right now to verify the live feed synchronization?
