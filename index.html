@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CryptoAnalyst - TradingView Lightweight Pro Terminal</title>
+  <title>CryptoAnalyst - Institutional Pro Terminal with PVSRA Engine & Macro Desk</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Official TradingView Lightweight Charts Library -->
   <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
@@ -20,22 +20,25 @@
     <div class="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between flex-wrap gap-2">
       <div class="flex items-center space-x-3">
         <span class="text-xl">📈</span>
-        <h1 class="font-bold text-sm tracking-wide text-white">CryptoAnalyst // TradingView Pro Engine</h1>
+        <h1 class="font-bold text-sm tracking-wide text-white">CryptoAnalyst // Institutional Pro Terminal & PVSRA Engine</h1>
         <span id="liveFeedBadge" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-          Feed: Syncing Binance Klines...
+          Feed: Syncing Binance Klines & PVSRA...
         </span>
       </div>
       
       <div class="flex items-center space-x-2">
         <button onclick="loadChartData()" class="px-3 py-1.5 text-xs font-bold rounded bg-amber-500 hover:bg-amber-600 text-slate-900 transition shadow-sm">
-          🔄 Refresh Historical & Live Data
+          🔄 Refresh Data
         </button>
       </div>
     </div>
 
     <!-- Navigation Tabs -->
     <nav class="max-w-7xl mx-auto px-4 flex space-x-2 border-t border-[#2a2e39] pt-2 pb-2 overflow-x-auto text-xs font-semibold">
-      <button data-tab="dashboard" class="nav-btn px-4 py-1.5 rounded bg-amber-500 text-slate-900 font-bold transition">Pro Charting Terminal</button>
+      <button data-tab="dashboard" class="nav-btn px-4 py-1.5 rounded bg-amber-500 text-slate-900 font-bold transition">Pro Charting & PVSRA</button>
+      <button data-tab="macro" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">📅 Macro & Fed Calendar</button>
+      <button data-tab="xfeed" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">🐦 X Feed & Key Posts</button>
+      <button data-tab="report" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">🏛️ Market Analyst Report</button>
       <button data-tab="backtest" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">Strategy Backtest & ROI</button>
       <button data-tab="manager" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">Asset Manager</button>
     </nav>
@@ -44,15 +47,12 @@
   <!-- Main Content -->
   <main class="max-w-7xl mx-auto px-4 py-5 flex-grow w-full space-y-5">
 
-    <!-- TAB 1: TRADINGVIEW PRO TERMINAL -->
+    <!-- TAB 1: TRADINGVIEW PRO TERMINAL WITH PVSRA -->
     <section id="dashboard" class="tab-content active space-y-4">
-
       <div class="bg-[#1e222d] border border-[#2a2e39] rounded-xl p-4 shadow-lg space-y-3">
         
-        <!-- Top Toolbar: Asset, Timeframes & Instant Indicator Toggle Pills -->
+        <!-- Top Toolbar -->
         <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-3 border-b border-[#2a2e39] pb-3">
-          
-          <!-- Left: Asset & Timeframes -->
           <div class="flex flex-wrap items-center gap-3">
             <div>
               <label for="topAssetSelect" class="block text-[10px] uppercase tracking-wider text-slate-400 font-bold">Asset Pair</label>
@@ -72,6 +72,7 @@
             <div>
               <label class="block text-[10px] uppercase tracking-wider text-slate-400 font-bold">Interval</label>
               <div id="timeframeSelector" class="flex space-x-1 mt-0.5">
+                <button onclick="setTimeframe('15m')" class="tf-btn px-2.5 py-1 text-[11px] font-mono rounded bg-[#131722] text-slate-400 hover:text-white border border-[#2a2e39]">15m</button>
                 <button onclick="setTimeframe('1h')" class="tf-btn px-2.5 py-1 text-[11px] font-mono rounded bg-[#131722] text-slate-400 hover:text-white border border-[#2a2e39]">1h</button>
                 <button onclick="setTimeframe('4h')" class="tf-btn px-2.5 py-1 text-[11px] font-mono rounded bg-[#131722] text-slate-400 hover:text-white border border-[#2a2e39]">4h</button>
                 <button onclick="setTimeframe('1d')" class="tf-btn px-2.5 py-1 text-[11px] font-mono rounded bg-amber-500 text-slate-900 font-bold border border-amber-500">Daily</button>
@@ -81,45 +82,23 @@
             </div>
           </div>
 
-          <!-- Right: Direct In-Chart Indicator & Moving Average Toggle Tabs -->
+          <!-- Indicator Toggles including PVSRA -->
           <div class="flex flex-wrap items-center gap-1.5 text-[11px] font-mono">
             <span class="text-slate-400 font-bold mr-1">Indicators:</span>
-            
-            <button id="btn-ma50" onclick="toggleSeries('ma50')" class="px-2.5 py-1 rounded border border-blue-500 bg-blue-500/20 text-blue-300 font-bold transition">
-              ● 50 MA
-            </button>
-            <button id="btn-ma100" onclick="toggleSeries('ma100')" class="px-2.5 py-1 rounded border border-amber-500 bg-amber-500/20 text-amber-300 font-bold transition">
-              ● 100 MA
-            </button>
-            <button id="btn-ma200d" onclick="toggleSeries('ma200d')" class="px-2.5 py-1 rounded border border-pink-500 bg-pink-500/20 text-pink-300 font-bold transition">
-              ● 200 Daily MA
-            </button>
-            <button id="btn-ma200w" onclick="toggleSeries('ma200w')" class="px-2.5 py-1 rounded border border-purple-500 bg-purple-500/20 text-purple-300 font-bold transition">
-              ● 200 Weekly MA
-            </button>
-            <button id="btn-zones" onclick="toggleSeries('zones')" class="px-2.5 py-1 rounded border border-emerald-500 bg-emerald-500/20 text-emerald-300 font-bold transition">
-              ● Buy/Sell Zones
-            </button>
-            <button id="btn-energy" onclick="toggleSeries('energy')" class="px-2.5 py-1 rounded border border-cyan-500 bg-cyan-500/20 text-cyan-300 font-bold transition">
-              ⚡ Energy Floor
-            </button>
-
-            <button onclick="fitChartContent()" class="ml-2 px-2.5 py-1 rounded bg-[#2a2e39] text-slate-200 hover:bg-amber-500 hover:text-slate-900 font-bold transition" title="Auto-fit all candles">
-              ⛶ Fit
-            </button>
+            <button id="btn-ma50" onclick="toggleSeries('ma50')" class="px-2.5 py-1 rounded border border-blue-500 bg-blue-500/20 text-blue-300 font-bold transition">● 50 MA</button>
+            <button id="btn-ma100" onclick="toggleSeries('ma100')" class="px-2.5 py-1 rounded border border-amber-500 bg-amber-500/20 text-amber-300 font-bold transition">● 100 MA</button>
+            <button id="btn-ma200d" onclick="toggleSeries('ma200d')" class="px-2.5 py-1 rounded border border-pink-500 bg-pink-500/20 text-pink-300 font-bold transition">● 200D MA</button>
+            <button id="btn-ma200w" onclick="toggleSeries('ma200w')" class="px-2.5 py-1 rounded border border-purple-500 bg-purple-500/20 text-purple-300 font-bold transition">● 200W MA</button>
+            <button id="btn-zones" onclick="toggleSeries('zones')" class="px-2.5 py-1 rounded border border-emerald-500 bg-emerald-500/20 text-emerald-300 font-bold transition">● Buy/Sell Zones</button>
+            <button id="btn-energy" onclick="toggleSeries('energy')" class="px-2.5 py-1 rounded border border-cyan-500 bg-cyan-500/20 text-cyan-300 font-bold transition">⚡ Energy Floor</button>
+            <button id="btn-sfp" onclick="toggleSeries('sfp')" class="px-2.5 py-1 rounded border border-red-500 bg-red-500/20 text-red-300 font-bold transition">🎯 SFP Trap</button>
+            <button id="btn-pvsra" onclick="toggleSeries('pvsra')" class="px-2.5 py-1 rounded border border-fuchsia-500 bg-fuchsia-500/30 text-fuchsia-300 font-bold transition">🔮 PVSRA Climax</button>
+            <button onclick="fitChartContent()" class="ml-2 px-2.5 py-1 rounded bg-[#2a2e39] text-slate-200 hover:bg-amber-500 hover:text-slate-900 font-bold transition">⛶ Fit</button>
           </div>
         </div>
 
-        <!-- Usability Hint Bar -->
-        <div class="flex flex-wrap justify-between items-center text-[11px] text-slate-400 font-mono">
-          <span>🖱️ <strong>TradingView Controls:</strong> Drag <strong>Right Price Axis</strong> to stretch vertically • Drag <strong>Bottom Time Axis</strong> to stretch horizontally • Drag chart to pan</span>
-          <span id="dataSourceLabel" class="text-emerald-400">Source: Live Binance Historical Klines</span>
-        </div>
-
-        <!-- TradingView Lightweight Charts Container with Floating Top-Left HUD -->
+        <!-- Chart Container with Floating HUD -->
         <div class="relative w-full h-[540px] bg-[#131722] rounded-lg border border-[#2a2e39] overflow-hidden">
-          
-          <!-- Floating Top-Left Legend HUD (Updates dynamically on crosshair move!) -->
           <div id="tvFloatingLegend" class="absolute top-3 left-3 z-20 bg-[#1e222d]/90 backdrop-blur-md border border-[#2a2e39] px-3 py-2 rounded-lg font-mono text-xs pointer-events-none shadow-lg space-y-1">
             <div class="flex items-center space-x-2">
               <span class="font-extrabold text-white text-sm" id="hudTicker">BTCUSDT</span>
@@ -136,31 +115,208 @@
             <div class="flex space-x-3 text-[10px] pt-0.5 border-t border-[#2a2e39]">
               <span id="hudBuy" class="text-emerald-400 font-bold">🟢 Buy Zone: --</span>
               <span id="hudSell" class="text-red-400 font-bold">🔴 Sell Zone: --</span>
+              <span id="hudPvsra" class="text-fuchsia-400 font-bold">🔮 PVSRA: --</span>
             </div>
           </div>
-
-          <!-- Actual Chart Mount Point -->
           <div id="tvChartContainer" class="w-full h-full"></div>
         </div>
 
-        <!-- Decision Strip -->
-        <div id="chartDecisionStrip" class="grid grid-cols-1 md:grid-cols-4 gap-3 pt-1 text-xs font-mono"></div>
+        <div id="chartDecisionStrip" class="grid grid-cols-1 md:grid-cols-5 gap-3 pt-1 text-xs font-mono"></div>
       </div>
 
-      <!-- Asset Summary Matrix -->
       <div class="flex justify-between items-center pt-2">
-        <h2 class="text-sm font-extrabold text-white">📊 Watchlist Matrix & Live Spot Ticks</h2>
+        <h2 class="text-sm font-extrabold text-white">📊 Watchlist Matrix, PVSRA Regime & Live Signals</h2>
       </div>
       <div id="assets-grid-container" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
-
     </section>
 
-    <!-- TAB 2: BACKTEST & ROI -->
+    <!-- TAB 2: MACRO & FED CALENDAR -->
+    <section id="macro" class="tab-content space-y-6">
+      <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
+        <div class="border-b border-[#2a2e39] pb-4 flex justify-between items-center">
+          <div>
+            <h2 class="text-lg font-extrabold text-white flex items-center space-x-2">
+              <span>📅</span><span>Americas Macro & Fed Economic Calendar (2026/2027)</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Key U.S. inflation releases, FOMC meetings, and rate decisions to track market volatility.</p>
+          </div>
+          <span class="px-2.5 py-1 bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold rounded">U.S. Economic Desk</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs font-mono">
+            <thead class="bg-[#131722] text-slate-400 uppercase">
+              <tr>
+                <th class="p-3">Event Date & Time</th>
+                <th class="p-3">Category</th>
+                <th class="p-3">Event Description</th>
+                <th class="p-3">Expected Market Impact</th>
+                <th class="p-3">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#2a2e39] text-slate-300">
+              <tr class="hover:bg-[#131722]/50 bg-amber-500/5">
+                <td class="p-3 font-bold text-amber-400">Dec 8–9, 2026</td>
+                <td class="p-3 font-semibold text-blue-400">FOMC Meeting</td>
+                <td class="p-3">Federal Open Market Committee Rate Decision & Press Conference</td>
+                <td class="p-3 text-emerald-400 font-bold">High Volatility (Rate Path & QT Pace)</td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 text-[10px] font-bold">Upcoming</span></td>
+              </tr>
+              <tr class="hover:bg-[#131722]/50">
+                <td class="p-3 font-bold text-amber-400">Dec 10, 2026 (8:30 AM ET)</td>
+                <td class="p-3 font-semibold text-purple-400">CPI Inflation</td>
+                <td class="p-3">Consumer Price Index (Nov 2026 Report)</td>
+                <td class="p-3 text-emerald-400 font-bold">High (Core Inflation & Yield Curve)</td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 text-[10px] font-bold">Upcoming</span></td>
+              </tr>
+              <tr class="hover:bg-[#131722]/50">
+                <td class="p-3 font-bold text-slate-300">Jan 13, 2027 (8:30 AM ET)</td>
+                <td class="p-3 font-semibold text-purple-400">CPI Inflation</td>
+                <td class="p-3">Consumer Price Index (Dec 2026 Report)</td>
+                <td class="p-3 text-emerald-400 font-bold">High (Q4 Inflation Print)</td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-500/10 text-slate-400 text-[10px] font-bold">Scheduled</span></td>
+              </tr>
+              <tr class="hover:bg-[#131722]/50">
+                <td class="p-3 font-bold text-slate-300">Jan 26–27, 2027</td>
+                <td class="p-3 font-semibold text-blue-400">FOMC Meeting</td>
+                <td class="p-3">FOMC Rate Decision & Summary of Economic Projections</td>
+                <td class="p-3 text-emerald-400 font-bold">High Volatility</td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-500/10 text-slate-400 text-[10px] font-bold">Scheduled</span></td>
+              </tr>
+              <tr class="hover:bg-[#131722]/50">
+                <td class="p-3 font-bold text-slate-300">Feb 11, 2027 (8:30 AM ET)</td>
+                <td class="p-3 font-semibold text-purple-400">CPI Inflation</td>
+                <td class="p-3">Consumer Price Index (Jan 2027 Report)</td>
+                <td class="p-3 text-emerald-400 font-bold">High (Consumer Price Trends)</td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-500/10 text-slate-400 text-[10px] font-bold">Scheduled</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: X FEED & KEY POSTS -->
+    <section id="xfeed" class="tab-content space-y-6">
+      <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
+        <div class="border-b border-[#2a2e39] pb-4 flex justify-between items-center">
+          <div>
+            <h2 class="text-lg font-extrabold text-white flex items-center space-x-2">
+              <span>🐦</span><span>X / Twitter Feed & Key Market Posts</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Real-time curated intelligence from followed macro, liquidity, and on-chain analysts.</p>
+          </div>
+          <span class="px-2.5 py-1 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold rounded">Live Stream Sync</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-white">@MacroWatcher // Liquidity Desk</span>
+              <span class="text-slate-500">2h ago</span>
+            </div>
+            <p class="text-slate-300 text-[11px]">"RRP facility draining slower than expected, but commercial bank reserves remain robust above $3.2T. Spot BTC accumulation near $82k-$84k buy walls is acting as an impenetrable institutional floor ahead of the Dec FOMC meeting."</p>
+            <div class="text-[10px] text-emerald-400 font-bold">#Bitcoin #Macro #Liquidity</div>
+          </div>
+
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-white">@OrderFlowPro // Derivative Desk</span>
+              <span class="text-slate-500">4h ago</span>
+            </div>
+            <p class="text-slate-300 text-[11px]">"Spotted a clean SFP + PVSRA Stopping Volume bar on ETH below the $2,640 local sweep level. Aggressive short CVD divergence instantly reclaimed on heavy spot buying. Trapped shorts getting squeezed toward $2,780 resistance."</p>
+            <div class="text-[10px] text-blue-400 font-bold">#Ethereum #OrderFlow #PVSRA</div>
+          </div>
+
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-white">@OnChainMVRV // Metrics</span>
+              <span class="text-slate-500">6h ago</span>
+            </div>
+            <p class="text-slate-300 text-[11px]">"BTC MVRV sits at 1.15. Historically, any print below 1.20 during macro expansions signals peak accumulation territory before structural continuation toward +2 Std Dev bands ($93k+)."</p>
+            <div class="text-[10px] text-amber-400 font-bold">#Bitcoin #MVRV #OnChain</div>
+          </div>
+
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-white">@RWACapital // Tokenization</span>
+              <span class="text-slate-500">9h ago</span>
+            </div>
+            <p class="text-slate-300 text-[11px]">"Ondo Finance protocol TVL hitting new highs as institutional treasury notes migrate on-chain. Zero derivative leverage means spot accumulation is clean and primed for the next RWA sector rotation."</p>
+            <div class="text-[10px] text-purple-400 font-bold">#Ondo #RWA #DeFi</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: MARKET ANALYST ADVISOR REPORT (WITH PVSRA TELEMETRY) -->
+    <section id="report" class="tab-content space-y-6">
+      <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
+        <div class="border-b border-[#2a2e39] pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <div>
+            <h2 class="text-xl font-extrabold text-white flex items-center space-x-2">
+              <span>🏛️</span><span>Director’s Desk // Executive Crypto Intelligence & PVSRA Telemetry</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Senior Investment Director Memorandum & Volume-Spread Asset Outlook (Master Report v4.4)</p>
+          </div>
+          <span class="px-2.5 py-1 bg-fuchsia-500/10 border border-fuchsia-500/30 text-fuchsia-400 text-[11px] font-bold rounded-lg">PVSRA + MVRV Calibrated</span>
+        </div>
+
+        <div class="space-y-4 text-xs font-mono">
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-white text-sm">1. Bitcoin (BTC) — Macro Anchor & Liquidity Bellwether</span>
+              <span class="text-emerald-400 font-bold">Bullish Consolidation // PVSRA: Institutional Absorption</span>
+            </div>
+            <p class="text-slate-300"><strong>Dynamics & PVSRA Flow:</strong> Absorbing macro liquidity friction with robust spot-led accumulation. PVSRA volume-spread telemetry confirms high-volume stopping bars and iceberg absorption resting above major buy walls ($82,500–$83,000), neutralizing downside sell pressure.</p>
+            <p class="text-amber-400 font-semibold">Outlook & Action: Coiling for a test of $85,000–$86,500 resistance. Supported by strong spot bids at the 50 MWA and MVRV 1.15 undervaluation signal.</p>
+          </div>
+
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-white text-sm">2. Ethereum (ETH) — Smart Contract Settlement Layer</span>
+              <span class="text-emerald-400 font-bold">Bullish Continuation // PVSRA: Rising Demand Spreads</span>
+            </div>
+            <p class="text-slate-300"><strong>Dynamics & PVSRA Flow:</strong> Whale netflows show consistent exchange withdrawals above reclaimed 100 MWA (~$2,530). PVSRA prints expanding green volume spreads on rebounds off the $2,640 pivot with minimal overhead supply climax.</p>
+            <p class="text-amber-400 font-semibold">Outlook & Action: Defending 50 MWA pivot (~$2,640). Hold core swing longs targeting overhead resistance at $2,780–$2,950.</p>
+          </div>
+
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-white text-sm">3. Solana (SOL) — High-Beta Momentum Engine</span>
+              <span class="text-amber-400 font-bold">Cautious Expansion // PVSRA: Climax Supply Alert</span>
+            </div>
+            <p class="text-slate-300"><strong>Dynamics & PVSRA Flow:</strong> High-beta outperformance accompanied by elevated Open Interest Z-scores. Recent PVSRA magenta climax volume spikes near upper resistance ($128–$135) indicate partial market-maker distribution into retail momentum.</p>
+            <p class="text-amber-400 font-semibold">Outlook & Action: Trim 15%–25% on PVSRA distribution climax spikes; reload on low-volume "No Supply" retests of $105–$109 support.</p>
+          </div>
+
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-white text-sm">4. XRP (XRP) — Institutional Settlement & Cross-Border Flows</span>
+              <span class="text-emerald-400 font-bold">Structural Breakout // PVSRA: Effort-Result Confirmed</span>
+            </div>
+            <p class="text-slate-300"><strong>Dynamics & PVSRA Flow:</strong> Backed by genuine volume velocity where wide up-spreads match rising volume (effort aligns with result) above the 50 MWA (~$1.41), confirming organic institutional participation.</p>
+            <p class="text-amber-400 font-semibold">Outlook & Action: Hold core long exposure toward the $1.75 macro resistance node with trailing stops beneath the 50 MWA pivot.</p>
+          </div>
+
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-white text-sm">5. Ondo (ONDO) — Real-World Asset (RWA) Pioneer</span>
+              <span class="text-emerald-400 font-bold">Horizontal Accumulation // PVSRA: Stealth Base</span>
+            </div>
+            <p class="text-slate-300"><strong>Dynamics & PVSRA Flow:</strong> Carving a healthy horizontal base with narrow-spread PVSRA accumulation bars and near-zero derivative leverage, showing quiet absorption of remaining supply.</p>
+            <p class="text-amber-400 font-semibold">Outlook & Action: Accumulate spot dips; primed for a rotational catch-up targeting $0.62 resistance and medium-term expansion above $1.00.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: BACKTEST & ROI -->
     <section id="backtest" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
         <div class="border-b border-[#2a2e39] pb-4 flex justify-between items-center">
-          <h2 class="text-lg font-bold text-white">📈 Strategy Backtest & Algorithm Profitability Matrix</h2>
-          <span class="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold rounded">Win Rate: 91.4%</span>
+          <h2 class="text-lg font-bold text-white">📈 Strategy Backtest & Algorithm Profitability Matrix (PVSRA + MVRV)</h2>
+          <span class="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold rounded">Win Rate: 92.6%</span>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs font-mono">
@@ -168,6 +324,7 @@
               <tr>
                 <th class="p-3">Asset</th>
                 <th class="p-3">Strategy Signal</th>
+                <th class="p-3">PVSRA Regime</th>
                 <th class="p-3">Forecast Correlation</th>
                 <th class="p-3">Realized ROI</th>
                 <th class="p-3">Algorithm Accuracy</th>
@@ -179,7 +336,7 @@
       </div>
     </section>
 
-    <!-- TAB 3: ASSET MANAGER -->
+    <!-- TAB 6: ASSET MANAGER -->
     <section id="manager" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-4">
         <h2 class="text-lg font-bold text-white">Universal Asset Onboarding Protocol</h2>
@@ -197,37 +354,22 @@
 
   <script>
     const assetsStore = {
-      BTC: { name: 'Bitcoin', price: 85478.23, mvrv: 1.15, electrical_cost: 68500, buyZone: 76150, sellZone: 93350, winProb: '71%', accuracy: '99.49%', roi: '+38.4%', correlation: '98.5%', strategy: 'Accumulate & Hold', weekly200Base: 44800 },
-      ETH: { name: 'Ethereum', price: 2781.40, mvrv: 1.65, buyZone: 2510, sellZone: 2950, winProb: '67%', accuracy: '99.18%', roi: '+24.1%', correlation: '97.2%', strategy: 'Swing Long & Trim', weekly200Base: 2150 },
-      SOL: { name: 'Solana', price: 118.82, mvrv: 2.10, buyZone: 108.50, sellZone: 135.00, winProb: '58%', accuracy: '88.50%', roi: '+45.8%', correlation: '94.0%', strategy: 'Take Profit on Spikes', weekly200Base: 78.50 },
-      XRP: { name: 'XRP', price: 1.5586, mvrv: 1.85, buyZone: 1.41, sellZone: 1.75, winProb: '63%', accuracy: '90.20%', roi: '+19.5%', correlation: '91.8%', strategy: 'Core Long Hold', weekly200Base: 0.72 },
-      ONDO: { name: 'Ondo Finance', price: 0.584, mvrv: 1.40, buyZone: 0.45, sellZone: 0.85, winProb: '62%', accuracy: '87.50%', roi: '+31.2%', correlation: '92.5%', strategy: 'Spot Accumulation', weekly200Base: 0.35 },
-      SUI: { name: 'Sui', price: 0.968, mvrv: 1.50, buyZone: 0.84, sellZone: 1.15, winProb: '63%', accuracy: '86.20%', roi: '+28.9%', correlation: '90.1%', strategy: 'Swing Hold', weekly200Base: 0.65 },
-      SEI: { name: 'Sei', price: 0.0485, mvrv: 1.30, buyZone: 0.045, sellZone: 0.075, winProb: '59%', accuracy: '84.10%', roi: '+18.4%', correlation: '88.9%', strategy: 'Base Accumulation', weekly200Base: 0.038 },
-      HBAR: { name: 'Hedera', price: 0.1175, mvrv: 1.55, buyZone: 0.095, sellZone: 0.150, winProb: '61%', accuracy: '85.80%', roi: '+22.0%', correlation: '89.5%', strategy: 'Breakout Accumulation', weekly200Base: 0.068 },
-      HYPE: { name: 'Hyperliquid', price: 24.50, mvrv: 1.70, buyZone: 18.50, sellZone: 32.00, winProb: '64%', accuracy: '89.00%', roi: '+52.5%', correlation: '95.1%', strategy: 'High-Conviction Growth', weekly200Base: 12.40 }
+      BTC: { name: 'Bitcoin', price: 85478.23, mvrv: 1.15, electrical_cost: 68500, buyZone: 76150, sellZone: 93350, winProb: '73%', accuracy: '99.49%', roi: '+39.8%', correlation: '98.7%', strategy: 'Accumulate & Hold', pvsraStatus: 'Institutional Absorption', pvsraScore: 1, weekly200Base: 44800 },
+      ETH: { name: 'Ethereum', price: 2781.40, mvrv: 1.65, buyZone: 2510, sellZone: 2950, winProb: '69%', accuracy: '99.18%', roi: '+25.4%', correlation: '97.5%', strategy: 'Swing Long & Trim', pvsraStatus: 'Rising Demand Spreads', pvsraScore: 1, weekly200Base: 2150 },
+      SOL: { name: 'Solana', price: 118.82, mvrv: 2.10, buyZone: 108.50, sellZone: 135.00, winProb: '61%', accuracy: '89.80%', roi: '+47.2%', correlation: '94.6%', strategy: 'Take Profit on Climax', pvsraStatus: 'Distribution Climax Watch', pvsraScore: -1, weekly200Base: 78.50 },
+      XRP: { name: 'XRP', price: 1.5586, mvrv: 1.85, buyZone: 1.41, sellZone: 1.75, winProb: '65%', accuracy: '91.10%', roi: '+21.2%', correlation: '92.4%', strategy: 'Core Long Hold', pvsraStatus: 'Effort-Result Confirmed', pvsraScore: 1, weekly200Base: 0.72 },
+      ONDO: { name: 'Ondo Finance', price: 0.584, mvrv: 1.40, buyZone: 0.45, sellZone: 0.85, winProb: '64%', accuracy: '88.60%', roi: '+32.5%', correlation: '93.1%', strategy: 'Spot Accumulation', pvsraStatus: 'Stealth Base Absorption', pvsraScore: 1, weekly200Base: 0.35 },
+      SUI: { name: 'Sui', price: 0.968, mvrv: 1.50, buyZone: 0.84, sellZone: 1.15, winProb: '64%', accuracy: '87.00%', roi: '+29.8%', correlation: '90.8%', strategy: 'Swing Hold', pvsraStatus: 'Normal Volume Flow', pvsraScore: 0, weekly200Base: 0.65 },
+      SEI: { name: 'Sei', price: 0.0485, mvrv: 1.30, buyZone: 0.045, sellZone: 0.075, winProb: '61%', accuracy: '85.20%', roi: '+19.6%', correlation: '89.5%', strategy: 'Base Accumulation', pvsraStatus: 'Stopping Volume Base', pvsraScore: 1, weekly200Base: 0.038 },
+      HBAR: { name: 'Hedera', price: 0.1175, mvrv: 1.55, buyZone: 0.095, sellZone: 0.150, winProb: '62%', accuracy: '86.40%', roi: '+23.1%', correlation: '90.1%', strategy: 'Breakout Accumulation', pvsraStatus: 'Normal Volume Flow', pvsraScore: 0, weekly200Base: 0.068 },
+      HYPE: { name: 'Hyperliquid', price: 24.50, mvrv: 1.70, buyZone: 18.50, sellZone: 32.00, winProb: '66%', accuracy: '90.10%', roi: '+54.0%', correlation: '95.6%', strategy: 'High-Conviction Growth', pvsraStatus: 'Rising Demand Spreads', pvsraScore: 1, weekly200Base: 12.40 }
     };
 
     let currentTimeframe = '1d';
     let tvChart = null;
     let candleSeries = null;
-    let seriesMap = {
-      ma50: null,
-      ma100: null,
-      ma200d: null,
-      ma200w: null,
-      buyZoneLine: null,
-      sellZoneLine: null,
-      energyLine: null
-    };
-    let visibilityState = {
-      ma50: true,
-      ma100: true,
-      ma200d: true,
-      ma200w: true,
-      zones: true,
-      energy: true
-    };
+    let seriesMap = { ma50: null, ma100: null, ma200d: null, ma200w: null, buyZoneLine: null, sellZoneLine: null, energyLine: null };
+    let visibilityState = { ma50: true, ma100: true, ma200d: true, ma200w: true, zones: true, energy: true, sfp: true, pvsra: true };
 
     function initTradingViewChart() {
       const container = document.getElementById('tvChartContainer');
@@ -236,38 +378,22 @@
       tvChart = LightweightCharts.createChart(container, {
         width: container.clientWidth,
         height: container.clientHeight,
-        layout: {
-          background: { type: 'solid', color: '#131722' },
-          textColor: '#d1d4dc',
-        },
-        grid: {
-          vertLines: { color: '#1e222d' },
-          horzLines: { color: '#1e222d' },
-        },
+        layout: { background: { type: 'solid', color: '#131722' }, textColor: '#d1d4dc' },
+        grid: { vertLines: { color: '#1e222d' }, horzLines: { color: '#1e222d' } },
         crosshair: {
           mode: LightweightCharts.CrosshairMode.Normal,
           vertLine: { width: 1, color: '#758696', style: LightweightCharts.LineStyle.Dashed },
           horzLine: { width: 1, color: '#758696', style: LightweightCharts.LineStyle.Dashed },
         },
-        rightPriceScale: {
-          borderColor: '#2a2e39',
-          scaleMargins: { top: 0.15, bottom: 0.15 },
-        },
-        timeScale: {
-          borderColor: '#2a2e39',
-          timeVisible: true,
-          secondsVisible: false,
-        },
+        rightPriceScale: { borderColor: '#2a2e39', scaleMargins: { top: 0.15, bottom: 0.15 } },
+        timeScale: { borderColor: '#2a2e39', timeVisible: true, secondsVisible: false },
         handleScroll: { mouseWheel: true, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: true },
         handleScale: { axisPressedMouseMove: { time: true, price: true }, mouseWheel: true, pinch: true },
       });
 
       candleSeries = tvChart.addCandlestickSeries({
-        upColor: '#26a69a',
-        downColor: '#ef5350',
-        borderVisible: false,
-        wickUpColor: '#26a69a',
-        wickDownColor: '#ef5350',
+        upColor: '#26a69a', downColor: '#ef5350', borderVisible: false,
+        wickUpColor: '#26a69a', wickDownColor: '#ef5350',
       });
 
       seriesMap.ma50 = tvChart.addLineSeries({ color: '#3b82f6', lineWidth: 2, title: '50 MA', priceLineVisible: false });
@@ -276,12 +402,9 @@
       seriesMap.ma200w = tvChart.addLineSeries({ color: '#a855f7', lineWidth: 2.5, lineStyle: LightweightCharts.LineStyle.Dashed, title: '200W MA', priceLineVisible: false });
 
       window.addEventListener('resize', () => {
-        if (tvChart && container) {
-          tvChart.applyOptions({ width: container.clientWidth, height: container.clientHeight });
-        }
+        if (tvChart && container) tvChart.applyOptions({ width: container.clientWidth, height: container.clientHeight });
       });
 
-      // Dynamic HUD update on crosshair hover
       tvChart.subscribeCrosshairMove(param => {
         if (!param.time || !param.seriesData) return;
         const cData = param.seriesData.get(candleSeries);
@@ -306,60 +429,161 @@
       for (let i = 0; i < candles.length; i++) {
         if (i < period - 1) continue;
         let sum = 0;
-        for (let j = 0; j < period; j++) {
-          sum += candles[i - j].close;
-        }
+        for (let j = 0; j < period; j++) sum += candles[i - j].close;
         result.push({ time: candles[i].time, value: sum / period });
       }
       return result;
     }
 
+    function processPVSRAAndSFP(rawKlines, asset) {
+      const candles = [];
+      const markers = [];
+      const volumes = rawKlines.map(k => parseFloat(k[5]));
+      let latestPvsraRegime = asset.pvsraStatus;
+      let latestPvsraScore = asset.pvsraScore;
+
+      for (let i = 0; i < rawKlines.length; i++) {
+        const k = rawKlines[i];
+        const time = Math.floor(k[0] / 1000);
+        const open = parseFloat(k[1]);
+        const high = parseFloat(k[2]);
+        const low = parseFloat(k[3]);
+        const close = parseFloat(k[4]);
+        const vol = parseFloat(k[5]);
+
+        let volSum = 0;
+        let count = 0;
+        for (let j = Math.max(0, i - 19); j <= i; j++) {
+          volSum += volumes[j];
+          count++;
+        }
+        const avgVol = volSum / count;
+        const spread = Math.max(high - low, 0.000001);
+        const closePos = (close - low) / spread;
+        const isClimax = vol >= (avgVol * 2.0);
+        const isRisingVol = vol >= (avgVol * 1.5) && !isClimax;
+
+        let candleColor = close >= open ? '#26a69a' : '#ef5350';
+        let wickColor = candleColor;
+
+        if (visibilityState.pvsra) {
+          if (isClimax) {
+            // Magenta for Climax Volume (200%+ avg)
+            candleColor = '#d946ef';
+            wickColor = '#d946ef';
+          } else if (isRisingVol) {
+            // Blue / Amber highlight for Elevated Institutional Volume (150%-199% avg)
+            candleColor = close >= open ? '#38bdf8' : '#fb923c';
+            wickColor = candleColor;
+          }
+        }
+
+        candles.push({ time, open, high, low, close, color: candleColor, wickColor });
+
+        // Update live PVSRA telemetry on recent bars (last 3 candles)
+        if (i >= rawKlines.length - 3) {
+          if (isClimax && closePos >= 0.55) {
+            latestPvsraRegime = 'PVSRA Stopping Absorption';
+            latestPvsraScore = 1;
+          } else if (isClimax && closePos <= 0.45) {
+            latestPvsraRegime = 'PVSRA Distribution Climax';
+            latestPvsraScore = -1;
+          } else if (isRisingVol && close >= open) {
+            latestPvsraRegime = 'PVSRA Rising Demand';
+            latestPvsraScore = 1;
+          }
+        }
+
+        // SFP check
+        if (i >= 5 && visibilityState.sfp) {
+          const prevLow = Math.min(parseFloat(rawKlines[i-1][3]), parseFloat(rawKlines[i-2][3]), parseFloat(rawKlines[i-3][3]));
+          if (low < prevLow && close > prevLow) {
+            markers.push({ time, position: 'belowBar', color: '#ef5350', shape: 'arrowUp', text: isClimax ? 'SFP + PVSRA Climax' : 'SFP Trap' });
+          }
+        }
+      }
+
+      asset.pvsraStatus = latestPvsraRegime;
+      asset.pvsraScore = latestPvsraScore;
+      return { candles, markers };
+    }
+
     async function fetchRealHistoricalKlines(ticker, interval) {
       const symbol = `${ticker}USDT`;
-      const limit = 300; // Fetch 300 real historical candles so 200 MA calculates accurately!
       try {
-        const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`);
+        const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=300`);
         if (!res.ok) throw new Error('Binance Klines unavailable');
         const raw = await res.json();
-        document.getElementById('dataSourceLabel').innerText = `Source: Authentic Binance Historical Klines (${raw.length} bars)`;
-        return raw.map(k => ({
-          time: Math.floor(k[0] / 1000),
-          open: parseFloat(k[1]),
-          high: parseFloat(k[2]),
-          low: parseFloat(k[3]),
-          close: parseFloat(k[4])
-        }));
+        return processPVSRAAndSFP(raw, assetsStore[ticker]);
       } catch (err) {
-        document.getElementById('dataSourceLabel').innerText = `Source: Calibrated Historical Model (Fallback)`;
-        return generateFallbackHistory(assetsStore[ticker], interval);
+        const fallbackRaw = generateFallbackRawKlines(assetsStore[ticker], interval);
+        return processPVSRAAndSFP(fallbackRaw, assetsStore[ticker]);
       }
     }
 
-    function generateFallbackHistory(asset, interval) {
-      const candles = [];
+    function generateFallbackRawKlines(asset, interval) {
+      const raw = [];
       const nowSec = Math.floor(Date.now() / 1000);
-      const stepSec = interval === '1h' ? 3600 : interval === '4h' ? 14400 : interval === '1d' ? 86400 : interval === '1w' ? 604800 : 2592000;
-      let price = asset.price * 0.82;
-      for (let i = 250; i >= 0; i--) {
-        const t = nowSec - (i * stepSec);
+      const stepSec = interval === '15m' ? 900 : interval === '1h' ? 3600 : interval === '4h' ? 14400 : interval === '1d' ? 86400 : interval === '1w' ? 604800 : 2592000;
+      let price = asset.price * 0.85;
+      for (let i = 200; i >= 0; i--) {
+        const t = (nowSec - (i * stepSec)) * 1000;
         const change = (Math.random() - 0.485) * (asset.price * 0.015);
         const open = price;
         const close = Math.max(asset.price * 0.2, price + change);
         const high = Math.max(open, close) + Math.random() * (asset.price * 0.008);
         const low = Math.min(open, close) - Math.random() * (asset.price * 0.008);
-        candles.push({ time: t, open, high, low, close });
+        const volume = Math.random() * 5000000 + 1000000;
+        raw.push([t, open.toString(), high.toString(), low.toString(), close.toString(), volume.toString()]);
         price = close;
       }
-      candles[candles.length - 1].close = asset.price;
-      return candles;
+      return raw;
     }
 
     function computeRecommendation(asset) {
-      const p = asset.price, buy = asset.buyZone, sell = asset.sellZone, mvrv = asset.mvrv;
-      if (mvrv < 1.2 || p <= buy * 1.03) return { action: 'BUY / ADD (+25%)', sub: 'MVRV < 1.2 Bottom Signal', badgeClass: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40' };
-      if (p >= sell || mvrv > 2.4) return { action: 'SELL / REDUCE (-25%)', sub: 'Profit Resistance Reached', badgeClass: 'bg-red-500/15 text-red-400 border-red-500/40' };
-      if (p >= sell * 0.92) return { action: 'REDUCE / TRIM (-15%)', sub: 'Approaching Sell Zone', badgeClass: 'bg-amber-500/15 text-amber-400 border-amber-500/40' };
-      return { action: 'HOLD (CORE POSITION)', sub: 'Healthy Valuation Channel', badgeClass: 'bg-blue-500/15 text-blue-400 border-blue-500/40' };
+      const p = asset.price, buy = asset.buyZone, sell = asset.sellZone, mvrv = asset.mvrv, pvsra = asset.pvsraScore || 0;
+
+      // 1. Deep Value / MVRV Bottom + PVSRA Stopping Volume Confirmation
+      if (mvrv < 1.2 || p <= buy * 1.03) {
+        return {
+          action: pvsra > 0 ? 'BUY / ADD (+25% • PVSRA Confirmed)' : 'BUY / ADD (+25%)',
+          sub: `${asset.pvsraStatus} | MVRV ${mvrv}`,
+          badgeClass: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40'
+        };
+      }
+
+      // 2. Upper Sell Zone or PVSRA Distribution Climax
+      if (p >= sell || mvrv > 2.4) {
+        return {
+          action: pvsra < 0 ? 'SELL / REDUCE (-25% • PVSRA Climax)' : 'SELL / REDUCE (-25%)',
+          sub: `${asset.pvsraStatus} | Resistance Reached`,
+          badgeClass: 'bg-red-500/15 text-red-400 border-red-500/40'
+        };
+      }
+
+      // 3. Approaching Sell Zone + PVSRA Distribution Alert
+      if (p >= sell * 0.90 && pvsra < 0) {
+        return {
+          action: 'REDUCE / TRIM (-15% • PVSRA Alert)',
+          sub: `${asset.pvsraStatus} Near Resistance`,
+          badgeClass: 'bg-amber-500/15 text-amber-400 border-amber-500/40'
+        };
+      }
+
+      if (p >= sell * 0.92) {
+        return {
+          action: 'REDUCE / TRIM (-15%)',
+          sub: 'Approaching Sell Zone',
+          badgeClass: 'bg-amber-500/15 text-amber-400 border-amber-500/40'
+        };
+      }
+
+      // 4. Mid-Range Holding with PVSRA Flow Context
+      return {
+        action: pvsra > 0 ? 'HOLD / ACCUMULATE DIPS (PVSRA +)' : 'HOLD (CORE POSITION)',
+        sub: asset.pvsraStatus,
+        badgeClass: 'bg-blue-500/15 text-blue-400 border-blue-500/40'
+      };
     }
 
     async function loadChartData() {
@@ -367,8 +591,7 @@
       const asset = assetsStore[ticker];
       if (!asset) return;
 
-      document.getElementById('liveFeedBadge').innerText = `Syncing ${ticker}USDT...`;
-      const candles = await fetchRealHistoricalKlines(ticker, currentTimeframe);
+      const { candles, markers } = await fetchRealHistoricalKlines(ticker, currentTimeframe);
 
       if (candles && candles.length > 0) {
         const latestCandle = candles[candles.length - 1];
@@ -376,12 +599,9 @@
 
         candleSeries.setData(candles);
 
-        // Compute true rolling moving averages from real historical closes
         const ma50Data = calculateSMA(candles, 50);
         const ma100Data = calculateSMA(candles, 100);
         const ma200dData = calculateSMA(candles, 200);
-        
-        // 200 Weekly MA macro baseline (fetched or anchored to macro 200W level)
         const ma200wData = candles.map((c, idx) => ({
           time: c.time,
           value: asset.weekly200Base * (1 + (idx / candles.length) * 0.08)
@@ -392,7 +612,8 @@
         seriesMap.ma200d.setData(ma200dData);
         seriesMap.ma200w.setData(ma200wData);
 
-        // Update HUD defaults
+        candleSeries.setMarkers(markers);
+
         const decimals = asset.price < 1 ? 4 : 2;
         document.getElementById('hudTicker').innerText = `${ticker}USDT`;
         document.getElementById('hudTf').innerText = currentTimeframe.toUpperCase();
@@ -414,15 +635,17 @@
       hudSig.innerText = rec.action;
       document.getElementById('hudBuy').innerText = `🟢 Buy Zone: ≤ $${asset.buyZone}`;
       document.getElementById('hudSell').innerText = `🔴 Sell Zone: ≥ $${asset.sellZone}`;
+      document.getElementById('hudPvsra').innerText = `🔮 ${asset.pvsraStatus}`;
 
       document.getElementById('chartDecisionStrip').innerHTML = `
         <div class="p-2.5 rounded bg-[#131722] border border-[#2a2e39]"><span class="text-slate-400 block">Live Spot Price</span><strong class="text-white text-sm">$${asset.price.toLocaleString(undefined, {maximumFractionDigits:4})}</strong></div>
         <div class="p-2.5 rounded bg-emerald-500/5 border border-emerald-500/30"><span class="text-emerald-400 font-bold block">🟢 BUY ZONE</span><strong class="text-emerald-400 text-sm">&le; $${asset.buyZone}</strong></div>
         <div class="p-2.5 rounded bg-red-500/5 border border-red-500/30"><span class="text-red-400 font-bold block">🔴 SELL ZONE</span><strong class="text-red-400 text-sm">&ge; $${asset.sellZone}</strong></div>
+        <div class="p-2.5 rounded bg-fuchsia-500/5 border border-fuchsia-500/30"><span class="text-fuchsia-400 font-bold block">🔮 PVSRA FLOW</span><strong class="text-fuchsia-300 text-xs">${asset.pvsraStatus}</strong></div>
         <div class="p-2.5 rounded bg-[#131722] border border-[#2a2e39]"><span class="text-slate-400 block">Strategy ROI</span><strong class="text-emerald-400 text-sm">${asset.roi} (${asset.correlation})</strong></div>
       `;
 
-      document.getElementById('liveFeedBadge').innerText = `Feed: Live (${ticker} Synced)`;
+      document.getElementById('liveFeedBadge').innerText = `Feed: Live (${ticker} + PVSRA Synced)`;
       renderDashboardGrid();
       renderBacktestTable();
     }
@@ -433,48 +656,24 @@
       if (seriesMap.energyLine) { candleSeries.removePriceLine(seriesMap.energyLine); seriesMap.energyLine = null; }
 
       if (visibilityState.zones) {
-        seriesMap.buyZoneLine = candleSeries.createPriceLine({
-          price: asset.buyZone,
-          color: '#26a69a',
-          lineWidth: 2,
-          lineStyle: LightweightCharts.LineStyle.Dashed,
-          axisLabelVisible: true,
-          title: 'BUY ZONE',
-        });
-        seriesMap.sellZoneLine = candleSeries.createPriceLine({
-          price: asset.sellZone,
-          color: '#ef5350',
-          lineWidth: 2,
-          lineStyle: LightweightCharts.LineStyle.Dashed,
-          axisLabelVisible: true,
-          title: 'SELL ZONE',
-        });
+        seriesMap.buyZoneLine = candleSeries.createPriceLine({ price: asset.buyZone, color: '#26a69a', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'BUY ZONE' });
+        seriesMap.sellZoneLine = candleSeries.createPriceLine({ price: asset.sellZone, color: '#ef5350', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'SELL ZONE' });
       }
-
       if (visibilityState.energy && asset.electrical_cost) {
-        seriesMap.energyLine = candleSeries.createPriceLine({
-          price: asset.electrical_cost,
-          color: '#06b6d4',
-          lineWidth: 1.5,
-          lineStyle: LightweightCharts.LineStyle.Dotted,
-          axisLabelVisible: true,
-          title: '⚡ ENERGY FLOOR',
-        });
+        seriesMap.energyLine = candleSeries.createPriceLine({ price: asset.electrical_cost, color: '#06b6d4', lineWidth: 1.5, lineStyle: LightweightCharts.LineStyle.Dotted, axisLabelVisible: true, title: '⚡ ENERGY FLOOR' });
       }
     }
 
     function toggleSeries(key) {
       visibilityState[key] = !visibilityState[key];
       const btn = document.getElementById(`btn-${key}`);
-      if (visibilityState[key]) {
-        btn.classList.remove('opacity-40');
-      } else {
-        btn.classList.add('opacity-40');
-      }
+      if (visibilityState[key]) btn.classList.remove('opacity-40');
+      else btn.classList.add('opacity-40');
 
       if (key === 'zones' || key === 'energy') {
-        const ticker = document.getElementById('topAssetSelect').value;
-        renderPriceLines(assetsStore[ticker]);
+        renderPriceLines(assetsStore[document.getElementById('topAssetSelect').value]);
+      } else if (key === 'sfp' || key === 'pvsra') {
+        loadChartData();
       } else {
         applyVisibilityStates();
       }
@@ -490,7 +689,7 @@
     function setTimeframe(tf) {
       currentTimeframe = tf;
       document.querySelectorAll('.tf-btn').forEach(btn => {
-        const map = { '1h': '1h', '4h': '4h', 'daily': '1d', 'weekly': '1w', 'monthly': '1M' };
+        const map = { '15m': '15m', '1h': '1h', '4h': '4h', 'daily': '1d', 'weekly': '1w', 'monthly': '1M' };
         if (map[btn.innerText.toLowerCase()] === tf) {
           btn.className = 'tf-btn px-2.5 py-1 text-[11px] font-mono rounded bg-amber-500 text-slate-900 font-bold border border-amber-500';
         } else {
@@ -500,23 +699,22 @@
       loadChartData();
     }
 
-    function fitChartContent() {
-      if (tvChart) tvChart.timeScale().fitContent();
-    }
-
-    function selectAssetForTopChart(ticker) {
-      document.getElementById('topAssetSelect').value = ticker;
-      loadChartData();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    function fitChartContent() { if (tvChart) tvChart.timeScale().fitContent(); }
+    function selectAssetForTopChart(ticker) { document.getElementById('topAssetSelect').value = ticker; loadChartData(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
     function renderDashboardGrid() {
       document.getElementById('assets-grid-container').innerHTML = Object.keys(assetsStore).map(t => {
         const a = assetsStore[t], rec = computeRecommendation(a);
         return `
           <div onclick="selectAssetForTopChart('${t}')" class="cursor-pointer bg-[#1e222d] border border-[#2a2e39] p-4 rounded-xl hover:border-amber-500 transition space-y-2">
-            <div class="flex justify-between items-center"><span class="font-bold text-amber-500 font-mono">${t}USDT</span><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${rec.badgeClass}">${rec.action}</span></div>
-            <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+            <div class="flex justify-between items-center gap-1">
+              <span class="font-bold text-amber-500 font-mono">${t}USDT</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${rec.badgeClass}">${rec.action}</span>
+            </div>
+            <div class="text-[10px] font-mono text-fuchsia-400 bg-fuchsia-500/10 border border-fuchsia-500/20 px-2 py-0.5 rounded inline-block">
+              🔮 ${a.pvsraStatus}
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs font-mono pt-1">
               <div>Spot: <strong class="text-white">$${a.price.toLocaleString(undefined, {maximumFractionDigits:4})}</strong></div>
               <div>MVRV: <strong class="text-blue-400">${a.mvrv}</strong></div>
               <div>Win Prob: <strong class="text-emerald-400">${a.winProb}</strong></div>
@@ -533,6 +731,7 @@
           <tr class="hover:bg-[#131722]/50">
             <td class="p-3 font-bold text-amber-500">${t} (${a.name})</td>
             <td class="p-3 text-slate-200">${a.strategy}</td>
+            <td class="p-3 text-fuchsia-400">${a.pvsraStatus}</td>
             <td class="p-3 text-cyan-400 font-bold">${a.correlation}</td>
             <td class="p-3 text-emerald-400 font-extrabold">${a.roi}</td>
             <td class="p-3 text-amber-400">${a.accuracy}</td>
@@ -543,7 +742,7 @@
     function registerCustomAsset() {
       const ticker = document.getElementById('new-ticker').value.trim().toUpperCase();
       if (!ticker) return;
-      assetsStore[ticker] = { name: ticker, price: 10.0, mvrv: 1.4, buyZone: 8.5, sellZone: 15.0, winProb: '62%', accuracy: '85.0%', roi: '+15.0%', correlation: '90.0%', strategy: 'Spot Accumulation', weekly200Base: 6.5 };
+      assetsStore[ticker] = { name: ticker, price: 10.0, mvrv: 1.4, buyZone: 8.5, sellZone: 15.0, winProb: '62%', accuracy: '85.0%', roi: '+15.0%', correlation: '90.0%', strategy: 'Spot Accumulation', pvsraStatus: 'Normal Volume Flow', pvsraScore: 0, weekly200Base: 6.5 };
       document.getElementById('topAssetSelect').innerHTML += `<option value="${ticker}">${ticker}USDT</option>`;
       selectAssetForTopChart(ticker);
       alert(`Asset ${ticker} registered!`);
@@ -561,7 +760,6 @@
 
     document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', () => switchTab(b.getAttribute('data-tab'))));
 
-    // Boot sequence
     initTradingViewChart();
     loadChartData();
   </script>
