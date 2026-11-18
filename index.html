@@ -31,7 +31,7 @@
   <style>
     .tab-content { display: none; }
     .tab-content.active { display: block; }
-    canvas { touch-action: none; }
+    canvas { touch-action: none; cursor: crosshair; }
     body { background-color: #131722; color: #d1d4dc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
   </style>
 </head>
@@ -70,19 +70,7 @@
     <!-- TAB 1: TRADINGVIEW PRO DASHBOARD -->
     <section id="dashboard" class="tab-content active space-y-4">
 
-      <!-- TradingView Style Top Status Bar (Legend HUD) -->
-      <div class="bg-[#1e222d] border border-[#2a2e39] rounded-lg px-4 py-2.5 flex flex-wrap justify-between items-center text-xs font-mono shadow-sm">
-        <div class="flex items-center space-x-3 text-slate-300 flex-wrap gap-y-1">
-          <span class="font-bold text-white text-sm" id="statusTicker">BTCUSD</span>
-          <span class="text-slate-400 bg-[#131722] px-2 py-0.5 rounded border border-[#2a2e39]" id="statusTfLabel">4h</span>
-          <span class="text-emerald-400 font-bold" id="statusOHLC">O: -- H: -- L: -- C: --</span>
-        </div>
-        <div class="flex items-center space-x-2">
-          <span id="inChartSignalBadge" class="px-3 py-1 rounded border font-bold"></span>
-        </div>
-      </div>
-
-      <!-- Master Chart Card with TradingView Toolbars -->
+      <!-- Master Chart Card with Top-Left Floating Legend HUD -->
       <div class="bg-[#1e222d] border border-[#2a2e39] rounded-xl p-4 shadow-lg space-y-3">
         
         <!-- Top Toolbar Controls -->
@@ -114,19 +102,40 @@
                 <button onclick="setTimeframe('monthly')" class="tf-btn px-2.5 py-1 text-[11px] font-mono rounded bg-[#131722] text-slate-400 hover:text-white border border-[#2a2e39]">Monthly</button>
               </div>
             </div>
+
+            <!-- Quick Indicator Checkbox Toggles -->
+            <div class="hidden sm:flex items-center space-x-3 text-xs font-mono pt-4">
+              <label class="flex items-center space-x-1 cursor-pointer text-emerald-400"><input type="checkbox" id="quick-buy" checked onchange="syncQuickToggle('buyzone')" class="accent-amber-500"><span>Buy Zone</span></label>
+              <label class="flex items-center space-x-1 cursor-pointer text-red-400"><input type="checkbox" id="quick-sell" checked onchange="syncQuickToggle('sellzone')" class="accent-amber-500"><span>Sell Zone</span></label>
+              <label class="flex items-center space-x-1 cursor-pointer text-blue-400"><input type="checkbox" id="quick-mwa50" checked onchange="syncQuickToggle('mwa50')" class="accent-amber-500"><span>50 EMA</span></label>
+            </div>
           </div>
 
-          <!-- Quick Actions & Indicator Quick Toggles -->
           <div class="flex flex-wrap items-center gap-2 text-xs">
             <button onclick="switchTab('indicators')" class="px-3 py-1.5 rounded border border-amber-500/40 bg-amber-500/10 text-amber-400 font-bold hover:bg-amber-500 hover:text-slate-900 transition">
-              ⚙️ Indicators & Zones Config
+              ⚙️ All Indicators
             </button>
             <button onclick="resetChartZoom()" class="px-3 py-1.5 rounded bg-[#2a2e39] font-bold text-slate-300 hover:bg-amber-500 hover:text-slate-900 transition">↺ Reset View</button>
           </div>
         </div>
 
-        <!-- Canvas Container -->
-        <div style="height: 500px; width: 100%; position: relative;" class="bg-[#131722] rounded-lg p-2 border border-[#2a2e39]">
+        <!-- Canvas Container with Absolute Top-Left Floating TradingView HUD Legend -->
+        <div style="height: 520px; width: 100%; position: relative;" class="bg-[#131722] rounded-lg p-2 border border-[#2a2e39]">
+          
+          <!-- Floating Top-Left Legend HUD -->
+          <div id="tvFloatingLegend" class="absolute top-4 left-4 z-10 bg-[#1e222d]/90 backdrop-blur-md border border-[#2a2e39] px-3 py-2 rounded-lg font-mono text-xs pointer-events-none shadow-md space-y-0.5 max-w-sm">
+            <div class="flex items-center space-x-2">
+              <span class="font-extrabold text-white text-sm" id="hudTicker">BTCUSD</span>
+              <span class="text-slate-400" id="hudTf">4h</span>
+              <span id="hudSignal" class="text-[10px] px-1.5 py-0.5 rounded font-bold"></span>
+            </div>
+            <div class="text-slate-300 text-[11px]" id="hudOHLC">O: -- H: -- L: -- C: --</div>
+            <div class="text-[10px] text-emerald-400 flex space-x-2 pt-0.5">
+              <span id="hudBuy">Buy: --</span>
+              <span id="hudSell" class="text-red-400">Sell: --</span>
+            </div>
+          </div>
+
           <canvas id="masterInteractiveChart"></canvas>
         </div>
 
@@ -159,7 +168,7 @@
               <span class="font-bold text-slate-200 block text-sm">🟢 Buy / Accumulation Zone</span>
               <span class="text-slate-400 text-[11px]">Highlights historical undervaluation & MVRV bottom thresholds.</span>
             </div>
-            <input type="checkbox" id="ind-buyzone" checked onchange="renderInteractiveZoneChart()" class="w-4 h-4 accent-amber-500 cursor-pointer" />
+            <input type="checkbox" id="ind-buyzone" checked onchange="syncMasterToggle('buyzone')" class="w-4 h-4 accent-amber-500 cursor-pointer" />
           </label>
 
           <label class="flex items-center justify-between p-4 bg-[#131722] rounded-xl border border-[#2a2e39] cursor-pointer hover:border-amber-500">
@@ -167,7 +176,7 @@
               <span class="font-bold text-slate-200 block text-sm">🔴 Sell / Profit-Taking Zone</span>
               <span class="text-slate-400 text-[11px]">Highlights upper fair value resistance channels.</span>
             </div>
-            <input type="checkbox" id="ind-sellzone" checked onchange="renderInteractiveZoneChart()" class="w-4 h-4 accent-amber-500 cursor-pointer" />
+            <input type="checkbox" id="ind-sellzone" checked onchange="syncMasterToggle('sellzone')" class="w-4 h-4 accent-amber-500 cursor-pointer" />
           </label>
 
           <label class="flex items-center justify-between p-4 bg-[#131722] rounded-xl border border-[#2a2e39] cursor-pointer hover:border-amber-500">
@@ -175,7 +184,7 @@
               <span class="font-bold text-slate-200 block text-sm">📈 50 EMA / MWA</span>
               <span class="text-slate-400 text-[11px]">Primary structural trend and dynamic support pivot.</span>
             </div>
-            <input type="checkbox" id="ind-mwa50" checked onchange="renderInteractiveZoneChart()" class="w-4 h-4 accent-amber-500 cursor-pointer" />
+            <input type="checkbox" id="ind-mwa50" checked onchange="syncMasterToggle('mwa50')" class="w-4 h-4 accent-amber-500 cursor-pointer" />
           </label>
 
           <label class="flex items-center justify-between p-4 bg-[#131722] rounded-xl border border-[#2a2e39] cursor-pointer hover:border-amber-500">
@@ -183,7 +192,7 @@
               <span class="font-bold text-slate-200 block text-sm">📈 100 EMA / MWA</span>
               <span class="text-slate-400 text-[11px]">Macro trend continuation baseline.</span>
             </div>
-            <input type="checkbox" id="ind-mwa100" checked onchange="renderInteractiveZoneChart()" class="w-4 h-4 accent-amber-500 cursor-pointer" />
+            <input type="checkbox" id="ind-mwa100" checked onchange="syncMasterToggle('mwa100')" class="w-4 h-4 accent-amber-500 cursor-pointer" />
           </label>
 
           <label class="flex items-center justify-between p-4 bg-[#131722] rounded-xl border border-[#2a2e39] cursor-pointer hover:border-amber-500">
@@ -191,7 +200,7 @@
               <span class="font-bold text-slate-200 block text-sm">📈 200 EMA / MWA</span>
               <span class="text-slate-400 text-[11px]">Ultimate macro cycle valuation pivot.</span>
             </div>
-            <input type="checkbox" id="ind-mwa200" checked onchange="renderInteractiveZoneChart()" class="w-4 h-4 accent-amber-500 cursor-pointer" />
+            <input type="checkbox" id="ind-mwa200" checked onchange="syncMasterToggle('mwa200')" class="w-4 h-4 accent-amber-500 cursor-pointer" />
           </label>
 
           <label class="flex items-center justify-between p-4 bg-[#131722] rounded-xl border border-[#2a2e39] cursor-pointer hover:border-amber-500">
@@ -270,7 +279,23 @@
           btn.className = 'tf-btn px-2.5 py-1 text-[11px] font-mono rounded bg-[#131722] text-slate-400 hover:text-white border border-[#2a2e39]';
         }
       });
-      document.getElementById('statusTfLabel').innerText = tf.toUpperCase();
+      renderInteractiveZoneChart();
+    }
+
+    function syncQuickToggle(type) {
+      const target = document.getElementById(`ind-${type}`);
+      if (target) {
+        target.checked = document.getElementById(`quick-${type === 'buyzone' ? 'buy' : type === 'sellzone' ? 'sell' : 'mwa50'}`).checked;
+      }
+      renderInteractiveZoneChart();
+    }
+
+    function syncMasterToggle(type) {
+      const quickMap = { buyzone: 'buy', sellzone: 'sell', mwa50: 'mwa50' };
+      if (quickMap[type]) {
+        const qEl = document.getElementById(`quick-${quickMap[type]}`);
+        if (qEl) qEl.checked = document.getElementById(`ind-${type}`).checked;
+      }
       renderInteractiveZoneChart();
     }
 
@@ -297,19 +322,6 @@
               assetsStore[t].basePrice = p;
               count++;
               continue;
-            }
-          }
-        } catch (e) {}
-
-        try {
-          const cbRes = await fetch(`https://api.coinbase.com/v2/prices/${t}-USD/spot`);
-          if (cbRes.ok) {
-            const cbData = await cbRes.json();
-            const cbPrice = parseFloat(cbData.data.amount);
-            if (!isNaN(cbPrice) && cbPrice > 0) {
-              assetsStore[t].price = cbPrice;
-              assetsStore[t].basePrice = cbPrice;
-              count++;
             }
           }
         } catch (e) {}
@@ -360,11 +372,14 @@
       const asset = assetsStore[ticker];
       if (!asset) return;
 
-      document.getElementById('statusTicker').innerText = `${ticker}USD`;
       const rec = computeRecommendation(asset);
-      const sigBadge = document.getElementById('inChartSignalBadge');
-      sigBadge.className = `px-3 py-1 rounded border font-mono text-xs ${rec.badgeClass}`;
-      sigBadge.innerText = `${rec.action} • ${rec.sub}`;
+      document.getElementById('hudTicker').innerText = `${ticker}USD`;
+      document.getElementById('hudTf').innerText = currentTimeframe.toUpperCase();
+      const hudSig = document.getElementById('hudSignal');
+      hudSig.className = `text-[10px] px-1.5 py-0.5 rounded font-bold ${rec.badgeClass}`;
+      hudSig.innerText = rec.action;
+      document.getElementById('hudBuy').innerText = `Buy: ≤ $${asset.buyZone}`;
+      document.getElementById('hudSell').innerText = `Sell: ≥ $${asset.sellZone}`;
 
       document.getElementById('chartDecisionStrip').innerHTML = `
         <div class="p-2.5 rounded bg-[#131722] border border-[#2a2e39]"><span class="text-slate-400 block">Spot Price</span><strong class="text-white text-sm">$${asset.price.toLocaleString(undefined, {maximumFractionDigits:2})}</strong></div>
@@ -377,7 +392,7 @@
       const lastC = candleData[candleData.length - 1];
       const chg = lastC.c - lastC.o;
       const chgPct = (chg / lastC.o) * 100;
-      document.getElementById('statusOHLC').innerText = `O: ${lastC.o.toFixed(2)}  H: ${lastC.h.toFixed(2)}  L: ${lastC.l.toFixed(2)}  C: ${lastC.c.toFixed(2)}  ${chg >= 0 ? '+' : ''}${chg.toFixed(2)} (${chgPct >= 0 ? '+' : ''}${chgPct.toFixed(2)}%)`;
+      document.getElementById('hudOHLC').innerText = `O: ${lastC.o.toFixed(2)}  H: ${lastC.h.toFixed(2)}  L: ${lastC.l.toFixed(2)}  C: ${lastC.c.toFixed(2)} (${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%)`;
 
       const ctx = document.getElementById('masterInteractiveChart');
       if (!ctx) return;
@@ -406,13 +421,13 @@
         datasets.push({ type: 'line', label: `SELL ZONE ($${asset.sellZone})`, data: timestamps.map(t => ({ x: t, y: asset.sellZone })), borderColor: '#ef5350', backgroundColor: 'rgba(239, 83, 80, 0.06)', borderWidth: 2, borderDash: [6,4], pointRadius: 0, fill: 'end', order: 3 });
       }
       if (showMwa50) {
-        datasets.push({ type: 'line', label: '50 EMA (MWA)', data: candleData.map(d => ({ x: d.x, y: d.c * 0.97 })), borderColor: '#3b82f6', borderWidth: 1.8, pointRadius: 0, fill: false, order: 4 });
+        datasets.push({ type: 'line', label: '50 EMA', data: candleData.map(d => ({ x: d.x, y: d.c * 0.97 })), borderColor: '#3b82f6', borderWidth: 1.8, pointRadius: 0, fill: false, order: 4 });
       }
       if (showMwa100) {
-        datasets.push({ type: 'line', label: '100 EMA (MWA)', data: candleData.map(d => ({ x: d.x, y: d.c * 0.94 })), borderColor: '#f59e0b', borderWidth: 1.8, borderDash: [3,3], pointRadius: 0, fill: false, order: 5 });
+        datasets.push({ type: 'line', label: '100 EMA', data: candleData.map(d => ({ x: d.x, y: d.c * 0.94 })), borderColor: '#f59e0b', borderWidth: 1.8, borderDash: [3,3], pointRadius: 0, fill: false, order: 5 });
       }
       if (showMwa200) {
-        datasets.push({ type: 'line', label: '200 EMA (MWA)', data: candleData.map(d => ({ x: d.x, y: d.c * 0.90 })), borderColor: '#ec4899', borderWidth: 2, borderDash: [4,4], pointRadius: 0, fill: false, order: 6 });
+        datasets.push({ type: 'line', label: '200 EMA', data: candleData.map(d => ({ x: d.x, y: d.c * 0.90 })), borderColor: '#ec4899', borderWidth: 2, borderDash: [4,4], pointRadius: 0, fill: false, order: 6 });
       }
       if (showEnergy && asset.electrical_cost) {
         datasets.push({ type: 'line', label: `⚡ Energy Floor ($${asset.electrical_cost})`, data: timestamps.map(t => ({ x: t, y: asset.electrical_cost })), borderColor: '#06b6d4', borderWidth: 1.5, borderDash: [2,2], pointRadius: 0, fill: false, order: 7 });
@@ -424,9 +439,13 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
           plugins: {
-            legend: { labels: { color: '#d1d4dc', font: { size: 11, family: 'monospace' } } },
-            zoom: { pan: { enabled: true, mode: 'xy' }, zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'xy' } }
+            legend: { display: false }, // Hidden because we use our custom top-left floating HUD!
+            zoom: {
+              pan: { enabled: true, mode: 'xy', threshold: 3 },
+              zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'xy' }
+            }
           },
           scales: {
             x: {
