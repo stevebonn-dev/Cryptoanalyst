@@ -129,6 +129,40 @@
         <div id="chartDecisionStrip" class="grid grid-cols-1 md:grid-cols-5 gap-3 pt-1 text-xs font-mono"></div>
       </div>
 
+      <!-- BTC Multi-Touch Resistance & Support Zones (Screenshot Analysis) -->
+      <div id="multiTouchLevelsCard" class="bg-[#1e222d] border border-[#2a2e39] rounded-xl p-4 shadow-sm space-y-3 font-mono text-xs">
+        <div class="flex flex-wrap justify-between items-center gap-2 border-b border-[#2a2e39] pb-2">
+          <div>
+            <h3 class="text-sm font-extrabold text-white">🎯 BTC Multi-Touch Resistance &amp; Support Zones (200-Day Trend Context)</h3>
+            <p class="text-[11px] text-slate-400">Kurs heute: <strong class="text-amber-400">$63,762</strong> &bull; Downward trajectory below 200-day line toward support</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="applyScreenshotLevelsToChart()" class="px-2.5 py-1 rounded bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-[11px]">
+              Plot Levels on Chart
+            </button>
+            <button onclick="clearScreenshotLevelsFromChart()" class="px-2.5 py-1 rounded bg-[#131722] hover:bg-[#2a2e39] text-slate-300 border border-[#2a2e39] font-bold text-[11px]">
+              Clear Levels
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px]">
+          <div class="p-3 rounded-lg bg-red-500/5 border border-red-500/30 space-y-1.5">
+            <div class="font-bold text-red-400 uppercase">Resistance Zones (Widerstand)</div>
+            <div>&bull; <strong>74,050 &ndash; 76,264 $</strong> <span class="text-slate-400">(5&times; tested)</span></div>
+            <div>&bull; <strong>70,983 &ndash; 72,026 $</strong> <span class="text-slate-400">(2&times; tested)</span></div>
+            <div>&bull; <strong>64,700 &ndash; 67,531 $</strong> <span class="text-slate-400">(7&times; tested)</span></div>
+          </div>
+
+          <div class="p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/30 space-y-1.5">
+            <div class="font-bold text-emerald-400 uppercase">Support Zones (Unterst&uuml;tzung)</div>
+            <div>&bull; <strong>62,062 &ndash; 62,818 $</strong> <span class="text-slate-400">(3&times; tested &bull; Immediate)</span></div>
+            <div>&bull; <strong>57,800 &ndash; 59,131 $</strong> <span class="text-slate-400">(3&times; tested &bull; Deeper Floor)</span></div>
+            <div class="text-amber-300">&bull; Reference Spot: <strong>63,762 $</strong></div>
+          </div>
+        </div>
+      </div>
+
       <!-- State Transitions & Engine Telemetry Strip -->
       <div class="bg-[#1e222d] border border-[#2a2e39] rounded-xl p-4 shadow-sm space-y-2 font-mono text-xs">
         <div class="flex flex-wrap justify-between items-center gap-2 border-b border-[#2a2e39] pb-2">
@@ -443,6 +477,19 @@
       { date: 'Dec 17, 2026', event: 'ECB Governing Council & BoE Policy Meetings', category: 'Global Central Banks', impact: 'Medium — Cross-currency liquidity and global risk appetite backdrop.' }
     ];
 
+    const screenshotLevels = [
+      { price: 76264, color: '#ef5350', title: 'R3 Top (5x): $76,264' },
+      { price: 74050, color: '#ef5350', title: 'R3 Base (5x): $74,050' },
+      { price: 72026, color: '#f97316', title: 'R2 Top (2x): $72,026' },
+      { price: 70983, color: '#f97316', title: 'R2 Base (2x): $70,983' },
+      { price: 67531, color: '#ef5350', title: 'R1 Top (7x): $67,531' },
+      { price: 64700, color: '#ef5350', title: 'R1 Base (7x): $64,700' },
+      { price: 62818, color: '#26a69a', title: 'S1 Top (3x): $62,818' },
+      { price: 62062, color: '#26a69a', title: 'S1 Base (3x): $62,062' },
+      { price: 59131, color: '#10b981', title: 'S2 Top (3x): $59,131' },
+      { price: 57800, color: '#10b981', title: 'S2 Base (3x): $57,800' }
+    ];
+
     let currentTimeframe = '1d';
     let tvChart = null;
     let candleSeries = null;
@@ -451,6 +498,7 @@
     let plFairSeries = null;
     let plLowSeries = null;
     let plHighSeries = null;
+    let screenshotPriceLines = [];
     let seriesMap = { ma50: null, ma100: null, ma200d: null, ma200w: null, plTrend: null, buyZoneLine: null, sellZoneLine: null, energyLine: null };
     let visibilityState = { ma50: true, ma100: true, ma200d: true, ma200w: true, zones: true, energy: true, sfp: true, pvsra: true, pl: true };
 
@@ -496,6 +544,29 @@
           plChart.applyOptions({ width: plBox.clientWidth, height: plBox.clientHeight });
         }
       });
+    }
+
+    function applyScreenshotLevelsToChart() {
+      if (!candleSeries || typeof LightweightCharts === 'undefined') return;
+      clearScreenshotLevelsFromChart();
+      screenshotPriceLines = screenshotLevels.map(lvl =>
+        candleSeries.createPriceLine({
+          price: lvl.price,
+          color: lvl.color,
+          lineWidth: 1,
+          lineStyle: LightweightCharts.LineStyle.Dotted,
+          axisLabelVisible: true,
+          title: lvl.title
+        })
+      );
+    }
+
+    function clearScreenshotLevelsFromChart() {
+      if (!candleSeries) return;
+      screenshotPriceLines.forEach(line => {
+        try { candleSeries.removePriceLine(line); } catch (_) {}
+      });
+      screenshotPriceLines = [];
     }
 
     function initPowerLawChart() {
