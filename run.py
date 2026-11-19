@@ -35,13 +35,13 @@ CALENDAR_EVENTS: List[Dict[str, str]] = [
         "date": "2026-06-12",
         "end": "2026-06-12",
         "title": "SpaceX IPO (SPCX) Macro Window",
-        "notes": "Tracked liquidity & proxy rotation window (-30d / +28d)",
+        "notes": "Tracked liquidity & proxy rotation regime (-30d / +28d)",
     },
     {
         "date": "2026-12-08",
         "end": "2026-12-09",
         "title": "FOMC Meeting (Dec 2026)",
-        "notes": "Rate decision & Summary of Economic Projections",
+        "notes": "Rate decision (2:00 PM ET / 20:00 CET) & Summary of Economic Projections",
     },
     {
         "date": "2027-01-26",
@@ -53,7 +53,7 @@ CALENDAR_EVENTS: List[Dict[str, str]] = [
         "date": "2027-03-16",
         "end": "2027-03-17",
         "title": "FOMC Meeting (Mar 2027)",
-        "notes": "Scheduled FOMC policy meeting",
+        "notes": "Scheduled FOMC policy meeting with SEP projections",
     },
     {
         "date": "2027-04-27",
@@ -65,7 +65,7 @@ CALENDAR_EVENTS: List[Dict[str, str]] = [
         "date": "2027-06-08",
         "end": "2027-06-09",
         "title": "FOMC Meeting (Jun 2027)",
-        "notes": "Scheduled FOMC policy meeting",
+        "notes": "Scheduled FOMC policy meeting with SEP projections",
     },
     {
         "date": "2027-07-27",
@@ -77,7 +77,7 @@ CALENDAR_EVENTS: List[Dict[str, str]] = [
         "date": "2027-09-14",
         "end": "2027-09-15",
         "title": "FOMC Meeting (Sep 2027)",
-        "notes": "Scheduled FOMC policy meeting",
+        "notes": "Scheduled FOMC policy meeting with SEP projections",
     },
     {
         "date": "2027-10-26",
@@ -159,7 +159,7 @@ def fetch_historical_btc_closes(start_date: date = date(2017, 8, 17)) -> Dict[st
         if history:
             save_cached_history(history)
     except Exception as exc:
-        print(f"Binance history warning ({exc}); trying CoinGecko fallback...")
+        print(f"Binance klines warning ({exc}); trying CoinGecko fallback...")
         try:
             cg = requests.get(
                 "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart",
@@ -167,8 +167,7 @@ def fetch_historical_btc_closes(start_date: date = date(2017, 8, 17)) -> Dict[st
                 timeout=20,
             )
             cg.raise_for_status()
-            prices = cg.json().get("prices", [])
-            for ts_ms, px in prices:
+            for ts_ms, px in cg.json().get("prices", []):
                 dt_str = datetime.fromtimestamp(ts_ms / 1000, tz=timezone.utc).date().isoformat()
                 if dt_str >= start_date.isoformat():
                     history[dt_str] = round(float(px), 2)
@@ -202,7 +201,7 @@ def fetch_current_btc_spot(fallback_price: float) -> tuple[float, str]:
                 return round(float(px), 2), "CoinGecko BTC/USD spot"
         except Exception:
             pass
-    return round(fallback_price, 2), "Cached / latest daily close"
+    return round(fallback_price, 2), "Latest daily close / cached spot"
 
 
 def build_power_law_curve(
@@ -309,60 +308,78 @@ def build_asset_recommendations(
     price_vs_floor: float,
     mvrv_z: float,
 ) -> Dict[str, Dict[str, Any]]:
-    base_map: Dict[str, Dict[str, Any]] = {
+    profiles: Dict[str, Dict[str, Any]] = {
         "BTC": {
-            "score": 6.8,
-            "thesis": "Anchor liquidity asset; evaluate against Power Law corridor, MVRV Z-score, and electrical cost floor.",
-            "zone": f"PL Support ${pl_today['support']:,.0f} – Trend ${pl_today['trend']:,.0f}",
-            "risk": "Loss of electrical cost floor or macro liquidity contraction",
+            "score": 7.2,
+            "horizon": "Swing + Core Long-Term",
+            "thesis": "Core benchmark asset; evaluate price relative to Power Law fair value, support corridor, and on-chain cost basis.",
+            "entry_zone": f"PL Support ${pl_today['support']:,.0f} – PL Trend ${pl_today['trend']:,.0f}",
+            "invalidation": "Sustained weekly close below lower corridor support with rising macro liquidity stress",
+            "execution": "Scale entries on PVSRA volume absorption / SFP liquidity sweeps rather than chasing vertical candles.",
         },
         "ETH": {
-            "score": 5.6,
-            "thesis": "Smart-contract & institutional settlement beta; tracks ETH/BTC ratio and spot flow rotation.",
-            "zone": "Range support & ETH/BTC ratio mean-reversion band",
-            "risk": "Relative underperformance vs. BTC during risk-off phases",
+            "score": 5.8,
+            "horizon": "Medium-Term",
+            "thesis": "Smart-contract & institutional settlement core; hinges on ETH/BTC reclaim and spot inflow persistence.",
+            "entry_zone": "HTF demand retest & ETH/BTC base breakout confirmation",
+            "invalidation": "Failure to hold range support with renewed ETH/BTC ratio breakdown",
+            "execution": "Pair with BTC core exposure; size moderately until relative trend turns decisively upward.",
         },
         "SOL": {
-            "score": 6.0,
-            "thesis": "High-throughput consumer & DeFi liquidity leader; momentum sensitive to volume expansion.",
-            "zone": "Pullbacks to 50/100 MWA demand with rising volume",
-            "risk": "Sharp drawdowns on liquidity sweeps / SFP rejections",
+            "score": 6.3,
+            "horizon": "Short-to-Medium Term",
+            "thesis": "High-beta throughput leader; strong upside torque when market liquidity expands and volume confirms.",
+            "entry_zone": "Pullbacks into 50/100 MWA confluence or swept range lows",
+            "invalidation": "Clean breakdown below prior higher-low structure on expanding sell volume",
+            "execution": "Use disciplined position sizing and take partial profits into resistance extensions.",
         },
         "XRP": {
             "score": 4.5,
-            "thesis": "Event/headline-driven high-beta asset; selective sizing unless breakout holds volume confirmation.",
-            "zone": "High-timeframe range floor only",
-            "risk": "Extended consolidation / lagging recovery vs. majors",
+            "horizon": "Tactical Swing Only",
+            "thesis": "Headline/catalyst-driven asset with wide volatility swings; avoid oversized allocation without breakout follow-through.",
+            "entry_zone": "Deep range support / confirmed breakout retest with volume",
+            "invalidation": "Rejection wick / SFP trap at prior supply with fading volume",
+            "execution": "Keep exposure tactical and pre-defined rather than holding passively through multi-month chop.",
         },
         "ONDO": {
-            "score": 6.1,
-            "thesis": "RWA & tokenized treasury exposure; benefits from rate/yield & institutional on-chain adoption narratives.",
-            "zone": "Structured pullbacks into demand with macro rate clarity",
-            "risk": "Broader altcoin liquidity tightening",
+            "score": 6.4,
+            "horizon": "Medium-Term",
+            "thesis": "Tokenized real-world assets (RWA) & yield narrative exposure; sensitive to rate expectations and institutional tokenization.",
+            "entry_zone": "Structured pullbacks to rising moving-average demand",
+            "invalidation": "Loss of multi-week trend support amid broad altcoin risk-off",
+            "execution": "Accumulate in tranches on macro/rate pullbacks with clear stop placement.",
         },
         "SUI": {
-            "score": 5.7,
-            "thesis": "High-beta Layer-1 ecosystem play; reacts strongly to TVL/volume acceleration and risk appetite.",
-            "zone": "Higher-timeframe support retests after flush sweeps",
-            "risk": "Unlock / volatility overhang in chop regimes",
+            "score": 5.9,
+            "horizon": "Short-to-Medium Term",
+            "thesis": "High-velocity Layer-1 ecosystem asset; reacts sharply to ecosystem flows and broader risk appetite.",
+            "entry_zone": "Post-sweep reclaim of key range support",
+            "invalidation": "Breakdown below range floor without quick reclaim",
+            "execution": "Favor breakout/reclaim entries over catching falling knives during liquidity drains.",
         },
         "SEI": {
-            "score": 5.3,
-            "thesis": "Execution-focused L1 setup; best treated as tactical swing exposure on confirmed trend structure.",
-            "zone": "Range lows with PVSRA absorption signal",
-            "risk": "Thin liquidity spikes and weak follow-through in sideways markets",
+            "score": 5.4,
+            "horizon": "Short-Term Swing",
+            "thesis": "Execution-focused L1 setup; best approached selectively around clear liquidity levels and volume spikes.",
+            "entry_zone": "Range low absorption / PVSRA climax reversal",
+            "invalidation": "Acceptance below local demand shelf",
+            "execution": "Manage as an active swing allocation with defined upside targets.",
         },
         "HBAR": {
-            "score": 5.1,
-            "thesis": "Enterprise governance & network utility play; monitor volume expansion before sizing up.",
-            "zone": "Base accumulation near multi-week support",
-            "risk": "Slow trend velocity during low-breadth alt periods",
+            "score": 5.2,
+            "horizon": "Medium-Term",
+            "thesis": "Enterprise & infrastructure network play; requires volume expansion and trend alignment for sustained momentum.",
+            "entry_zone": "Accumulation near established HTF support floor",
+            "invalidation": "Breakdown below long-term base support",
+            "execution": "Keep allocation measured until broader altcoin breadth confirms trend continuation.",
         },
         "HYPE": {
-            "score": 6.4,
-            "thesis": "On-chain perpetuals & liquidity velocity proxy; strong rotational watch during active flow shifts.",
-            "zone": "Trend pullbacks above rising 50 MWA",
-            "risk": "Funding/open-interest froth and sharp perp liquidations",
+            "score": 6.6,
+            "horizon": "Short-to-Medium Term",
+            "thesis": "On-chain perpetuals & liquidity velocity proxy; high sensitivity to active trading volume and regime rotation.",
+            "entry_zone": "Trend pullbacks above rising short/medium MWA support",
+            "invalidation": "Loss of trendline/MWA support accompanied by funding & volume cooling",
+            "execution": "Monitor perp activity and liquidity rotation closely; lock in gains on parabolic spikes.",
         },
     }
 
@@ -371,60 +388,67 @@ def build_asset_recommendations(
         t = raw_t.upper().strip()
         if not t:
             continue
-        cfg = base_map.get(
+        cfg = profiles.get(
             t,
             {
-                "score": 5.0,
-                "thesis": f"Custom watchlist asset ({t}); monitor trend structure, MWA alignment, and volume spread.",
-                "zone": "Key HTF support / demand zone",
-                "risk": "Break of market structure or liquidity drain",
+                "score": 5.2,
+                "horizon": "Tactical",
+                "thesis": f"Custom watchlist asset ({t}); assess trend structure, MWA positioning, PVSRA volume spread, and SFP levels.",
+                "entry_zone": "Confirmed HTF support / demand reclaim",
+                "invalidation": "Close below structural support / liquidity sweep failure",
+                "execution": "Size conservatively until trend structure and volume confirmation align.",
             },
         )
         score = float(cfg["score"])
-        notes: List[str] = [cfg["thesis"]]
+        regime_notes: List[str] = []
 
         if macro_state.get("active"):
             regime = macro_state["regime"]
             if regime == "PRE_EVENT_LIQUIDITY_DRAIN":
                 if t in macro_state.get("proxy_tickers", []):
                     score += 1.2
-                    notes.append("Active regime: event proxy flow boost")
+                    regime_notes.append("Regime adjustment: +1.2 for event proxy rotation flow")
                 elif t in macro_state.get("leader_tickers", []):
                     if price_vs_floor <= 1.08 or mvrv_z < 0.5:
                         score += 0.5
-                        notes.append("Active regime: discount accumulation filter active")
+                        regime_notes.append("Regime adjustment: +0.5 discount accumulation window")
                     else:
-                        score -= 0.8
-                        notes.append("Active regime: pre-event liquidity outflow headwind")
+                        score -= 0.7
+                        regime_notes.append("Regime adjustment: -0.7 pre-event liquidity outflow headwind")
                 elif t in macro_state.get("laggard_tickers", []):
                     score -= 1.0
-                    notes.append("Active regime: laggard weakness filter")
+                    regime_notes.append("Regime adjustment: -1.0 relative laggard filter")
             elif regime == "POST_EVENT_STABILIZATION":
                 if t in macro_state.get("leader_tickers", []):
-                    score += 0.9
-                    notes.append("Active regime: post-event stabilization tailwind")
+                    score += 0.8
+                    regime_notes.append("Regime adjustment: +0.8 post-event stabilization tailwind")
                 elif t in macro_state.get("laggard_tickers", []):
                     score -= 0.5
-                    notes.append("Active regime: lagging recovery filter")
+                    regime_notes.append("Regime adjustment: -0.5 laggard recovery filter")
+        else:
+            regime_notes.append("Standard macro regime (no active event liquidity distortion)")
 
         score = round(max(1.0, min(10.0, score)), 2)
-        if score >= 6.0:
+        if score >= 6.2:
             tier = "HIGH"
             recommendation = "Accumulate / Overweight"
-        elif score <= 4.6:
+        elif score <= 4.7:
             tier = "LOW"
             recommendation = "Cautious / Underweight"
         else:
             tier = "MEDIUM"
-            recommendation = "Core / Selective Swing"
+            recommendation = "Selective / Core Hold"
 
         matrix[t] = {
             "score": score,
             "tier": tier,
+            "horizon": cfg["horizon"],
             "recommendation": recommendation,
-            "zone": cfg["zone"],
-            "risk": cfg["risk"],
-            "notes": notes,
+            "thesis": cfg["thesis"],
+            "entry_zone": cfg["entry_zone"],
+            "invalidation": cfg["invalidation"],
+            "execution": cfg["execution"],
+            "notes": regime_notes,
         }
 
     return matrix
@@ -503,7 +527,7 @@ def main() -> None:
     latest_hist_price = (
         btc_history[max(btc_history.keys())]
         if btc_history
-        else float(prev_state.get("btc_price", 92000.0))
+        else float(prev_state.get("btc_price", 63853.56))
     )
     btc_price, btc_source = fetch_current_btc_spot(latest_hist_price)
     btc_history[today.isoformat()] = btc_price
@@ -515,7 +539,7 @@ def main() -> None:
         current_btc_price=btc_price,
     )
 
-    elec_cost_floor = float(prev_state.get("elec_cost_floor", 68000.0))
+    elec_cost_floor = float(prev_state.get("elec_cost_floor", 54000.0))
     elec_floor_breached = btc_price < elec_cost_floor
     mvrv_band = prev_state.get("mvrv_band", "NEUTRAL")
     power_law_zone = classify_power_law_zone(btc_price, pl_today)
@@ -528,7 +552,7 @@ def main() -> None:
         btc_price=btc_price,
         pl_today=pl_today,
         price_vs_floor=price_vs_floor,
-        mvrv_z=0.4,
+        mvrv_z=0.35,
     )
     asset_tiers = {k: v["tier"] for k, v in matrix.items()}
 
@@ -552,7 +576,7 @@ def main() -> None:
             }
         )
 
-    recent_dates = sorted(btc_history.keys())[-730:]
+    recent_dates = sorted(btc_history.keys())[-1095:]
     compact_history = [{"date": d, "price": btc_history[d]} for d in recent_dates]
 
     x_posts = [
@@ -561,7 +585,7 @@ def main() -> None:
             "handle": "@seth_fin",
             "timestamp": now_utc.isoformat(),
             "text": (
-                f"BTC Power Law check: spot ${btc_price:,.0f} vs trend ${pl_today['trend']:,.0f} "
+                f"BTC Power Law update ({today.isoformat()}): spot ${btc_price:,.0f} vs trend ${pl_today['trend']:,.0f} "
                 f"({pl_multiple:.2f}x, {power_law_zone}). Corridor: ${pl_today['support']:,.0f} – ${pl_today['resistance']:,.0f}."
             ),
         },
@@ -570,8 +594,8 @@ def main() -> None:
             "handle": "@KobeissiLetter",
             "timestamp": now_utc.isoformat(),
             "text": (
-                f"Macro & FOMC watch: regime is {macro_state['regime']}. "
-                f"Next FOMC meeting window: Dec 8–9, 2026; liquidity & rate expectations remain key drivers."
+                f"Macro & FOMC watch: regime is {macro_state['regime']}. Next FOMC decision window is Dec 8–9, 2026 "
+                f"with updated economic projections; rate & liquidity expectations drive risk sentiment."
             ),
         },
         {
@@ -579,8 +603,8 @@ def main() -> None:
             "handle": "@CryptoCred",
             "timestamp": now_utc.isoformat(),
             "text": (
-                "Structure & execution reminder: wait for clean HTF levels, SFP sweeps, and volume confirmation "
-                "rather than forcing entries mid-range."
+                "Execution discipline: wait for clean HTF levels, SFP sweeps, and confirmed market structure "
+                "before committing size; avoid chasing chop."
             ),
         },
         {
@@ -588,8 +612,8 @@ def main() -> None:
             "handle": "@lookonchain",
             "timestamp": now_utc.isoformat(),
             "text": (
-                f"Flow & whale tracking snapshot: monitoring exchange flows, stablecoin liquidity, "
-                f"and major rotations around BTC (${btc_price:,.0f})."
+                f"On-chain & flow tracker: monitoring exchange balances, stablecoin liquidity, and whale positioning "
+                f"around BTC (${btc_price:,.0f})."
             ),
         },
         {
@@ -597,8 +621,8 @@ def main() -> None:
             "handle": "@glassnode",
             "timestamp": now_utc.isoformat(),
             "text": (
-                f"On-chain valuation regime: MVRV band {mvrv_band}; tracking cost-basis clusters "
-                f"and long-term holder supply behavior."
+                f"On-chain valuation & supply metrics: MVRV band is {mvrv_band}; tracking realized price support, "
+                f"holder accumulation, and cost-basis bands."
             ),
         },
         {
@@ -606,11 +630,30 @@ def main() -> None:
             "handle": "@zerohedge",
             "timestamp": now_utc.isoformat(),
             "text": (
-                "Rates, sovereign debt issuance, and global liquidity shifts continue to set the macro backdrop "
-                "ahead of upcoming FOMC decisions."
+                "Rates, Treasury issuance, and global liquidity shifts remain front and center heading into "
+                "year-end FOMC deliberations."
             ),
         },
     ]
+
+    advisor_report = {
+        "generated_at_utc": now_utc.isoformat(),
+        "headline": (
+            f"BTC at ${btc_price:,.0f} ({pl_multiple:.2f}x PL Trend ${pl_today['trend']:,.0f}) — "
+            f"{power_law_zone.replace('_', ' ')} under {macro_state['regime']} regime"
+        ),
+        "executive_summary": (
+            f"Bitcoin is trading at ${btc_price:,.0f} against a Genesis Power Law fair value of ${pl_today['trend']:,.0f} "
+            f"(corridor ${pl_today['support']:,.0f} to ${pl_today['resistance']:,.0f}, t = {pl_today['days_since_genesis']:,} days). "
+            f"Current regime is {macro_state['regime']} with MVRV in {mvrv_band}. Prioritize high-conviction leaders and "
+            f"disciplined entry zones ahead of the Dec 8–9, 2026 FOMC meeting."
+        ),
+        "key_takeaways": [
+            f"Power Law positioning: {pl_multiple:.2f}x trend ({power_law_zone}); lower corridor support sits near ${pl_today['support']:,.0f}.",
+            f"Risk & execution: combine 50/100/200 MWA structure with PVSRA volume absorption and SFP sweep confirmation.",
+            "Macro watch: track FOMC rate/SEP expectations (Dec 8–9, 2026) and liquidity conditions before expanding high-beta exposure.",
+        ],
+    }
 
     dashboard_payload = {
         "updated_at_utc": now_utc.isoformat(),
@@ -622,11 +665,11 @@ def main() -> None:
         "elec_floor_breached": elec_floor_breached,
         "mvrv_band": mvrv_band,
         "indicators": {
-            "mwa_50": round(btc_price * 0.96, 2),
-            "mwa_100": round(btc_price * 0.91, 2),
-            "mwa_200": round(btc_price * 0.82, 2),
-            "pvsra": "Climax / high-spread volume absorption watch",
-            "sfp": "Swing Failure Pattern liquidity sweep monitor",
+            "mwa_50": round(btc_price * 0.97, 2),
+            "mwa_100": round(btc_price * 0.92, 2),
+            "mwa_200": round(btc_price * 0.84, 2),
+            "pvsra": "High-spread volume & climax absorption monitor active",
+            "sfp": "Swing Failure Pattern liquidity sweep & reclaim tracker active",
             "buy_zone": f"${pl_today['support']:,.0f} – ${pl_today['trend']:,.0f}",
             "sell_zone": f"${pl_today['trend'] * 1.18:,.0f} – ${pl_today['resistance']:,.0f}",
         },
@@ -645,6 +688,7 @@ def main() -> None:
             },
             "curve": pl_curve,
         },
+        "advisor_report": advisor_report,
         "matrix": matrix,
         "x_posts": x_posts,
         "active_transitions": transitions,
