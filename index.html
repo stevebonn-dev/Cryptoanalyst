@@ -10,6 +10,16 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
     body { background-color: #131722; color: #d1d4dc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    /* Remove TradingView attribution link/logo while keeping the dynamic chart intact */
+    #tvChartContainer a[href*="tradingview"],
+    #plChartContainer a[href*="tradingview"],
+    .tv-lightweight-charts__attribution,
+    #tvChartContainer table tr td:first-child a,
+    #plChartContainer table tr td:first-child a {
+      display: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -44,7 +54,7 @@
   <!-- Main Content -->
   <main class="max-w-7xl mx-auto px-4 py-5 flex-grow w-full space-y-5">
 
-    <!-- TAB 1: CHARTING + PVSRA + SAMPLE PORTFOLIO COMPARISON + STATE TRANSITIONS -->
+    <!-- TAB 1: CHARTING + PVSRA + SAMPLE PORTFOLIO COMPARISON -->
     <section id="dashboard" class="tab-content active space-y-5">
       <div class="bg-[#1e222d] border border-[#2a2e39] rounded-xl p-4 shadow-lg space-y-3">
         <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-3 border-b border-[#2a2e39] pb-3">
@@ -168,13 +178,13 @@
       <div id="assets-grid-container" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
     </section>
 
-    <!-- TAB 2: POWER LAW MODEL -->
+    <!-- TAB 2: POWER LAW MODEL (WITH BITCOIN HISTORICAL PRICE CHART) -->
     <section id="powerlaw" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
-        <div class="border-b border-[#2a2e39] pb-4 flex justify-between items-center">
+        <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-2">
           <div>
-            <h2 class="text-lg font-extrabold text-white">📐 Bitcoin Power Law Regression & Valuation Corridor</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Log-Log Fair Value Curve & Deviation Engine (Genesis: Jan 3, 2009)</p>
+            <h2 class="text-lg font-extrabold text-white">📐 Bitcoin Power Law Regression & Historical Price Corridor</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Historical BTC Price vs. Power Law Fair Value Curve & Accumulation/Euphoria Bands (Genesis: Jan 3, 2009)</p>
           </div>
           <span class="px-2.5 py-1 bg-teal-500/10 border border-teal-500/30 text-teal-400 text-xs font-bold rounded">Integrated in Algorithm</span>
         </div>
@@ -197,81 +207,97 @@
             <strong class="text-emerald-400 text-sm" id="plRegime">Deep Discount / Buy Zone</strong>
           </div>
         </div>
+
+        <div class="space-y-2">
+          <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+            <span class="text-slate-300 font-bold">Historical BTC Price (2016–2026) vs. Power Law Fair Value & Bands</span>
+            <div class="flex flex-wrap gap-3 text-[11px]">
+              <span class="text-amber-400 font-bold">● BTC Historical Price</span>
+              <span class="text-teal-400 font-bold">● Power Law Fair Value</span>
+              <span class="text-emerald-400 font-bold">--- Lower Accumulation Band</span>
+              <span class="text-red-400 font-bold">--- Upper Cycle Band</span>
+            </div>
+          </div>
+          <div id="plChartContainer" class="w-full h-[420px] bg-[#131722] rounded-lg border border-[#2a2e39] overflow-hidden"></div>
+        </div>
       </div>
     </section>
 
-    <!-- TAB 3: MARKET ANALYST REPORT -->
+    <!-- TAB 3: MARKET ANALYST REPORT (ALL ASSETS) -->
     <section id="report" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
-        <div class="border-b border-[#2a2e39] pb-4 flex justify-between items-center">
+        <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-2">
           <div>
-            <h2 class="text-xl font-extrabold text-white">🏛️ Director’s Desk // Market Analyst Report (Power Law + PVSRA)</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Short-, Medium-, and Long-Term Asset Outlooks with Volume & Power Law Context</p>
+            <h2 class="text-xl font-extrabold text-white">🏛️ Director’s Desk // Full Market Analyst Report (All Assets)</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Indicators, Algorithms, Recommendations & Short / Medium / Long-Term Outlooks Across Every Tracked Asset</p>
           </div>
-          <span class="px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] font-bold rounded-lg">Master Report v4.8</span>
+          <span class="px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] font-bold rounded-lg">Master Report v4.9 • All Assets</span>
         </div>
 
-        <div class="space-y-4 text-xs font-mono">
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="font-bold text-white text-sm">1. Bitcoin (BTC) — Power Law Discount + PVSRA Absorption</span>
-              <span class="text-emerald-400 font-bold" id="repBtcStatus">BUY / ADD</span>
-            </div>
-            <p class="text-slate-300">Trading well below the Power Law regression fair value curve while PVSRA highlights heavy volume absorption near support and MVRV remains in a long-term accumulation band.</p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 pt-1 text-[11px]">
-              <div class="p-2 rounded bg-slate-800/50 border border-slate-700"><strong>Short-Term (1–7d):</strong> Accumulate dips near support; watch SFP reversals & volume spikes.</div>
-              <div class="p-2 rounded bg-slate-800/50 border border-slate-700"><strong>Medium-Term (1–4w):</strong> Track 50/100/200 MWA trend reclaims and macro catalysts.</div>
-              <div class="p-2 rounded bg-slate-800/50 border border-slate-700"><strong>Long-Term (1–6m+):</strong> High-conviction Power Law & MVRV cycle accumulation.</div>
-            </div>
-          </div>
-
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="font-bold text-white text-sm">2. Ethereum (ETH) & High-Beta Alts (SOL, XRP, ONDO, HYPE)</span>
-              <span class="text-blue-400 font-bold">PVSRA + MWA Filtered</span>
-            </div>
-            <p class="text-slate-300">Altcoin recommendations combine moving average structure and PVSRA volume spread confirmation: reward PVSRA stopping volume at support, and trim into PVSRA climax spikes near resistance.</p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 pt-1 text-[11px]">
-              <div class="p-2 rounded bg-slate-800/50 border border-slate-700"><strong>Short-Term (1–7d):</strong> Fade climax spikes; buy SFP sweeps with tight risk.</div>
-              <div class="p-2 rounded bg-slate-800/50 border border-slate-700"><strong>Medium-Term (1–4w):</strong> Hold above MWA pivots; rotate profits into strength.</div>
-              <div class="p-2 rounded bg-slate-800/50 border border-slate-700"><strong>Long-Term (1–6m+):</strong> Scale core positions during deep drawdowns; trim euphoria bands.</div>
-            </div>
-          </div>
+        <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] text-xs font-mono space-y-1">
+          <div class="font-bold text-amber-400">Active Algorithmic & Indicator Stack</div>
+          <p class="text-slate-300 text-[11px]">Composite decision engine weights MVRV valuation (&lt;1.2 bottom signal, 1.2–2.4 neutral/accumulation, &gt;2.4 euphoria), Power Law fair-value deviation (BTC), 50/100/200D/200W MWA trend alignment, SFP liquidity sweeps, and PVSRA 20-bar volume spread confirmation (climax &ge;2.0x volume, rising &ge;1.5x volume), with adaptive learning rates (&alpha; = 0.08 macro, &alpha; = 0.12 high-beta).</p>
         </div>
+
+        <div id="full-analyst-report-container" class="space-y-4 text-xs font-mono"></div>
       </div>
     </section>
 
-    <!-- TAB 4: X FEED -->
+    <!-- TAB 4: X FEED (LAST 24–48H POSTS + ADD NEW PEOPLE) -->
     <section id="xfeed" class="tab-content space-y-6">
-      <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-4">
-        <h2 class="text-lg font-extrabold text-white">🐦 X Feed & Key Market Posts</h2>
-        <p class="text-xs text-slate-400">Tracked handles: @seth_fin, @KobeissiLetter, @TedPillows, @CW8900, @aktionaer, @KillaXBT, @DrProfitCrypto</p>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
-            <div class="font-bold text-amber-400">@DrProfitCrypto</div>
-            <p class="text-slate-300 text-[11px]">"Watch major liquidity pockets and power-law valuation zones rather than emotional retail panic."</p>
+      <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
+        <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-2">
+          <div>
+            <h2 class="text-lg font-extrabold text-white">🐦 X Feed & Key Market Posts (Last 24–48 Hours)</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Tracked accounts: @seth_fin, @KobeissiLetter, @TedPillows, @CW8900, @aktionaer, @KillaXBT, @DrProfitCrypto — plus custom accounts you add.</p>
           </div>
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
-            <div class="font-bold text-blue-400">@KobeissiLetter</div>
-            <p class="text-slate-300 text-[11px]">"Macro rates, inflation prints, and FOMC liquidity expectations remain key volatility catalysts across risk assets."</p>
+          <span class="px-2.5 py-1 bg-sky-500/10 border border-sky-500/30 text-sky-400 text-[11px] font-bold rounded">Window: Last 24–48h</span>
+        </div>
+
+        <!-- Add New X Person / Post Form -->
+        <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-3 font-mono text-xs">
+          <div class="font-bold text-amber-400">+ Add New X Account & Recent Post (24–48h)</div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <input type="text" id="x-new-handle" placeholder="@Handle (e.g. @crypto_quant)" class="bg-[#1e222d] border border-[#2a2e39] rounded p-2 text-xs text-white font-mono" />
+            <input type="text" id="x-new-time" placeholder="Window (e.g. 14h ago / Yesterday)" class="bg-[#1e222d] border border-[#2a2e39] rounded p-2 text-xs text-white font-mono" />
+            <input type="text" id="x-new-tag" placeholder="Topic (e.g. BTC / Macro / SFP)" class="bg-[#1e222d] border border-[#2a2e39] rounded p-2 text-xs text-white font-mono" />
           </div>
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
-            <div class="font-bold text-fuchsia-400">@TedPillows & @KillaXBT</div>
-            <p class="text-slate-300 text-[11px]">"Liquidity sweeps (SFP), spot CVD absorption, and volume climax bars often precede sharp directional moves."</p>
-          </div>
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
-            <div class="font-bold text-cyan-400">@seth_fin, @CW8900 & @aktionaer</div>
-            <p class="text-slate-300 text-[11px]">"Track moving average reclaims, RWA/on-chain adoption trends, and disciplined risk sizing across timeframes."</p>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <input type="text" id="x-new-post" placeholder="Paste or summarize the latest post from the last 24–48 hours..." class="flex-grow bg-[#1e222d] border border-[#2a2e39] rounded p-2 text-xs text-white font-mono" />
+            <button onclick="addXFeedEntry()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-xs rounded shadow transition whitespace-nowrap">
+              + Add to X Feed
+            </button>
           </div>
         </div>
+
+        <div id="xfeed-posts-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono"></div>
       </div>
     </section>
 
-    <!-- TAB 5: MACRO CALENDAR -->
+    <!-- TAB 5: MACRO & FED CALENDAR -->
     <section id="macro" class="tab-content space-y-6">
-      <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-4">
-        <h2 class="text-lg font-extrabold text-white">📅 Macro & Fed Calendar</h2>
-        <p class="text-xs text-slate-400">Monitor FOMC rate decisions and U.S. CPI releases for elevated cross-asset volatility.</p>
+      <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
+        <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-2">
+          <div>
+            <h2 class="text-lg font-extrabold text-white">📅 Macro & Fed Calendar (FOMC, CPI, PCE & Liquidity Milestones)</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Key Federal Reserve decisions, inflation releases, and macro catalysts impacting crypto liquidity.</p>
+          </div>
+          <span class="px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] font-bold rounded">Nov–Dec 2026 Schedule</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs font-mono">
+            <thead class="bg-[#131722] text-slate-400 uppercase">
+              <tr>
+                <th class="p-3">Date</th>
+                <th class="p-3">Event / Release</th>
+                <th class="p-3">Category</th>
+                <th class="p-3">Market & Crypto Impact Notes</th>
+              </tr>
+            </thead>
+            <tbody id="macro-calendar-body" class="divide-y divide-[#2a2e39] text-slate-300"></tbody>
+          </table>
+        </div>
       </div>
     </section>
 
@@ -315,20 +341,116 @@
 
   <script>
     const assetsStore = {
-      BTC: { name: 'Bitcoin', price: 63635.16, mvrv: 1.15, electrical_cost: 54500, buyZone: 60150, sellZone: 76000, weight: 0.40, winST: '72%', winMT: '84%', winLT: '93%', winProb: '74%', accuracy: '99.49%', roi: '+39.8%', correlation: '98.7%', strategy: 'Power Law + PVSRA Accumulate', pvsraStatus: 'Institutional Absorption', pvsraScore: 1, weekly200Base: 41000 },
-      ETH: { name: 'Ethereum', price: 1761.48, mvrv: 1.65, buyZone: 1650, sellZone: 2150, weight: 0.20, winST: '68%', winMT: '79%', winLT: '88%', winProb: '69%', accuracy: '99.18%', roi: '+25.4%', correlation: '97.5%', strategy: 'Swing Long + PVSRA', pvsraStatus: 'Rising Demand Spreads', pvsraScore: 1, weekly200Base: 1450 },
-      SOL: { name: 'Solana', price: 74.12, mvrv: 2.10, buyZone: 68.50, sellZone: 92.00, weight: 0.15, winST: '61%', winMT: '74%', winLT: '83%', winProb: '61%', accuracy: '89.80%', roi: '+47.2%', correlation: '94.6%', strategy: 'Climax Trim + Pullback Buy', pvsraStatus: 'Distribution Climax Watch', pvsraScore: -1, weekly200Base: 48.50 },
-      XRP: { name: 'XRP', price: 0.9708, mvrv: 1.85, buyZone: 0.90, sellZone: 1.25, weight: 0.10, winST: '65%', winMT: '77%', winLT: '86%', winProb: '65%', accuracy: '91.10%', roi: '+21.2%', correlation: '92.4%', strategy: 'Trend + Volume Velocity', pvsraStatus: 'Effort-Result Confirmed', pvsraScore: 1, weekly200Base: 0.55 },
-      ONDO: { name: 'Ondo Finance', price: 0.584, mvrv: 1.40, buyZone: 0.45, sellZone: 0.85, weight: 0.10, winST: '63%', winMT: '75%', winLT: '85%', winProb: '64%', accuracy: '88.60%', roi: '+32.5%', correlation: '93.1%', strategy: 'RWA Base Accumulation', pvsraStatus: 'Stealth Base Absorption', pvsraScore: 1, weekly200Base: 0.35 },
-      SUI: { name: 'Sui', price: 0.968, mvrv: 1.50, buyZone: 0.84, sellZone: 1.15, weight: 0.00, winST: '62%', winMT: '73%', winLT: '82%', winProb: '64%', accuracy: '87.00%', roi: '+29.8%', correlation: '90.8%', strategy: 'Swing Hold', pvsraStatus: 'Normal Volume Flow', pvsraScore: 0, weekly200Base: 0.65 },
-      SEI: { name: 'Sei', price: 0.0485, mvrv: 1.30, buyZone: 0.045, sellZone: 0.075, weight: 0.00, winST: '60%', winMT: '71%', winLT: '80%', winProb: '61%', accuracy: '85.20%', roi: '+19.6%', correlation: '89.5%', strategy: 'Base Accumulation', pvsraStatus: 'Stopping Volume Base', pvsraScore: 1, weekly200Base: 0.038 },
-      HBAR: { name: 'Hedera', price: 0.1175, mvrv: 1.55, buyZone: 0.095, sellZone: 0.150, weight: 0.00, winST: '61%', winMT: '72%', winLT: '81%', winProb: '62%', accuracy: '86.40%', roi: '+23.1%', correlation: '90.1%', strategy: 'Breakout Accumulation', pvsraStatus: 'Normal Volume Flow', pvsraScore: 0, weekly200Base: 0.068 },
-      HYPE: { name: 'Hyperliquid', price: 24.50, mvrv: 1.70, buyZone: 18.50, sellZone: 32.00, weight: 0.05, winST: '64%', winMT: '76%', winLT: '84%', winProb: '66%', accuracy: '90.10%', roi: '+54.0%', correlation: '95.6%', strategy: 'Perp DEX Growth + PVSRA', pvsraStatus: 'Rising Demand Spreads', pvsraScore: 1, weekly200Base: 12.40 }
+      BTC: {
+        name: 'Bitcoin', price: 63635.16, mvrv: 1.15, electrical_cost: 54500, buyZone: 60150, sellZone: 76000,
+        weight: 0.40, winST: '72%', winMT: '84%', winLT: '93%', winProb: '74%', accuracy: '99.49%',
+        roi: '+39.8%', correlation: '98.7%', strategy: 'Power Law + PVSRA Accumulate',
+        pvsraStatus: 'Institutional Absorption', pvsraScore: 1, weekly200Base: 41000,
+        outlookST: 'Defending $61.3k–$62.0k support; watch SFP sweeps and PVSRA absorption for tactical longs.',
+        outlookMT: 'Reclaiming 50/100/200 MWA levels and stabilizing ETF/rate flows required for range expansion.',
+        outlookLT: 'Deep Power Law discount and MVRV < 1.2 favor multi-month core accumulation.'
+      },
+      ETH: {
+        name: 'Ethereum', price: 1761.48, mvrv: 1.65, buyZone: 1650, sellZone: 2150,
+        weight: 0.20, winST: '68%', winMT: '79%', winLT: '88%', winProb: '69%', accuracy: '99.18%',
+        roi: '+25.4%', correlation: '97.5%', strategy: 'Swing Long + PVSRA',
+        pvsraStatus: 'Rising Demand Spreads', pvsraScore: 1, weekly200Base: 1450,
+        outlookST: 'Buy dips into $1,650 buy zone when PVSRA shows stopping volume; avoid chasing weak bounces.',
+        outlookMT: 'Monitor 50/100 MWA pivots and L2 settlement flows for rotation toward $2,150.',
+        outlookLT: 'Fairly valued MVRV supports steady structural accumulation on major pullbacks.'
+      },
+      SOL: {
+        name: 'Solana', price: 74.12, mvrv: 2.10, buyZone: 68.50, sellZone: 92.00,
+        weight: 0.15, winST: '61%', winMT: '74%', winLT: '83%', winProb: '61%', accuracy: '89.80%',
+        roi: '+47.2%', correlation: '94.6%', strategy: 'Climax Trim + Pullback Buy',
+        pvsraStatus: 'Distribution Climax Watch', pvsraScore: -1, weekly200Base: 48.50,
+        outlookST: 'Trim into PVSRA climax spikes or high-beta pops; reload on flush toward $68.50.',
+        outlookMT: 'Manage funding/leverage spikes while tracking intermediate moving average support.',
+        outlookLT: 'High-beta growth exposure; scale in during deep drawdowns and trim near $92+.'
+      },
+      XRP: {
+        name: 'XRP', price: 0.9708, mvrv: 1.85, buyZone: 0.90, sellZone: 1.25,
+        weight: 0.10, winST: '65%', winMT: '77%', winLT: '86%', winProb: '65%', accuracy: '91.10%',
+        roi: '+21.2%', correlation: '92.4%', strategy: 'Trend + Volume Velocity',
+        pvsraStatus: 'Effort-Result Confirmed', pvsraScore: 1, weekly200Base: 0.55,
+        outlookST: 'Accumulate near $0.90 support when volume confirms; use tight stops on liquidity wicks.',
+        outlookMT: 'Track settlement volume velocity and moving average anchors toward $1.25.',
+        outlookLT: 'Hold core structural tranche with trailing risk rules as cross-border adoption scales.'
+      },
+      ONDO: {
+        name: 'Ondo Finance', price: 0.584, mvrv: 1.40, buyZone: 0.45, sellZone: 0.85,
+        weight: 0.10, winST: '63%', winMT: '75%', winLT: '85%', winProb: '64%', accuracy: '88.60%',
+        roi: '+32.5%', correlation: '93.1%', strategy: 'RWA Base Accumulation',
+        pvsraStatus: 'Stealth Base Absorption', pvsraScore: 1, weekly200Base: 0.35,
+        outlookST: 'Watch base support and PVSRA absorption for range-bound entries; fade spikes into $0.85.',
+        outlookMT: 'Tokenized treasury / RWA sector rotation drives medium-term swing potential.',
+        outlookLT: 'Constructive MVRV accumulation zone for multi-month RWA infrastructure exposure.'
+      },
+      SUI: {
+        name: 'Sui', price: 0.968, mvrv: 1.50, buyZone: 0.84, sellZone: 1.15,
+        weight: 0.00, winST: '62%', winMT: '73%', winLT: '82%', winProb: '64%', accuracy: '87.00%',
+        roi: '+29.8%', correlation: '90.8%', strategy: 'Swing Hold',
+        pvsraStatus: 'Normal Volume Flow', pvsraScore: 0, weekly200Base: 0.65,
+        outlookST: 'Buy pullbacks toward $0.84 support zone; trim tactical gains near $1.15.',
+        outlookMT: 'Follow MWA trend alignment and order-book depth during L1 rotation.',
+        outlookLT: 'Maintain measured L1 growth exposure with disciplined position sizing.'
+      },
+      SEI: {
+        name: 'Sei', price: 0.0485, mvrv: 1.30, buyZone: 0.045, sellZone: 0.075,
+        weight: 0.00, winST: '60%', winMT: '71%', winLT: '80%', winProb: '61%', accuracy: '85.20%',
+        roi: '+19.6%', correlation: '89.5%', strategy: 'Base Accumulation',
+        pvsraStatus: 'Stopping Volume Base', pvsraScore: 1, weekly200Base: 0.038,
+        outlookST: 'Scale gradually near $0.045 accumulation floor when stopping volume appears.',
+        outlookMT: 'Look for moving average reclaim and volume expansion toward $0.075.',
+        outlookLT: 'Early-stage accumulation profile; keep sizing conservative given altcoin beta.'
+      },
+      HBAR: {
+        name: 'Hedera', price: 0.1175, mvrv: 1.55, buyZone: 0.095, sellZone: 0.150,
+        weight: 0.00, winST: '61%', winMT: '72%', winLT: '81%', winProb: '62%', accuracy: '86.40%',
+        roi: '+23.1%', correlation: '90.1%', strategy: 'Breakout Accumulation',
+        pvsraStatus: 'Normal Volume Flow', pvsraScore: 0, weekly200Base: 0.068,
+        outlookST: 'Accumulate dips toward $0.095 support; take partial profits near $0.150 resistance.',
+        outlookMT: 'Monitor 50/100 MWA structure and enterprise utility headlines for swing momentum.',
+        outlookLT: 'Hold core enterprise-layer allocation with clear invalidation below macro support.'
+      },
+      HYPE: {
+        name: 'Hyperliquid', price: 24.50, mvrv: 1.70, buyZone: 18.50, sellZone: 32.00,
+        weight: 0.05, winST: '64%', winMT: '76%', winLT: '84%', winProb: '66%', accuracy: '90.10%',
+        roi: '+54.0%', correlation: '95.6%', strategy: 'Perp DEX Growth + PVSRA',
+        pvsraStatus: 'Rising Demand Spreads', pvsraScore: 1, weekly200Base: 12.40,
+        outlookST: 'Buy dips into $18.50 support when PVSRA shows demand; trim into $32.00 target zone.',
+        outlookMT: 'Track perp DEX volume share and MWA trend continuation.',
+        outlookLT: 'High-conviction derivatives liquidity play; manage volatility with staged entries/exits.'
+      }
     };
+
+    const defaultXPosts = [
+      { handle: '@KobeissiLetter', time: '28h ago (Nov 18)', tag: 'Macro & Leverage', post: 'US margin debt fell -$32B in October to $1.45T amid market volatility while crypto saw ~$2B in liquidations and spot ETF outflows with December Fed rate expectations in focus.' },
+      { handle: '@TedPillows', time: '20h ago (Nov 18)', tag: 'BTC & Funding', post: 'BTC funding on perps has reset near neutral after heavy leverage unwinds, with options pricing a wide near-term range while spot tests support.' },
+      { handle: '@DrProfitCrypto', time: '26h ago (Nov 18)', tag: 'Valuation & Liquidity', post: 'Focusing on major liquidity zones and long-term valuation bands rather than chasing emotional swings during high-rate macro pressure.' },
+      { handle: '@KillaXBT', time: '22h ago (Nov 18)', tag: 'SFP & Order Flow', post: 'Watching liquidity sweeps, spot absorption, and volume climax bars around key intraday levels before committing to directional swings.' },
+      { handle: '@seth_fin', time: '31h ago (Nov 18)', tag: 'MWA & Structure', post: 'Tracking whether BTC and majors can reclaim key moving average pivots and hold structural support floors without fresh breakdown volume.' },
+      { handle: '@CW8900', time: '36h ago (Nov 17)', tag: 'Cycle & Flows', post: 'Monitoring spot flow pressure, exchange liquidity, and cycle structure to separate tactical relief bounces from durable trend reversals.' },
+      { handle: '@aktionaer', time: '29h ago (Nov 18)', tag: 'Rates, AI & Crypto', post: 'Higher bond yields, AI/IPO capital shifts, and hawkish central bank expectations continue to weigh on risk assets and crypto equities.' }
+    ];
+
+    const macroEvents = [
+      { date: 'Nov 18, 2026', event: 'FOMC Minutes Release (Oct 27–28 Meeting)', category: 'Federal Reserve', impact: 'High — Signals committee rate path and inflation stance ahead of December meeting.' },
+      { date: 'Nov 25, 2026', event: 'U.S. PCE Price Index Release', category: 'Inflation / Fed Watch', impact: 'High — Key Fed inflation gauge influencing December rate expectations.' },
+      { date: 'Nov 26, 2026', event: 'U.S. Thanksgiving Holiday (Markets Closed)', category: 'Market Holiday', impact: 'Medium — Thinner liquidity and potential weekend/holiday volatility.' },
+      { date: 'Dec 8–9, 2026', event: 'FOMC Monetary Policy Meeting & Rate Decision (Dec 9)', category: 'Federal Reserve', impact: 'Critical — Primary macro catalyst for USD yields, equities, and crypto.' },
+      { date: 'Dec 10, 2026', event: 'U.S. Consumer Price Index (CPI — Nov 2026)', category: 'Inflation / CPI', impact: 'High — Immediate reaction across rates, DXY, BTC, and high-beta alts.' },
+      { date: 'Dec 17, 2026', event: 'ECB Governing Council & BoE Policy Meetings', category: 'Global Central Banks', impact: 'Medium — Cross-currency liquidity and global risk appetite backdrop.' }
+    ];
 
     let currentTimeframe = '1d';
     let tvChart = null;
     let candleSeries = null;
+    let plChart = null;
+    let plPriceSeries = null;
+    let plFairSeries = null;
+    let plLowSeries = null;
+    let plHighSeries = null;
     let seriesMap = { ma50: null, ma100: null, ma200d: null, ma200w: null, plTrend: null, buyZoneLine: null, sellZoneLine: null, energyLine: null };
     let visibilityState = { ma50: true, ma100: true, ma200d: true, ma200w: true, zones: true, energy: true, sfp: true, pvsra: true, pl: true };
 
@@ -345,7 +467,7 @@
       tvChart = LightweightCharts.createChart(container, {
         width: container.clientWidth,
         height: container.clientHeight,
-        layout: { background: { type: 'solid', color: '#131722' }, textColor: '#d1d4dc' },
+        layout: { background: { type: 'solid', color: '#131722' }, textColor: '#d1d4dc', attributionLogo: false },
         grid: { vertLines: { color: '#1e222d' }, horzLines: { color: '#1e222d' } },
         crosshair: {
           mode: LightweightCharts.CrosshairMode.Normal,
@@ -369,7 +491,31 @@
 
       window.addEventListener('resize', () => {
         if (tvChart && container) tvChart.applyOptions({ width: container.clientWidth, height: container.clientHeight });
+        if (plChart && document.getElementById('plChartContainer')) {
+          const plBox = document.getElementById('plChartContainer');
+          plChart.applyOptions({ width: plBox.clientWidth, height: plBox.clientHeight });
+        }
       });
+    }
+
+    function initPowerLawChart() {
+      const container = document.getElementById('plChartContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      plChart = LightweightCharts.createChart(container, {
+        width: container.clientWidth || 900,
+        height: container.clientHeight || 420,
+        layout: { background: { type: 'solid', color: '#131722' }, textColor: '#d1d4dc', attributionLogo: false },
+        grid: { vertLines: { color: '#1e222d' }, horzLines: { color: '#1e222d' } },
+        rightPriceScale: { mode: LightweightCharts.PriceScaleMode.Logarithmic, borderColor: '#2a2e39' },
+        timeScale: { borderColor: '#2a2e39', timeVisible: false },
+      });
+
+      plPriceSeries = plChart.addLineSeries({ color: '#f59e0b', lineWidth: 2.5, title: 'BTC Price', priceLineVisible: false });
+      plFairSeries = plChart.addLineSeries({ color: '#14b8a6', lineWidth: 2.5, title: 'Power Law Fair', priceLineVisible: false });
+      plLowSeries = plChart.addLineSeries({ color: '#26a69a', lineWidth: 1.5, lineStyle: LightweightCharts.LineStyle.Dashed, title: 'Lower Band', priceLineVisible: false });
+      plHighSeries = plChart.addLineSeries({ color: '#ef5350', lineWidth: 1.5, lineStyle: LightweightCharts.LineStyle.Dashed, title: 'Upper Band', priceLineVisible: false });
     }
 
     function calculateSMA(candles, period) {
@@ -459,25 +605,6 @@
       }
     }
 
-    async function loadStateTelemetry() {
-      try {
-        const res = await fetch('./state/last_run.json', { cache: 'no-store' });
-        if (!res.ok) throw new Error('No state file');
-        const st = await res.json();
-        document.getElementById('stateRegimeBadge').innerText = `Regime: ${st.regime || 'ACCUMULATION_DISCOUNT'}`;
-        const items = (st.alerts && st.alerts.length) ? st.alerts : [`BTC MVRV Band: ${st.mvrv_band || 'UNDERVALUED_BOTTOM'} | Floor Breached: ${Boolean(st.elec_floor_breached)}`];
-        document.getElementById('stateAlertsList').innerHTML = items.map(x => `<div>• ${x}</div>`).join('');
-      } catch (_) {
-        const btc = assetsStore.BTC;
-        const breached = btc.price <= btc.electrical_cost;
-        document.getElementById('stateRegimeBadge').innerText = `Regime: ${breached ? 'THERMODYNAMIC_STRESS' : 'ACCUMULATION_DISCOUNT'}`;
-        document.getElementById('stateAlertsList').innerHTML = `
-          <div>• BTC MVRV (${btc.mvrv} &lt; 1.2): UNDERVALUED_BOTTOM active</div>
-          <div>• BTC Spot ($${btc.price.toLocaleString()}) vs Electrical Cost Floor ($${btc.electrical_cost.toLocaleString()}): ${breached ? 'BREACHED' : 'ABOVE FLOOR'}</div>
-        `;
-      }
-    }
-
     function getPowerLawMetrics(price) {
       const fair = calcPowerLawValue(Math.floor(Date.now() / 1000));
       const pctDiff = ((price - fair) / fair) * 100;
@@ -512,13 +639,61 @@
       };
     }
 
-    function updatePowerLawPanel(btcPrice) {
-      const { fair, pctDiff } = getPowerLawMetrics(btcPrice);
+    function renderPowerLawHistoryChart(btcSpot) {
+      if (!plChart) initPowerLawChart();
+      const { fair, pctDiff } = getPowerLawMetrics(btcSpot);
       const sign = pctDiff >= 0 ? '+' : '';
-      document.getElementById('plLivePrice').innerText = `$${btcPrice.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+      document.getElementById('plLivePrice').innerText = `$${btcSpot.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
       document.getElementById('plFairValue').innerText = `$${fair.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
       document.getElementById('plDistance').innerText = `${sign}${pctDiff.toFixed(1)}% vs Fair`;
       document.getElementById('plRegime').innerText = pctDiff < -35 ? 'Undervalued / Accumulation' : pctDiff > 60 ? 'Overextended / Trim Zone' : 'Fair Value Corridor';
+
+      const anchors = [
+        ['2016-05-06', 450], ['2017-01-01', 998], ['2017-12-16', 19400], ['2018-12-15', 3250],
+        ['2019-06-26', 11800], ['2020-03-16', 5050], ['2020-12-31', 29000], ['2021-04-14', 63500],
+        ['2021-11-10', 67500], ['2022-11-21', 15780], ['2023-12-31', 42265], ['2024-03-14', 73100],
+        ['2024-12-17', 106100], ['2025-10-06', 124650], ['2026-01-14', 97800], ['2026-06-15', 66800],
+        ['2026-11-15', 62080], ['2026-11-19', btcSpot]
+      ];
+
+      const pricePts = [];
+      const fairPts = [];
+      const lowPts = [];
+      const highPts = [];
+
+      anchors.forEach(([dateStr, val]) => {
+        const sec = Math.floor(Date.parse(dateStr + 'T00:00:00Z') / 1000);
+        const plVal = calcPowerLawValue(sec);
+        pricePts.push({ time: dateStr, value: val });
+        fairPts.push({ time: dateStr, value: Number(plVal.toFixed(2)) });
+        lowPts.push({ time: dateStr, value: Number((plVal * 0.42).toFixed(2)) });
+        highPts.push({ time: dateStr, value: Number((plVal * 2.15).toFixed(2)) });
+      });
+
+      plPriceSeries.setData(pricePts);
+      plFairSeries.setData(fairPts);
+      plLowSeries.setData(lowPts);
+      plHighSeries.setData(highPts);
+      plChart.timeScale().fitContent();
+    }
+
+    async function loadStateTelemetry() {
+      try {
+        const res = await fetch('./state/last_run.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error('No state file');
+        const st = await res.json();
+        document.getElementById('stateRegimeBadge').innerText = `Regime: ${st.regime || 'ACCUMULATION_DISCOUNT'}`;
+        const items = (st.alerts && st.alerts.length) ? st.alerts : [`BTC MVRV Band: ${st.mvrv_band || 'UNDERVALUED_BOTTOM'} | Floor Breached: ${Boolean(st.elec_floor_breached)}`];
+        document.getElementById('stateAlertsList').innerHTML = items.map(x => `<div>• ${x}</div>`).join('');
+      } catch (_) {
+        const btc = assetsStore.BTC;
+        const breached = btc.price <= btc.electrical_cost;
+        document.getElementById('stateRegimeBadge').innerText = `Regime: ${breached ? 'THERMODYNAMIC_STRESS' : 'ACCUMULATION_DISCOUNT'}`;
+        document.getElementById('stateAlertsList').innerHTML = `
+          <div>• BTC MVRV (${btc.mvrv} &lt; 1.2): UNDERVALUED_BOTTOM active</div>
+          <div>• BTC Spot ($${btc.price.toLocaleString()}) vs Electrical Cost Floor ($${btc.electrical_cost.toLocaleString()}): ${breached ? 'BREACHED' : 'ABOVE FLOOR'}</div>
+        `;
+      }
     }
 
     async function loadChartData() {
@@ -561,7 +736,7 @@
         tvChart.timeScale().fitContent();
       }
 
-      updatePowerLawPanel(assetsStore.BTC.price);
+      renderPowerLawHistoryChart(assetsStore.BTC.price);
       await loadStateTelemetry();
       const rec = computeRecommendation(asset);
       const hudSig = document.getElementById('hudSignal');
@@ -582,6 +757,7 @@
       document.getElementById('liveFeedBadge').innerText = `Feed: Live (${ticker} Synced)`;
       renderPortfolioTable();
       renderDashboardGrid();
+      renderAnalystReportAllAssets();
       renderBacktestTable();
     }
 
@@ -671,6 +847,81 @@
       }).join('');
     }
 
+    function renderAnalystReportAllAssets() {
+      const container = document.getElementById('full-analyst-report-container');
+      if (!container) return;
+      container.innerHTML = Object.keys(assetsStore).map((t, idx) => {
+        const a = assetsStore[t], rec = computeRecommendation(a);
+        const extraPl = t === 'BTC' ? ` • Power Law: ${getPowerLawMetrics(a.price).pctDiff.toFixed(1)}% vs Fair` : '';
+        return `
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-2">
+            <div class="flex flex-wrap justify-between items-center gap-2">
+              <span class="font-bold text-white text-sm">${idx + 1}. ${a.name} (${t}) — Spot: $${a.price.toLocaleString(undefined, { maximumFractionDigits: 4 })} | MVRV: ${a.mvrv}${extraPl}</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${rec.badgeClass}">${rec.action}</span>
+            </div>
+            <div class="text-[11px] text-slate-400">
+              <strong>Algorithm & Indicators:</strong> ${a.strategy} • <strong>PVSRA:</strong> ${a.pvsraStatus} • <strong>Buy/Sell Zones:</strong> &le; $${a.buyZone} / &ge; $${a.sellZone}
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 pt-1 text-[11px]">
+              <div class="p-2.5 rounded bg-[#1e222d] border border-[#2a2e39]"><strong class="text-amber-400 block">Short-Term (1–7d • Win ${a.winST}):</strong>${a.outlookST || 'Monitor support/resistance, SFP traps, and PVSRA volume confirmation.'}</div>
+              <div class="p-2.5 rounded bg-[#1e222d] border border-[#2a2e39]"><strong class="text-cyan-400 block">Medium-Term (1–4w • Win ${a.winMT}):</strong>${a.outlookMT || 'Track 50/100/200 MWA structure and swing range rotations.'}</div>
+              <div class="p-2.5 rounded bg-[#1e222d] border border-[#2a2e39]"><strong class="text-emerald-400 block">Long-Term (1–6m+ • Win ${a.winLT}):</strong>${a.outlookLT || 'Align core allocation with MVRV cycle bands and macro trend.'}</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function getXPosts() {
+      const saved = localStorage.getItem('cryptoanalyst_x_posts_v1');
+      return saved ? JSON.parse(saved) : defaultXPosts;
+    }
+
+    function saveXPosts(list) {
+      localStorage.setItem('cryptoanalyst_x_posts_v1', JSON.stringify(list));
+    }
+
+    function renderXFeed() {
+      const posts = getXPosts();
+      document.getElementById('xfeed-posts-container').innerHTML = posts.map(p => `
+        <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1.5">
+          <div class="flex justify-between items-center gap-2">
+            <span class="font-bold text-amber-400">${p.handle}</span>
+            <span class="text-[10px] text-slate-400">${p.time}</span>
+          </div>
+          <div class="text-[10px] text-cyan-400 font-bold uppercase">${p.tag}</div>
+          <p class="text-slate-300 text-[11px] leading-relaxed">${p.post}</p>
+        </div>
+      `).join('');
+    }
+
+    function addXFeedEntry() {
+      let handle = document.getElementById('x-new-handle').value.trim();
+      const time = document.getElementById('x-new-time').value.trim() || 'Just now (24–48h window)';
+      const tag = document.getElementById('x-new-tag').value.trim() || 'Market Commentary';
+      const post = document.getElementById('x-new-post').value.trim();
+      if (!handle || !post) return;
+      if (!handle.startsWith('@')) handle = '@' + handle;
+      const list = getXPosts();
+      list.unshift({ handle, time, tag, post });
+      saveXPosts(list);
+      document.getElementById('x-new-handle').value = '';
+      document.getElementById('x-new-time').value = '';
+      document.getElementById('x-new-tag').value = '';
+      document.getElementById('x-new-post').value = '';
+      renderXFeed();
+    }
+
+    function renderMacroCalendar() {
+      document.getElementById('macro-calendar-body').innerHTML = macroEvents.map(ev => `
+        <tr class="hover:bg-[#131722]/50">
+          <td class="p-3 font-bold text-amber-400 whitespace-nowrap">${ev.date}</td>
+          <td class="p-3 text-white font-bold">${ev.event}</td>
+          <td class="p-3 text-cyan-400">${ev.category}</td>
+          <td class="p-3 text-slate-300">${ev.impact}</td>
+        </tr>
+      `).join('');
+    }
+
     function renderBacktestTable() {
       document.getElementById('backtest-table-body').innerHTML = Object.keys(assetsStore).map(t => {
         const a = assetsStore[t];
@@ -689,24 +940,43 @@
     function registerCustomAsset() {
       const ticker = document.getElementById('new-ticker').value.trim().toUpperCase();
       if (!ticker) return;
-      assetsStore[ticker] = { name: ticker, price: 10.0, mvrv: 1.4, buyZone: 8.5, sellZone: 15.0, weight: 0.0, winST: '61%', winMT: '73%', winLT: '82%', winProb: '62%', accuracy: '85.0%', roi: '+15.0%', correlation: '90.0%', strategy: 'Spot Accumulation', pvsraStatus: 'Normal Volume Flow', pvsraScore: 0, weekly200Base: 6.5 };
+      const mcap = parseFloat(document.getElementById('new-mcap').value) || 10;
+      const mvrv = parseFloat(document.getElementById('new-mvrv').value) || 1.4;
+      const energy = parseFloat(document.getElementById('new-energy').value) || undefined;
+      assetsStore[ticker] = {
+        name: ticker, price: 10.0, mvrv: mvrv, electrical_cost: energy, buyZone: 8.5, sellZone: 15.0,
+        weight: 0.0, winST: '61%', winMT: '73%', winLT: '82%', winProb: '62%', accuracy: '85.0%',
+        roi: '+15.0%', correlation: '90.0%', strategy: mcap >= 50 ? 'Macro MWA + PVSRA' : 'High-Beta MWA + PVSRA',
+        pvsraStatus: 'Normal Volume Flow', pvsraScore: 0, weekly200Base: 6.5,
+        outlookST: 'Monitor liquidity sweeps, PVSRA volume, and key support/resistance.',
+        outlookMT: 'Track moving average alignment and medium-term swing structure.',
+        outlookLT: 'Align position sizing with MVRV valuation and broader cycle trend.'
+      };
       document.getElementById('topAssetSelect').innerHTML += `<option value="${ticker}">${ticker}USDT</option>`;
       selectAssetForTopChart(ticker);
     }
 
     function switchTab(tabId) {
       document.querySelectorAll('.nav-btn').forEach(b => {
-        b.classList.toggle('bg-amber-500', b.getAttribute('data-tab') === tabId);
-        b.classList.toggle('text-slate-900', b.getAttribute('data-tab') === tabId);
-        b.classList.toggle('font-bold', b.getAttribute('data-tab') === tabId);
+        const active = b.getAttribute('data-tab') === tabId;
+        b.classList.toggle('bg-amber-500', active);
+        b.classList.toggle('text-slate-900', active);
+        b.classList.toggle('font-bold', active);
+        b.classList.toggle('text-slate-400', !active);
       });
       document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === tabId));
+      if (tabId === 'powerlaw') renderPowerLawHistoryChart(assetsStore.BTC.price);
+      if (tabId === 'report') renderAnalystReportAllAssets();
+      if (tabId === 'xfeed') renderXFeed();
+      if (tabId === 'macro') renderMacroCalendar();
     }
 
     document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', () => switchTab(b.getAttribute('data-tab'))));
     initTradingViewChart();
+    initPowerLawChart();
+    renderXFeed();
+    renderMacroCalendar();
     loadChartData();
   </script>
 </body>
 </html>
-
