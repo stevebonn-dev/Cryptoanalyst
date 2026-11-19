@@ -12,7 +12,7 @@ import smtplib
 import urllib.request
 from email.message import EmailMessage
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import numpy as np
 
