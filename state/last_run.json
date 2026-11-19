@@ -1,0 +1,15 @@
+{
+  "regime": "NORMAL",
+  "mvrv_band": "NEUTRAL",
+  "power_law_zone": "DISCOUNT_BELOW_TREND",
+  "elec_floor_breached": false,
+  "asset_tiers": {
+    "BTC": "MEDIUM",
+    "ETH": "MEDIUM",
+    "SOL": "MEDIUM",
+    "XRP": "MEDIUM",
+    "HYPE": "MEDIUM"
+  },
+  "btc_price": 92000.0,
+  "elec_cost_floor": 68000.0
+}

@@ -1,0 +1,3366 @@
+{
+  "updated_at_utc": "2026-11-19T10:49:28.855863+00:00",
+  "macro_regime": {
+    "active": false,
+    "regime": "NORMAL",
+    "event_name": null,
+    "proxy_tickers": [],
+    "leader_tickers": [],
+    "laggard_tickers": []
+  },
+  "btc_price": 92000.0,
+  "elec_cost_floor": 68000.0,
+  "elec_floor_breached": false,
+  "mvrv_band": "NEUTRAL",
+  "power_law": {
+    "params": {
+      "log_a": -16.493,
+      "beta": 5.688,
+      "band_log10": 0.35,
+      "genesis_date": "2009-01-03"
+    },
+    "current": {
+      "date": "2026-11-19",
+      "days_since_genesis": 6529,
+      "trend": 160637.84,
+      "support": 71754.29,
+      "resistance": 359623.32,
+      "btc_price": 92000.0,
+      "multiple_to_trend": 0.57,
+      "zone": "DISCOUNT_BELOW_TREND"
+    },
+    "curve": [
+      {
+        "date": "2017-01-01",
+        "t": 2920,
+        "trend": 1652.33,
+        "support": 738.07,
+        "resistance": 3699.11,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-01-15",
+        "t": 2934,
+        "trend": 1697.9,
+        "support": 758.43,
+        "resistance": 3801.13,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-01-29",
+        "t": 2948,
+        "trend": 1744.51,
+        "support": 779.24,
+        "resistance": 3905.46,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-02-12",
+        "t": 2962,
+        "trend": 1792.16,
+        "support": 800.53,
+        "resistance": 4012.14,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-02-26",
+        "t": 2976,
+        "trend": 1840.87,
+        "support": 822.29,
+        "resistance": 4121.2,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-03-12",
+        "t": 2990,
+        "trend": 1890.68,
+        "support": 844.54,
+        "resistance": 4232.7,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-03-26",
+        "t": 3004,
+        "trend": 1941.59,
+        "support": 867.28,
+        "resistance": 4346.68,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-04-09",
+        "t": 3018,
+        "trend": 1993.62,
+        "support": 890.52,
+        "resistance": 4463.17,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-04-23",
+        "t": 3032,
+        "trend": 2046.8,
+        "support": 914.27,
+        "resistance": 4582.22,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-05-07",
+        "t": 3046,
+        "trend": 2101.14,
+        "support": 938.55,
+        "resistance": 4703.87,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-05-21",
+        "t": 3060,
+        "trend": 2156.67,
+        "support": 963.35,
+        "resistance": 4828.18,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-06-04",
+        "t": 3074,
+        "trend": 2213.4,
+        "support": 988.69,
+        "resistance": 4955.18,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-06-18",
+        "t": 3088,
+        "trend": 2271.35,
+        "support": 1014.58,
+        "resistance": 5084.92,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-07-02",
+        "t": 3102,
+        "trend": 2330.55,
+        "support": 1041.02,
+        "resistance": 5217.45,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-07-16",
+        "t": 3116,
+        "trend": 2391.01,
+        "support": 1068.03,
+        "resistance": 5352.82,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-07-30",
+        "t": 3130,
+        "trend": 2452.77,
+        "support": 1095.61,
+        "resistance": 5491.06,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-08-13",
+        "t": 3144,
+        "trend": 2515.83,
+        "support": 1123.78,
+        "resistance": 5632.23,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-08-27",
+        "t": 3158,
+        "trend": 2580.22,
+        "support": 1152.54,
+        "resistance": 5776.39,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-09-10",
+        "t": 3172,
+        "trend": 2645.96,
+        "support": 1181.91,
+        "resistance": 5923.56,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-09-24",
+        "t": 3186,
+        "trend": 2713.08,
+        "support": 1211.89,
+        "resistance": 6073.82,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-10-08",
+        "t": 3200,
+        "trend": 2781.59,
+        "support": 1242.49,
+        "resistance": 6227.2,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-10-22",
+        "t": 3214,
+        "trend": 2851.52,
+        "support": 1273.73,
+        "resistance": 6383.77,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-11-05",
+        "t": 3228,
+        "trend": 2922.9,
+        "support": 1305.61,
+        "resistance": 6543.56,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-11-19",
+        "t": 3242,
+        "trend": 2995.74,
+        "support": 1338.15,
+        "resistance": 6706.63,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-12-03",
+        "t": 3256,
+        "trend": 3070.07,
+        "support": 1371.35,
+        "resistance": 6873.04,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-12-17",
+        "t": 3270,
+        "trend": 3145.92,
+        "support": 1405.23,
+        "resistance": 7042.84,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2017-12-31",
+        "t": 3284,
+        "trend": 3223.3,
+        "support": 1439.8,
+        "resistance": 7216.08,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-01-14",
+        "t": 3298,
+        "trend": 3302.25,
+        "support": 1475.06,
+        "resistance": 7392.81,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-01-28",
+        "t": 3312,
+        "trend": 3382.78,
+        "support": 1511.03,
+        "resistance": 7573.1,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-02-11",
+        "t": 3326,
+        "trend": 3464.92,
+        "support": 1547.72,
+        "resistance": 7757.0,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-02-25",
+        "t": 3340,
+        "trend": 3548.71,
+        "support": 1585.15,
+        "resistance": 7944.56,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-03-11",
+        "t": 3354,
+        "trend": 3634.15,
+        "support": 1623.31,
+        "resistance": 8135.85,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-03-25",
+        "t": 3368,
+        "trend": 3721.28,
+        "support": 1662.23,
+        "resistance": 8330.91,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-04-08",
+        "t": 3382,
+        "trend": 3810.13,
+        "support": 1701.92,
+        "resistance": 8529.81,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-04-22",
+        "t": 3396,
+        "trend": 3900.71,
+        "support": 1742.39,
+        "resistance": 8732.61,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-05-06",
+        "t": 3410,
+        "trend": 3993.07,
+        "support": 1783.64,
+        "resistance": 8939.37,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-05-20",
+        "t": 3424,
+        "trend": 4087.22,
+        "support": 1825.69,
+        "resistance": 9150.15,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-06-03",
+        "t": 3438,
+        "trend": 4183.19,
+        "support": 1868.56,
+        "resistance": 9365.0,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-06-17",
+        "t": 3452,
+        "trend": 4281.01,
+        "support": 1912.26,
+        "resistance": 9584.0,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-07-01",
+        "t": 3466,
+        "trend": 4380.71,
+        "support": 1956.79,
+        "resistance": 9807.2,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-07-15",
+        "t": 3480,
+        "trend": 4482.32,
+        "support": 2002.18,
+        "resistance": 10034.66,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-07-29",
+        "t": 3494,
+        "trend": 4585.86,
+        "support": 2048.43,
+        "resistance": 10266.46,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-08-12",
+        "t": 3508,
+        "trend": 4691.36,
+        "support": 2095.55,
+        "resistance": 10502.65,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-08-26",
+        "t": 3522,
+        "trend": 4798.86,
+        "support": 2143.57,
+        "resistance": 10743.3,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-09-09",
+        "t": 3536,
+        "trend": 4908.37,
+        "support": 2192.49,
+        "resistance": 10988.48,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-09-23",
+        "t": 3550,
+        "trend": 5019.94,
+        "support": 2242.33,
+        "resistance": 11238.25,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-10-07",
+        "t": 3564,
+        "trend": 5133.6,
+        "support": 2293.09,
+        "resistance": 11492.69,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-10-21",
+        "t": 3578,
+        "trend": 5249.36,
+        "support": 2344.8,
+        "resistance": 11751.85,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-11-04",
+        "t": 3592,
+        "trend": 5367.26,
+        "support": 2397.47,
+        "resistance": 12015.81,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-11-18",
+        "t": 3606,
+        "trend": 5487.35,
+        "support": 2451.11,
+        "resistance": 12284.64,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-12-02",
+        "t": 3620,
+        "trend": 5609.63,
+        "support": 2505.73,
+        "resistance": 12558.4,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-12-16",
+        "t": 3634,
+        "trend": 5734.16,
+        "support": 2561.35,
+        "resistance": 12837.17,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2018-12-30",
+        "t": 3648,
+        "trend": 5860.95,
+        "support": 2617.99,
+        "resistance": 13121.03,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-01-13",
+        "t": 3662,
+        "trend": 5990.04,
+        "support": 2675.65,
+        "resistance": 13410.04,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-01-27",
+        "t": 3676,
+        "trend": 6121.47,
+        "support": 2734.36,
+        "resistance": 13704.27,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-02-10",
+        "t": 3690,
+        "trend": 6255.27,
+        "support": 2794.13,
+        "resistance": 14003.8,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-02-24",
+        "t": 3704,
+        "trend": 6391.47,
+        "support": 2854.96,
+        "resistance": 14308.71,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-03-10",
+        "t": 3718,
+        "trend": 6530.1,
+        "support": 2916.89,
+        "resistance": 14619.07,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-03-24",
+        "t": 3732,
+        "trend": 6671.2,
+        "support": 2979.92,
+        "resistance": 14934.96,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-04-07",
+        "t": 3746,
+        "trend": 6814.81,
+        "support": 3044.06,
+        "resistance": 15256.45,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-04-21",
+        "t": 3760,
+        "trend": 6960.95,
+        "support": 3109.34,
+        "resistance": 15583.62,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-05-05",
+        "t": 3774,
+        "trend": 7109.67,
+        "support": 3175.77,
+        "resistance": 15916.56,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-05-19",
+        "t": 3788,
+        "trend": 7260.99,
+        "support": 3243.37,
+        "resistance": 16255.33,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-06-02",
+        "t": 3802,
+        "trend": 7414.96,
+        "support": 3312.14,
+        "resistance": 16600.03,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-06-16",
+        "t": 3816,
+        "trend": 7571.61,
+        "support": 3382.12,
+        "resistance": 16950.73,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-06-30",
+        "t": 3830,
+        "trend": 7730.98,
+        "support": 3453.3,
+        "resistance": 17307.51,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-07-14",
+        "t": 3844,
+        "trend": 7893.1,
+        "support": 3525.72,
+        "resistance": 17670.46,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-07-28",
+        "t": 3858,
+        "trend": 8058.02,
+        "support": 3599.39,
+        "resistance": 18039.66,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-08-11",
+        "t": 3872,
+        "trend": 8225.76,
+        "support": 3674.31,
+        "resistance": 18415.19,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-08-25",
+        "t": 3886,
+        "trend": 8396.38,
+        "support": 3750.52,
+        "resistance": 18797.15,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-09-08",
+        "t": 3900,
+        "trend": 8569.89,
+        "support": 3828.03,
+        "resistance": 19185.6,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-09-22",
+        "t": 3914,
+        "trend": 8746.36,
+        "support": 3906.85,
+        "resistance": 19580.66,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-10-06",
+        "t": 3928,
+        "trend": 8925.8,
+        "support": 3987.01,
+        "resistance": 19982.39,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-10-20",
+        "t": 3942,
+        "trend": 9108.27,
+        "support": 4068.52,
+        "resistance": 20390.89,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-11-03",
+        "t": 3956,
+        "trend": 9293.81,
+        "support": 4151.39,
+        "resistance": 20806.25,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-11-17",
+        "t": 3970,
+        "trend": 9482.45,
+        "support": 4235.65,
+        "resistance": 21228.55,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-12-01",
+        "t": 3984,
+        "trend": 9674.23,
+        "support": 4321.32,
+        "resistance": 21657.9,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-12-15",
+        "t": 3998,
+        "trend": 9869.2,
+        "support": 4408.41,
+        "resistance": 22094.38,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2019-12-29",
+        "t": 4012,
+        "trend": 10067.39,
+        "support": 4496.94,
+        "resistance": 22538.08,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-01-12",
+        "t": 4026,
+        "trend": 10268.85,
+        "support": 4586.93,
+        "resistance": 22989.1,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-01-26",
+        "t": 4040,
+        "trend": 10473.63,
+        "support": 4678.4,
+        "resistance": 23447.54,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-02-09",
+        "t": 4054,
+        "trend": 10681.76,
+        "support": 4771.37,
+        "resistance": 23913.48,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-02-23",
+        "t": 4068,
+        "trend": 10893.28,
+        "support": 4865.85,
+        "resistance": 24387.02,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-03-08",
+        "t": 4082,
+        "trend": 11108.25,
+        "support": 4961.87,
+        "resistance": 24868.27,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-03-22",
+        "t": 4096,
+        "trend": 11326.7,
+        "support": 5059.45,
+        "resistance": 25357.32,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-04-05",
+        "t": 4110,
+        "trend": 11548.68,
+        "support": 5158.61,
+        "resistance": 25854.27,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-04-19",
+        "t": 4124,
+        "trend": 11774.23,
+        "support": 5259.36,
+        "resistance": 26359.22,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-05-03",
+        "t": 4138,
+        "trend": 12003.4,
+        "support": 5361.72,
+        "resistance": 26872.27,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-05-17",
+        "t": 4152,
+        "trend": 12236.23,
+        "support": 5465.73,
+        "resistance": 27393.52,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-05-31",
+        "t": 4166,
+        "trend": 12472.78,
+        "support": 5571.39,
+        "resistance": 27923.07,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-06-14",
+        "t": 4180,
+        "trend": 12713.08,
+        "support": 5678.72,
+        "resistance": 28461.04,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-06-28",
+        "t": 4194,
+        "trend": 12957.18,
+        "support": 5787.76,
+        "resistance": 29007.51,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-07-12",
+        "t": 4208,
+        "trend": 13205.13,
+        "support": 5898.52,
+        "resistance": 29562.61,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-07-26",
+        "t": 4222,
+        "trend": 13456.98,
+        "support": 6011.01,
+        "resistance": 30126.43,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-08-09",
+        "t": 4236,
+        "trend": 13712.78,
+        "support": 6125.27,
+        "resistance": 30699.09,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-08-23",
+        "t": 4250,
+        "trend": 13972.57,
+        "support": 6241.32,
+        "resistance": 31280.68,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-09-06",
+        "t": 4264,
+        "trend": 14236.4,
+        "support": 6359.17,
+        "resistance": 31871.33,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-09-20",
+        "t": 4278,
+        "trend": 14504.33,
+        "support": 6478.84,
+        "resistance": 32471.14,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-10-04",
+        "t": 4292,
+        "trend": 14776.39,
+        "support": 6600.37,
+        "resistance": 33080.22,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-10-18",
+        "t": 4306,
+        "trend": 15052.65,
+        "support": 6723.77,
+        "resistance": 33698.69,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-11-01",
+        "t": 4320,
+        "trend": 15333.16,
+        "support": 6849.07,
+        "resistance": 34326.66,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-11-15",
+        "t": 4334,
+        "trend": 15617.95,
+        "support": 6976.28,
+        "resistance": 34964.24,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-11-29",
+        "t": 4348,
+        "trend": 15907.1,
+        "support": 7105.44,
+        "resistance": 35611.55,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-12-13",
+        "t": 4362,
+        "trend": 16200.64,
+        "support": 7236.56,
+        "resistance": 36268.7,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2020-12-27",
+        "t": 4376,
+        "trend": 16498.63,
+        "support": 7369.67,
+        "resistance": 36935.82,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-01-10",
+        "t": 4390,
+        "trend": 16801.12,
+        "support": 7504.78,
+        "resistance": 37613.02,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-01-24",
+        "t": 4404,
+        "trend": 17108.17,
+        "support": 7641.94,
+        "resistance": 38300.42,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-02-07",
+        "t": 4418,
+        "trend": 17419.83,
+        "support": 7781.15,
+        "resistance": 38998.14,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-02-21",
+        "t": 4432,
+        "trend": 17736.15,
+        "support": 7922.45,
+        "resistance": 39706.3,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-03-07",
+        "t": 4446,
+        "trend": 18057.19,
+        "support": 8065.85,
+        "resistance": 40425.02,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-03-21",
+        "t": 4460,
+        "trend": 18383.01,
+        "support": 8211.39,
+        "resistance": 41154.44,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-04-04",
+        "t": 4474,
+        "trend": 18713.66,
+        "support": 8359.08,
+        "resistance": 41894.67,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-04-18",
+        "t": 4488,
+        "trend": 19049.19,
+        "support": 8508.96,
+        "resistance": 42645.83,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-05-02",
+        "t": 4502,
+        "trend": 19389.67,
+        "support": 8661.05,
+        "resistance": 43408.07,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-05-16",
+        "t": 4516,
+        "trend": 19735.15,
+        "support": 8815.37,
+        "resistance": 44181.49,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-05-30",
+        "t": 4530,
+        "trend": 20085.68,
+        "support": 8971.94,
+        "resistance": 44966.24,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-06-13",
+        "t": 4544,
+        "trend": 20441.33,
+        "support": 9130.81,
+        "resistance": 45762.44,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-06-27",
+        "t": 4558,
+        "trend": 20802.16,
+        "support": 9291.98,
+        "resistance": 46570.23,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-07-11",
+        "t": 4572,
+        "trend": 21168.21,
+        "support": 9455.49,
+        "resistance": 47389.73,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-07-25",
+        "t": 4586,
+        "trend": 21539.56,
+        "support": 9621.37,
+        "resistance": 48221.07,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-08-08",
+        "t": 4600,
+        "trend": 21916.27,
+        "support": 9789.64,
+        "resistance": 49064.41,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-08-22",
+        "t": 4614,
+        "trend": 22298.38,
+        "support": 9960.32,
+        "resistance": 49919.86,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-09-05",
+        "t": 4628,
+        "trend": 22685.97,
+        "support": 10133.45,
+        "resistance": 50787.56,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-09-19",
+        "t": 4642,
+        "trend": 23079.1,
+        "support": 10309.05,
+        "resistance": 51667.66,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-10-03",
+        "t": 4656,
+        "trend": 23477.82,
+        "support": 10487.16,
+        "resistance": 52560.29,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-10-17",
+        "t": 4670,
+        "trend": 23882.2,
+        "support": 10667.79,
+        "resistance": 53465.6,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-10-31",
+        "t": 4684,
+        "trend": 24292.31,
+        "support": 10850.98,
+        "resistance": 54383.71,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-11-14",
+        "t": 4698,
+        "trend": 24708.21,
+        "support": 11036.75,
+        "resistance": 55314.78,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-11-28",
+        "t": 4712,
+        "trend": 25129.95,
+        "support": 11225.14,
+        "resistance": 56258.95,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-12-12",
+        "t": 4726,
+        "trend": 25557.61,
+        "support": 11416.17,
+        "resistance": 57216.37,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2021-12-26",
+        "t": 4740,
+        "trend": 25991.25,
+        "support": 11609.87,
+        "resistance": 58187.17,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-01-09",
+        "t": 4754,
+        "trend": 26430.94,
+        "support": 11806.27,
+        "resistance": 59171.5,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-01-23",
+        "t": 4768,
+        "trend": 26876.74,
+        "support": 12005.4,
+        "resistance": 60169.52,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-02-06",
+        "t": 4782,
+        "trend": 27328.72,
+        "support": 12207.29,
+        "resistance": 61181.38,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-02-20",
+        "t": 4796,
+        "trend": 27786.94,
+        "support": 12411.97,
+        "resistance": 62207.21,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-03-06",
+        "t": 4810,
+        "trend": 28251.48,
+        "support": 12619.47,
+        "resistance": 63247.18,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-03-20",
+        "t": 4824,
+        "trend": 28722.4,
+        "support": 12829.82,
+        "resistance": 64301.44,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-04-03",
+        "t": 4838,
+        "trend": 29199.77,
+        "support": 13043.06,
+        "resistance": 65370.14,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-04-17",
+        "t": 4852,
+        "trend": 29683.66,
+        "support": 13259.2,
+        "resistance": 66453.44,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-05-01",
+        "t": 4866,
+        "trend": 30174.14,
+        "support": 13478.29,
+        "resistance": 67551.49,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-05-15",
+        "t": 4880,
+        "trend": 30671.28,
+        "support": 13700.36,
+        "resistance": 68664.45,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-05-29",
+        "t": 4894,
+        "trend": 31175.16,
+        "support": 13925.43,
+        "resistance": 69792.48,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-06-12",
+        "t": 4908,
+        "trend": 31685.83,
+        "support": 14153.54,
+        "resistance": 70935.74,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-06-26",
+        "t": 4922,
+        "trend": 32203.38,
+        "support": 14384.72,
+        "resistance": 72094.39,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-07-10",
+        "t": 4936,
+        "trend": 32727.88,
+        "support": 14619.01,
+        "resistance": 73268.59,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-07-24",
+        "t": 4950,
+        "trend": 33259.4,
+        "support": 14856.43,
+        "resistance": 74458.52,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-08-07",
+        "t": 4964,
+        "trend": 33798.01,
+        "support": 15097.02,
+        "resistance": 75664.32,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-08-21",
+        "t": 4978,
+        "trend": 34343.79,
+        "support": 15340.81,
+        "resistance": 76886.17,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-09-04",
+        "t": 4992,
+        "trend": 34896.82,
+        "support": 15587.83,
+        "resistance": 78124.24,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-09-18",
+        "t": 5006,
+        "trend": 35457.16,
+        "support": 15838.13,
+        "resistance": 79378.69,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-10-02",
+        "t": 5020,
+        "trend": 36024.9,
+        "support": 16091.73,
+        "resistance": 80649.7,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-10-16",
+        "t": 5034,
+        "trend": 36600.11,
+        "support": 16348.67,
+        "resistance": 81937.43,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-10-30",
+        "t": 5048,
+        "trend": 37182.86,
+        "support": 16608.98,
+        "resistance": 83242.06,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-11-13",
+        "t": 5062,
+        "trend": 37773.25,
+        "support": 16872.69,
+        "resistance": 84563.77,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-11-27",
+        "t": 5076,
+        "trend": 38371.34,
+        "support": 17139.85,
+        "resistance": 85902.72,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-12-11",
+        "t": 5090,
+        "trend": 38977.21,
+        "support": 17410.48,
+        "resistance": 87259.1,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2022-12-25",
+        "t": 5104,
+        "trend": 39590.94,
+        "support": 17684.63,
+        "resistance": 88633.09,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-01-08",
+        "t": 5118,
+        "trend": 40212.62,
+        "support": 17962.32,
+        "resistance": 90024.85,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-01-22",
+        "t": 5132,
+        "trend": 40842.32,
+        "support": 18243.6,
+        "resistance": 91434.58,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-02-05",
+        "t": 5146,
+        "trend": 41480.13,
+        "support": 18528.49,
+        "resistance": 92862.45,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-02-19",
+        "t": 5160,
+        "trend": 42126.12,
+        "support": 18817.05,
+        "resistance": 94308.64,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-03-05",
+        "t": 5174,
+        "trend": 42780.39,
+        "support": 19109.3,
+        "resistance": 95773.36,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-03-19",
+        "t": 5188,
+        "trend": 43443.0,
+        "support": 19405.28,
+        "resistance": 97256.76,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-04-02",
+        "t": 5202,
+        "trend": 44114.05,
+        "support": 19705.02,
+        "resistance": 98759.06,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-04-16",
+        "t": 5216,
+        "trend": 44793.62,
+        "support": 20008.58,
+        "resistance": 100280.43,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-04-30",
+        "t": 5230,
+        "trend": 45481.8,
+        "support": 20315.97,
+        "resistance": 101821.06,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-05-14",
+        "t": 5244,
+        "trend": 46178.66,
+        "support": 20627.25,
+        "resistance": 103381.15,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-05-28",
+        "t": 5258,
+        "trend": 46884.3,
+        "support": 20942.45,
+        "resistance": 104960.88,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-06-11",
+        "t": 5272,
+        "trend": 47598.81,
+        "support": 21261.61,
+        "resistance": 106560.46,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-06-25",
+        "t": 5286,
+        "trend": 48322.26,
+        "support": 21584.76,
+        "resistance": 108180.08,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-07-09",
+        "t": 5300,
+        "trend": 49054.76,
+        "support": 21911.96,
+        "resistance": 109819.93,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-07-23",
+        "t": 5314,
+        "trend": 49796.38,
+        "support": 22243.23,
+        "resistance": 111480.21,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-08-06",
+        "t": 5328,
+        "trend": 50547.22,
+        "support": 22578.61,
+        "resistance": 113161.13,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-08-20",
+        "t": 5342,
+        "trend": 51307.36,
+        "support": 22918.16,
+        "resistance": 114862.88,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-09-03",
+        "t": 5356,
+        "trend": 52076.9,
+        "support": 23261.9,
+        "resistance": 116585.66,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-09-17",
+        "t": 5370,
+        "trend": 52855.93,
+        "support": 23609.88,
+        "resistance": 118329.69,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-10-01",
+        "t": 5384,
+        "trend": 53644.54,
+        "support": 23962.14,
+        "resistance": 120095.17,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-10-15",
+        "t": 5398,
+        "trend": 54442.82,
+        "support": 24318.71,
+        "resistance": 121882.29,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-10-29",
+        "t": 5412,
+        "trend": 55250.87,
+        "support": 24679.66,
+        "resistance": 123691.28,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-11-12",
+        "t": 5426,
+        "trend": 56068.77,
+        "support": 25045.0,
+        "resistance": 125522.34,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-11-26",
+        "t": 5440,
+        "trend": 56896.63,
+        "support": 25414.79,
+        "resistance": 127375.69,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-12-10",
+        "t": 5454,
+        "trend": 57734.54,
+        "support": 25789.07,
+        "resistance": 129251.53,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2023-12-24",
+        "t": 5468,
+        "trend": 58582.59,
+        "support": 26167.88,
+        "resistance": 131150.07,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-01-07",
+        "t": 5482,
+        "trend": 59440.88,
+        "support": 26551.26,
+        "resistance": 133071.55,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-01-21",
+        "t": 5496,
+        "trend": 60309.51,
+        "support": 26939.27,
+        "resistance": 135016.16,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-02-04",
+        "t": 5510,
+        "trend": 61188.57,
+        "support": 27331.93,
+        "resistance": 136984.14,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-02-18",
+        "t": 5524,
+        "trend": 62078.17,
+        "support": 27729.3,
+        "resistance": 138975.7,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-03-03",
+        "t": 5538,
+        "trend": 62978.39,
+        "support": 28131.42,
+        "resistance": 140991.06,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-03-17",
+        "t": 5552,
+        "trend": 63889.36,
+        "support": 28538.33,
+        "resistance": 143030.45,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-03-31",
+        "t": 5566,
+        "trend": 64811.15,
+        "support": 28950.08,
+        "resistance": 145094.09,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-04-14",
+        "t": 5580,
+        "trend": 65743.88,
+        "support": 29366.71,
+        "resistance": 147182.21,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-04-28",
+        "t": 5594,
+        "trend": 66687.64,
+        "support": 29788.28,
+        "resistance": 149295.03,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-05-12",
+        "t": 5608,
+        "trend": 67642.54,
+        "support": 30214.81,
+        "resistance": 151432.79,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-05-26",
+        "t": 5622,
+        "trend": 68608.69,
+        "support": 30646.37,
+        "resistance": 153595.72,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-06-09",
+        "t": 5636,
+        "trend": 69586.17,
+        "support": 31083.0,
+        "resistance": 155784.04,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-06-23",
+        "t": 5650,
+        "trend": 70575.11,
+        "support": 31524.74,
+        "resistance": 157997.99,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-07-07",
+        "t": 5664,
+        "trend": 71575.6,
+        "support": 31971.65,
+        "resistance": 160237.82,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-07-21",
+        "t": 5678,
+        "trend": 72587.76,
+        "support": 32423.76,
+        "resistance": 162503.74,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-08-04",
+        "t": 5692,
+        "trend": 73611.68,
+        "support": 32881.13,
+        "resistance": 164796.01,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-08-18",
+        "t": 5706,
+        "trend": 74647.47,
+        "support": 33343.8,
+        "resistance": 167114.87,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-09-01",
+        "t": 5720,
+        "trend": 75695.25,
+        "support": 33811.82,
+        "resistance": 169460.55,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-09-15",
+        "t": 5734,
+        "trend": 76755.12,
+        "support": 34285.25,
+        "resistance": 171833.3,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-09-29",
+        "t": 5748,
+        "trend": 77827.19,
+        "support": 34764.13,
+        "resistance": 174233.37,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-10-13",
+        "t": 5762,
+        "trend": 78911.57,
+        "support": 35248.5,
+        "resistance": 176660.99,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-10-27",
+        "t": 5776,
+        "trend": 80008.37,
+        "support": 35738.43,
+        "resistance": 179116.43,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-11-10",
+        "t": 5790,
+        "trend": 81117.71,
+        "support": 36233.95,
+        "resistance": 181599.93,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-11-24",
+        "t": 5804,
+        "trend": 82239.69,
+        "support": 36735.12,
+        "resistance": 184111.74,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-12-08",
+        "t": 5818,
+        "trend": 83374.43,
+        "support": 37241.99,
+        "resistance": 186652.11,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2024-12-22",
+        "t": 5832,
+        "trend": 84522.05,
+        "support": 37754.61,
+        "resistance": 189221.3,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-01-05",
+        "t": 5846,
+        "trend": 85682.66,
+        "support": 38273.04,
+        "resistance": 191819.57,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-01-19",
+        "t": 5860,
+        "trend": 86856.36,
+        "support": 38797.31,
+        "resistance": 194447.18,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-02-02",
+        "t": 5874,
+        "trend": 88043.29,
+        "support": 39327.49,
+        "resistance": 197104.37,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-02-16",
+        "t": 5888,
+        "trend": 89243.55,
+        "support": 39863.63,
+        "resistance": 199791.43,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-03-02",
+        "t": 5902,
+        "trend": 90457.27,
+        "support": 40405.78,
+        "resistance": 202508.6,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-03-16",
+        "t": 5916,
+        "trend": 91684.56,
+        "support": 40953.99,
+        "resistance": 205256.16,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-03-30",
+        "t": 5930,
+        "trend": 92925.54,
+        "support": 41508.31,
+        "resistance": 208034.37,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-04-13",
+        "t": 5944,
+        "trend": 94180.33,
+        "support": 42068.81,
+        "resistance": 210843.5,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-04-27",
+        "t": 5958,
+        "trend": 95449.06,
+        "support": 42635.53,
+        "resistance": 213683.82,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-05-11",
+        "t": 5972,
+        "trend": 96731.83,
+        "support": 43208.52,
+        "resistance": 216555.6,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-05-25",
+        "t": 5986,
+        "trend": 98028.79,
+        "support": 43787.85,
+        "resistance": 219459.11,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-06-08",
+        "t": 6000,
+        "trend": 99340.04,
+        "support": 44373.56,
+        "resistance": 222394.64,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-06-22",
+        "t": 6014,
+        "trend": 100665.71,
+        "support": 44965.72,
+        "resistance": 225362.45,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-07-06",
+        "t": 6028,
+        "trend": 102005.93,
+        "support": 45564.37,
+        "resistance": 228362.83,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-07-20",
+        "t": 6042,
+        "trend": 103360.82,
+        "support": 46169.58,
+        "resistance": 231396.05,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-08-03",
+        "t": 6056,
+        "trend": 104730.51,
+        "support": 46781.4,
+        "resistance": 234462.4,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-08-17",
+        "t": 6070,
+        "trend": 106115.12,
+        "support": 47399.88,
+        "resistance": 237562.17,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-08-31",
+        "t": 6084,
+        "trend": 107514.79,
+        "support": 48025.09,
+        "resistance": 240695.63,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-09-14",
+        "t": 6098,
+        "trend": 108929.63,
+        "support": 48657.08,
+        "resistance": 243863.07,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-09-28",
+        "t": 6112,
+        "trend": 110359.79,
+        "support": 49295.91,
+        "resistance": 247064.8,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-10-12",
+        "t": 6126,
+        "trend": 111805.39,
+        "support": 49941.63,
+        "resistance": 250301.09,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-10-26",
+        "t": 6140,
+        "trend": 113266.56,
+        "support": 50594.31,
+        "resistance": 253572.23,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-11-09",
+        "t": 6154,
+        "trend": 114743.43,
+        "support": 51254.01,
+        "resistance": 256878.53,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-11-23",
+        "t": 6168,
+        "trend": 116236.13,
+        "support": 51920.77,
+        "resistance": 260220.29,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-12-07",
+        "t": 6182,
+        "trend": 117744.81,
+        "support": 52594.67,
+        "resistance": 263597.78,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2025-12-21",
+        "t": 6196,
+        "trend": 119269.58,
+        "support": 53275.77,
+        "resistance": 267011.33,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-01-04",
+        "t": 6210,
+        "trend": 120810.59,
+        "support": 53964.11,
+        "resistance": 270461.23,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-01-18",
+        "t": 6224,
+        "trend": 122367.98,
+        "support": 54659.77,
+        "resistance": 273947.79,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-02-01",
+        "t": 6238,
+        "trend": 123941.88,
+        "support": 55362.8,
+        "resistance": 277471.3,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-02-15",
+        "t": 6252,
+        "trend": 125532.42,
+        "support": 56073.27,
+        "resistance": 281032.08,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-03-01",
+        "t": 6266,
+        "trend": 127139.75,
+        "support": 56791.24,
+        "resistance": 284630.44,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-03-15",
+        "t": 6280,
+        "trend": 128764.0,
+        "support": 57516.77,
+        "resistance": 288266.68,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-03-29",
+        "t": 6294,
+        "trend": 130405.31,
+        "support": 58249.91,
+        "resistance": 291941.13,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-04-12",
+        "t": 6308,
+        "trend": 132063.83,
+        "support": 58990.75,
+        "resistance": 295654.1,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-04-26",
+        "t": 6322,
+        "trend": 133739.7,
+        "support": 59739.33,
+        "resistance": 299405.9,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-05-10",
+        "t": 6336,
+        "trend": 135433.06,
+        "support": 60495.72,
+        "resistance": 303196.85,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-05-24",
+        "t": 6350,
+        "trend": 137144.04,
+        "support": 61259.99,
+        "resistance": 307027.27,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-06-07",
+        "t": 6364,
+        "trend": 138872.81,
+        "support": 62032.2,
+        "resistance": 310897.49,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-06-21",
+        "t": 6378,
+        "trend": 140619.49,
+        "support": 62812.42,
+        "resistance": 314807.83,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-07-05",
+        "t": 6392,
+        "trend": 142384.24,
+        "support": 63600.7,
+        "resistance": 318758.61,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-07-19",
+        "t": 6406,
+        "trend": 144167.21,
+        "support": 64397.13,
+        "resistance": 322750.17,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-08-02",
+        "t": 6420,
+        "trend": 145968.53,
+        "support": 65201.75,
+        "resistance": 326782.84,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-08-16",
+        "t": 6434,
+        "trend": 147788.37,
+        "support": 66014.64,
+        "resistance": 330856.94,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-08-30",
+        "t": 6448,
+        "trend": 149626.86,
+        "support": 66835.86,
+        "resistance": 334972.82,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-09-13",
+        "t": 6462,
+        "trend": 151484.16,
+        "support": 67665.49,
+        "resistance": 339130.8,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-09-27",
+        "t": 6476,
+        "trend": 153360.43,
+        "support": 68503.59,
+        "resistance": 343331.23,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-10-11",
+        "t": 6490,
+        "trend": 155255.8,
+        "support": 69350.22,
+        "resistance": 347574.44,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-10-25",
+        "t": 6504,
+        "trend": 157170.44,
+        "support": 70205.46,
+        "resistance": 351860.79,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-11-08",
+        "t": 6518,
+        "trend": 159104.5,
+        "support": 71069.37,
+        "resistance": 356190.6,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-11-19",
+        "t": 6529,
+        "trend": 160637.84,
+        "support": 71754.29,
+        "resistance": 359623.32,
+        "btc_price": null,
+        "is_projection": false
+      },
+      {
+        "date": "2026-11-22",
+        "t": 6532,
+        "trend": 161058.13,
+        "support": 71942.02,
+        "resistance": 360564.24,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2026-12-06",
+        "t": 6546,
+        "trend": 163031.49,
+        "support": 72823.49,
+        "resistance": 364982.04,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2026-12-20",
+        "t": 6560,
+        "trend": 165024.73,
+        "support": 73713.84,
+        "resistance": 369444.36,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-01-03",
+        "t": 6574,
+        "trend": 167038.02,
+        "support": 74613.14,
+        "resistance": 373951.55,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-01-17",
+        "t": 6588,
+        "trend": 169071.51,
+        "support": 75521.47,
+        "resistance": 378503.96,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-01-31",
+        "t": 6602,
+        "trend": 171125.35,
+        "support": 76438.89,
+        "resistance": 383101.95,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-02-14",
+        "t": 6616,
+        "trend": 173199.72,
+        "support": 77365.47,
+        "resistance": 387745.87,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-02-28",
+        "t": 6630,
+        "trend": 175294.77,
+        "support": 78301.3,
+        "resistance": 392436.1,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-03-14",
+        "t": 6644,
+        "trend": 177410.66,
+        "support": 79246.43,
+        "resistance": 397172.98,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-03-28",
+        "t": 6658,
+        "trend": 179547.55,
+        "support": 80200.94,
+        "resistance": 401956.89,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-04-11",
+        "t": 6672,
+        "trend": 181705.61,
+        "support": 81164.92,
+        "resistance": 406788.2,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-04-25",
+        "t": 6686,
+        "trend": 183885.01,
+        "support": 82138.42,
+        "resistance": 411667.26,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-05-09",
+        "t": 6700,
+        "trend": 186085.9,
+        "support": 83121.52,
+        "resistance": 416594.45,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-05-23",
+        "t": 6714,
+        "trend": 188308.47,
+        "support": 84114.3,
+        "resistance": 421570.14,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-06-06",
+        "t": 6728,
+        "trend": 190552.86,
+        "support": 85116.84,
+        "resistance": 426594.71,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-06-20",
+        "t": 6742,
+        "trend": 192819.25,
+        "support": 86129.2,
+        "resistance": 431668.54,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-07-04",
+        "t": 6756,
+        "trend": 195107.82,
+        "support": 87151.46,
+        "resistance": 436792.0,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-07-18",
+        "t": 6770,
+        "trend": 197418.73,
+        "support": 88183.71,
+        "resistance": 441965.48,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-08-01",
+        "t": 6784,
+        "trend": 199752.15,
+        "support": 89226.01,
+        "resistance": 447189.35,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-08-15",
+        "t": 6798,
+        "trend": 202108.25,
+        "support": 90278.44,
+        "resistance": 452464.01,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-08-29",
+        "t": 6812,
+        "trend": 204487.21,
+        "support": 91341.08,
+        "resistance": 457789.84,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-09-12",
+        "t": 6826,
+        "trend": 206889.2,
+        "support": 92414.01,
+        "resistance": 463167.23,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-09-26",
+        "t": 6840,
+        "trend": 209314.4,
+        "support": 93497.31,
+        "resistance": 468596.57,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-10-10",
+        "t": 6854,
+        "trend": 211762.98,
+        "support": 94591.05,
+        "resistance": 474078.26,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-10-24",
+        "t": 6868,
+        "trend": 214235.12,
+        "support": 95695.31,
+        "resistance": 479612.69,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-11-07",
+        "t": 6882,
+        "trend": 216731.0,
+        "support": 96810.18,
+        "resistance": 485200.27,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-11-21",
+        "t": 6896,
+        "trend": 219250.79,
+        "support": 97935.73,
+        "resistance": 490841.39,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-12-05",
+        "t": 6910,
+        "trend": 221794.68,
+        "support": 99072.05,
+        "resistance": 496536.45,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2027-12-19",
+        "t": 6924,
+        "trend": 224362.85,
+        "support": 100219.2,
+        "resistance": 502285.86,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-01-02",
+        "t": 6938,
+        "trend": 226955.48,
+        "support": 101377.29,
+        "resistance": 508090.03,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-01-16",
+        "t": 6952,
+        "trend": 229572.75,
+        "support": 102546.38,
+        "resistance": 513949.37,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-01-30",
+        "t": 6966,
+        "trend": 232214.84,
+        "support": 103726.56,
+        "resistance": 519864.28,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-02-13",
+        "t": 6980,
+        "trend": 234881.95,
+        "support": 104917.91,
+        "resistance": 525835.19,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-02-27",
+        "t": 6994,
+        "trend": 237574.25,
+        "support": 106120.52,
+        "resistance": 531862.5,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-03-12",
+        "t": 7008,
+        "trend": 240291.94,
+        "support": 107334.47,
+        "resistance": 537946.64,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-03-26",
+        "t": 7022,
+        "trend": 243035.2,
+        "support": 108559.83,
+        "resistance": 544088.03,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-04-09",
+        "t": 7036,
+        "trend": 245804.21,
+        "support": 109796.71,
+        "resistance": 550287.09,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-04-23",
+        "t": 7050,
+        "trend": 248599.18,
+        "support": 111045.18,
+        "resistance": 556544.25,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-05-07",
+        "t": 7064,
+        "trend": 251420.29,
+        "support": 112305.32,
+        "resistance": 562859.92,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-05-21",
+        "t": 7078,
+        "trend": 254267.74,
+        "support": 113577.23,
+        "resistance": 569234.55,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-06-04",
+        "t": 7092,
+        "trend": 257141.7,
+        "support": 114860.98,
+        "resistance": 575668.57,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-06-18",
+        "t": 7106,
+        "trend": 260042.39,
+        "support": 116156.67,
+        "resistance": 582162.4,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-07-02",
+        "t": 7120,
+        "trend": 262970.0,
+        "support": 117464.38,
+        "resistance": 588716.49,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-07-16",
+        "t": 7134,
+        "trend": 265924.71,
+        "support": 118784.21,
+        "resistance": 595331.28,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-07-30",
+        "t": 7148,
+        "trend": 268906.74,
+        "support": 120116.23,
+        "resistance": 602007.2,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-08-13",
+        "t": 7162,
+        "trend": 271916.27,
+        "support": 121460.54,
+        "resistance": 608744.7,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-08-27",
+        "t": 7176,
+        "trend": 274953.51,
+        "support": 122817.22,
+        "resistance": 615544.23,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-09-10",
+        "t": 7190,
+        "trend": 278018.65,
+        "support": 124186.37,
+        "resistance": 622406.23,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-09-24",
+        "t": 7204,
+        "trend": 281111.9,
+        "support": 125568.07,
+        "resistance": 629331.15,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-10-08",
+        "t": 7218,
+        "trend": 284233.46,
+        "support": 126962.42,
+        "resistance": 636319.45,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-10-22",
+        "t": 7232,
+        "trend": 287383.53,
+        "support": 128369.51,
+        "resistance": 643371.59,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-11-05",
+        "t": 7246,
+        "trend": 290562.32,
+        "support": 129789.42,
+        "resistance": 650488.02,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-11-19",
+        "t": 7260,
+        "trend": 293770.04,
+        "support": 131222.26,
+        "resistance": 657669.19,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-12-03",
+        "t": 7274,
+        "trend": 297006.88,
+        "support": 132668.1,
+        "resistance": 664915.58,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-12-17",
+        "t": 7288,
+        "trend": 300273.06,
+        "support": 134127.05,
+        "resistance": 672227.65,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2028-12-31",
+        "t": 7302,
+        "trend": 303568.79,
+        "support": 135599.2,
+        "resistance": 679605.87,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-01-14",
+        "t": 7316,
+        "trend": 306894.28,
+        "support": 137084.64,
+        "resistance": 687050.7,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-01-28",
+        "t": 7330,
+        "trend": 310249.73,
+        "support": 138583.46,
+        "resistance": 694562.62,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-02-11",
+        "t": 7344,
+        "trend": 313635.36,
+        "support": 140095.77,
+        "resistance": 702142.1,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-02-25",
+        "t": 7358,
+        "trend": 317051.38,
+        "support": 141621.65,
+        "resistance": 709789.63,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-03-11",
+        "t": 7372,
+        "trend": 320498.01,
+        "support": 143161.2,
+        "resistance": 717505.67,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-03-25",
+        "t": 7386,
+        "trend": 323975.46,
+        "support": 144714.52,
+        "resistance": 725290.71,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-04-08",
+        "t": 7400,
+        "trend": 327483.95,
+        "support": 146281.71,
+        "resistance": 733145.24,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-04-22",
+        "t": 7414,
+        "trend": 331023.7,
+        "support": 147862.85,
+        "resistance": 741069.75,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-05-06",
+        "t": 7428,
+        "trend": 334594.92,
+        "support": 149458.06,
+        "resistance": 749064.71,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-05-20",
+        "t": 7442,
+        "trend": 338197.83,
+        "support": 151067.42,
+        "resistance": 757130.63,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-06-03",
+        "t": 7456,
+        "trend": 341832.66,
+        "support": 152691.04,
+        "resistance": 765268.0,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-06-17",
+        "t": 7470,
+        "trend": 345499.63,
+        "support": 154329.01,
+        "resistance": 773477.32,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-07-01",
+        "t": 7484,
+        "trend": 349198.95,
+        "support": 155981.44,
+        "resistance": 781759.08,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-07-15",
+        "t": 7498,
+        "trend": 352930.86,
+        "support": 157648.43,
+        "resistance": 790113.79,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-07-29",
+        "t": 7512,
+        "trend": 356695.59,
+        "support": 159330.07,
+        "resistance": 798541.95,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-08-12",
+        "t": 7526,
+        "trend": 360493.34,
+        "support": 161026.46,
+        "resistance": 807044.07,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-08-26",
+        "t": 7540,
+        "trend": 364324.36,
+        "support": 162737.72,
+        "resistance": 815620.65,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-09-09",
+        "t": 7554,
+        "trend": 368188.88,
+        "support": 164463.93,
+        "resistance": 824272.22,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-09-23",
+        "t": 7568,
+        "trend": 372087.11,
+        "support": 166205.21,
+        "resistance": 832999.29,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-10-07",
+        "t": 7582,
+        "trend": 376019.3,
+        "support": 167961.65,
+        "resistance": 841802.36,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-10-21",
+        "t": 7596,
+        "trend": 379985.68,
+        "support": 169733.37,
+        "resistance": 850681.97,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-11-04",
+        "t": 7610,
+        "trend": 383986.48,
+        "support": 171520.46,
+        "resistance": 859638.64,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-11-18",
+        "t": 7624,
+        "trend": 388021.92,
+        "support": 173323.03,
+        "resistance": 868672.88,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-12-02",
+        "t": 7638,
+        "trend": 392092.26,
+        "support": 175141.18,
+        "resistance": 877785.24,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-12-16",
+        "t": 7652,
+        "trend": 396197.73,
+        "support": 176975.02,
+        "resistance": 886976.23,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2029-12-30",
+        "t": 7666,
+        "trend": 400338.56,
+        "support": 178824.66,
+        "resistance": 896246.39,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-01-13",
+        "t": 7680,
+        "trend": 404514.99,
+        "support": 180690.21,
+        "resistance": 905596.26,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-01-27",
+        "t": 7694,
+        "trend": 408727.27,
+        "support": 182571.76,
+        "resistance": 915026.37,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-02-10",
+        "t": 7708,
+        "trend": 412975.63,
+        "support": 184469.44,
+        "resistance": 924537.27,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-02-24",
+        "t": 7722,
+        "trend": 417260.32,
+        "support": 186383.34,
+        "resistance": 934129.5,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-03-10",
+        "t": 7736,
+        "trend": 421581.58,
+        "support": 188313.58,
+        "resistance": 943803.6,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-03-24",
+        "t": 7750,
+        "trend": 425939.66,
+        "support": 190260.26,
+        "resistance": 953560.13,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-04-07",
+        "t": 7764,
+        "trend": 430334.81,
+        "support": 192223.5,
+        "resistance": 963399.63,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-04-21",
+        "t": 7778,
+        "trend": 434767.26,
+        "support": 194203.4,
+        "resistance": 973322.66,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-05-05",
+        "t": 7792,
+        "trend": 439237.28,
+        "support": 196200.09,
+        "resistance": 983329.78,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-05-19",
+        "t": 7806,
+        "trend": 443745.1,
+        "support": 198213.66,
+        "resistance": 993421.55,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-06-02",
+        "t": 7820,
+        "trend": 448290.99,
+        "support": 200244.23,
+        "resistance": 1003598.52,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-06-16",
+        "t": 7834,
+        "trend": 452875.19,
+        "support": 202291.92,
+        "resistance": 1013861.26,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-06-30",
+        "t": 7848,
+        "trend": 457497.96,
+        "support": 204356.83,
+        "resistance": 1024210.35,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-07-14",
+        "t": 7862,
+        "trend": 462159.55,
+        "support": 206439.09,
+        "resistance": 1034646.35,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-07-28",
+        "t": 7876,
+        "trend": 466860.21,
+        "support": 208538.8,
+        "resistance": 1045169.83,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-08-11",
+        "t": 7890,
+        "trend": 471600.21,
+        "support": 210656.08,
+        "resistance": 1055781.37,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-08-25",
+        "t": 7904,
+        "trend": 476379.81,
+        "support": 212791.04,
+        "resistance": 1066481.55,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-09-08",
+        "t": 7918,
+        "trend": 481199.26,
+        "support": 214943.81,
+        "resistance": 1077270.95,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-09-22",
+        "t": 7932,
+        "trend": 486058.82,
+        "support": 217114.5,
+        "resistance": 1088150.16,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-10-06",
+        "t": 7946,
+        "trend": 490958.76,
+        "support": 219303.22,
+        "resistance": 1099119.75,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-10-20",
+        "t": 7960,
+        "trend": 495899.34,
+        "support": 221510.1,
+        "resistance": 1110180.33,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-11-03",
+        "t": 7974,
+        "trend": 500880.82,
+        "support": 223735.24,
+        "resistance": 1121332.48,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-11-17",
+        "t": 7988,
+        "trend": 505903.48,
+        "support": 225978.78,
+        "resistance": 1132576.81,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-12-01",
+        "t": 8002,
+        "trend": 510967.57,
+        "support": 228240.83,
+        "resistance": 1143913.9,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-12-15",
+        "t": 8016,
+        "trend": 516073.37,
+        "support": 230521.5,
+        "resistance": 1155344.35,
+        "btc_price": null,
+        "is_projection": true
+      },
+      {
+        "date": "2030-12-29",
+        "t": 8030,
+        "trend": 521221.14,
+        "support": 232820.93,
+        "resistance": 1166868.78,
+        "btc_price": null,
+        "is_projection": true
+      }
+    ]
+  },
+  "matrix": {
+    "BTC": {
+      "score": 5.0,
+      "tier": "MEDIUM",
+      "notes": []
+    },
+    "ETH": {
+      "score": 5.0,
+      "tier": "MEDIUM",
+      "notes": []
+    },
+    "SOL": {
+      "score": 5.0,
+      "tier": "MEDIUM",
+      "notes": []
+    },
+    "XRP": {
+      "score": 5.0,
+      "tier": "MEDIUM",
+      "notes": []
+    },
+    "HYPE": {
+      "score": 5.0,
+      "tier": "MEDIUM",
+      "notes": []
+    }
+  },
+  "active_transitions": []
+}
