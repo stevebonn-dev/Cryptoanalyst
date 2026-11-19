@@ -1,682 +1,638 @@
-<!DOCTYPE html≈
-<html lang="en" class="dark">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CryptoAnalyst - Institutional Pro Terminal, Power Law, PVSRA & Portfolio Lab</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cryptoanalyst — Power Law, Alerts & FOMC Calendar</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-    body { background-color: #131722; color: #d1d4dc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    :root {
+      --bg: #0b0f17;
+      --card: #131a26;
+      --card-2: #182232;
+      --text: #e6edf7;
+      --muted: #8fa0b8;
+      --accent: #38bdf8;
+      --green: #22c55e;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --border: #232f42;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 20px;
+    }
+    .wrap { max-width: 1120px; margin: 0 auto; }
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+    button {
+      background: var(--card-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.15s ease;
+    }
+    button:hover { border-color: var(--accent); }
+    button.active {
+      background: var(--accent);
+      color: #061018;
+      font-weight: 700;
+      border-color: var(--accent);
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .tab-btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      font-weight: 600;
+    }
+
+    /* Visible flare animation when unread/active alerts exist */
+    @keyframes alertFlare {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.75), 0 0 14px rgba(245, 158, 11, 0.55);
+        border-color: #f59e0b;
+        background: #2a1719;
+      }
+      50% {
+        box-shadow: 0 0 0 6px rgba(239, 68, 68, 0), 0 0 24px rgba(239, 68, 68, 0.9);
+        border-color: #ef4444;
+        background: #3b171b;
+      }
+    }
+    .tab-btn.flare {
+      animation: alertFlare 1.4s infinite;
+      color: #fff;
+    }
+    .badge {
+      background: var(--red);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .val { font-size: 21px; font-weight: 700; margin-top: 6px; }
+
+    .banner-box {
+      border: 1px solid rgba(245, 158, 11, 0.5);
+      background: rgba(245, 158, 11, 0.08);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+    .alert-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      background: var(--card-2);
+      border-left: 4px solid var(--amber);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-top: 10px;
+    }
+    .close-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 4px 10px;
+      font-size: 12px;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+    .close-btn:hover { color: #fff; border-color: var(--red); background: rgba(239, 68, 68, 0.2); }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .chart-box { position: relative; height: 430px; width: 100%; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); font-size: 12px; text-transform: uppercase; }
+    .pill {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .pill-next { background: rgba(56, 189, 248, 0.18); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.4); }
+    .pill-upcoming { background: rgba(34, 197, 94, 0.16); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.35); }
+    .pill-past { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+    .err-box {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.45);
+      color: #fecaca;
+      padding: 12px 14px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+      display: none;
+    }
   </style>
 </head>
-<body class="min-h-screen flex flex-col">
-
-  <!-- Header -->
-  <header class="bg-[#1e222d] border-b border-[#2a2e39] sticky top-0 z-30">
-    <div class="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between flex-wrap gap-2">
-      <div class="flex items-center space-x-3">
-        <span class="text-xl">📈</span>
-        <h1 class="font-bold text-sm tracking-wide text-white">CryptoAnalyst // Institutional Terminal, Power Law & PVSRA</h1>
-        <span id="liveFeedBadge" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-          Feed: Syncing Binance & Power Law...
-        </span>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h2 style="margin:0;">Cryptoanalyst Dashboard</h2>
+        <div id="statusLine" class="sub">Loading ./dashboard_data.json...</div>
       </div>
-      <button onclick="loadChartData()" class="px-3 py-1.5 text-xs font-bold rounded bg-amber-500 hover:bg-amber-600 text-slate-900 transition shadow-sm">
-        🔄 Refresh Data
-      </button>
+      <div class="actions">
+        <button onclick="loadDashboard(true)">Refresh Data</button>
+        <button id="btnLog" class="active" onclick="setScale('logarithmic')">Log Scale</button>
+        <button id="btnLin" onclick="setScale('linear')">Linear Scale</button>
+      </div>
     </div>
 
-    <!-- Navigation Tabs -->
-    <nav class="max-w-7xl mx-auto px-4 flex space-x-2 border-t border-[#2a2e39] pt-2 pb-2 overflow-x-auto text-xs font-semibold">
-      <button data-tab="dashboard" class="nav-btn px-4 py-1.5 rounded bg-amber-500 text-slate-900 font-bold transition">Pro Charting, PVSRA & Portfolio</button>
-      <button data-tab="powerlaw" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">📐 Power Law Model</button>
-      <button data-tab="report" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">🏛️ Market Analyst Report</button>
-      <button data-tab="xfeed" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">🐦 X Feed & Key Posts</button>
-      <button data-tab="macro" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">📅 Macro & Fed Calendar</button>
-      <button data-tab="backtest" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">Strategy Backtest & ROI</button>
-      <button data-tab="manager" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">Asset Manager</button>
-    </nav>
-  </header>
+    <div id="errBox" class="err-box"></div>
 
-  <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-4 py-5 flex-grow w-full space-y-5">
-
-    <!-- TAB 1: CHARTING + PVSRA + SAMPLE PORTFOLIO COMPARISON -->
-    <section id="dashboard" class="tab-content active space-y-5">
-      <div class="bg-[#1e222d] border border-[#2a2e39] rounded-xl p-4 shadow-lg space-y-3">
-        <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-3 border-b border-[#2a2e39] pb-3">
-          <div class="flex flex-wrap items-center gap-3">
-            <div>
-              <label for="topAssetSelect" class="block text-[10px] uppercase tracking-wider text-slate-400 font-bold">Asset Pair</label>
-              <select id="topAssetSelect" onchange="loadChartData()" class="mt-0.5 bg-[#131722] border border-[#2a2e39] rounded px-3 py-1 text-xs font-mono font-bold text-amber-500 focus:outline-none">
-                <option value="BTC">BTCUSDT (Bitcoin)</option>
-                <option value="ETH">ETHUSDT (Ethereum)</option>
-                <option value="SOL">SOLUSDT (Solana)</option>
-                <option value="XRP">XRPUSDT (XRP)</option>
-                <option value="ONDO">ONDOUSDT (Ondo)</option>
-                <option value="SUI">SUIUSDT (Sui)</option>
-                <option value="SEI">SEIUSDT (Sei)</option>
-                <option value="HBAR">HBARUSDT (Hedera)</option>
-                <option value="HYPE">HYPEUSDT (Hyperliquid)</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-[10px] uppercase tracking-wider text-slate-400 font-bold">Interval</label>
-              <div id="timeframeSelector" class="flex space-x-1 mt-0.5">
-                <button onclick="setTimeframe('15m')" class="tf-btn px-2.5 py-1 text-[11px] font-mono rounded bg-[#131722] text-slate-400 hover:text-white border border-[#2a2e39]">15m</button>
-                <button onclick="setTimeframe('1h')" class="tf-btn px-2.5 py-1 text-[11px] font-mono rounded bg-[#131722] text-slate-400 hover:text-white border border-[#2a2e39]">1h</button>
-                <button onclick="setTimeframe('4h')" class="tf-btn px-2.5 py-1 text-[11px] font-mono rounded bg-[#131722] text-slate-400 hover:text-white border border-[#2a2e39]">4h</button>
-                <button onclick="setTimeframe('1d')" class="tf-btn px-2.5 py-1 text-[11px] font-mono rounded bg-amber-500 text-slate-900 font-bold border border-amber-500">Daily</button>
-                <button onclick="setTimeframe('1w')" class="tf-btn px-2.5 py-1 text-[11px] font-mono rounded bg-[#131722] text-slate-400 hover:text-white border border-[#2a2e39]">Weekly</button>
-                <button onclick="setTimeframe('1M')" class="tf-btn px-2.5 py-1 text-[11px] font-mono rounded bg-[#131722] text-slate-400 hover:text-white border border-[#2a2e39]">Monthly</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex flex-wrap items-center gap-1.5 text-[11px] font-mono">
-            <span class="text-slate-400 font-bold mr-1">Indicators:</span>
-            <button id="btn-ma50" onclick="toggleSeries('ma50')" class="px-2.5 py-1 rounded border border-blue-500 bg-blue-500/20 text-blue-300 font-bold transition">● 50 MA</button>
-            <button id="btn-ma100" onclick="toggleSeries('ma100')" class="px-2.5 py-1 rounded border border-amber-500 bg-amber-500/20 text-amber-300 font-bold transition">● 100 MA</button>
-            <button id="btn-ma200d" onclick="toggleSeries('ma200d')" class="px-2.5 py-1 rounded border border-pink-500 bg-pink-500/20 text-pink-300 font-bold transition">● 200D MA</button>
-            <button id="btn-ma200w" onclick="toggleSeries('ma200w')" class="px-2.5 py-1 rounded border border-purple-500 bg-purple-500/20 text-purple-300 font-bold transition">● 200W MA</button>
-            <button id="btn-zones" onclick="toggleSeries('zones')" class="px-2.5 py-1 rounded border border-emerald-500 bg-emerald-500/20 text-emerald-300 font-bold transition">● Buy/Sell Zones</button>
-            <button id="btn-energy" onclick="toggleSeries('energy')" class="px-2.5 py-1 rounded border border-cyan-500 bg-cyan-500/20 text-cyan-300 font-bold transition">⚡ Energy Floor</button>
-            <button id="btn-sfp" onclick="toggleSeries('sfp')" class="px-2.5 py-1 rounded border border-red-500 bg-red-500/20 text-red-300 font-bold transition">🎯 SFP Trap</button>
-            <button id="btn-pvsra" onclick="toggleSeries('pvsra')" class="px-2.5 py-1 rounded border border-fuchsia-500 bg-fuchsia-500/30 text-fuchsia-300 font-bold transition">🔮 PVSRA Climax</button>
-            <button id="btn-pl" onclick="toggleSeries('pl')" class="px-2.5 py-1 rounded border border-teal-500 bg-teal-500/20 text-teal-300 font-bold transition">📐 Power Law</button>
-            <button onclick="fitChartContent()" class="ml-2 px-2.5 py-1 rounded bg-[#2a2e39] text-slate-200 hover:bg-amber-500 hover:text-slate-900 font-bold transition">⛶ Fit</button>
-          </div>
-        </div>
-
-        <div class="relative w-full h-[520px] bg-[#131722] rounded-lg border border-[#2a2e39] overflow-hidden">
-          <div id="tvFloatingLegend" class="absolute top-3 left-3 z-20 bg-[#1e222d]/90 backdrop-blur-md border border-[#2a2e39] px-3 py-2 rounded-lg font-mono text-xs pointer-events-none shadow-lg space-y-1">
-            <div class="flex items-center space-x-2">
-              <span class="font-extrabold text-white text-sm" id="hudTicker">BTCUSDT</span>
-              <span class="text-slate-400 bg-[#131722] px-1.5 py-0.5 rounded text-[10px]" id="hudTf">1D</span>
-              <span id="hudSignal" class="text-[10px] px-2 py-0.5 rounded font-bold border"></span>
-            </div>
-            <div class="text-slate-200 text-[11px]" id="hudOHLC">O: --  H: --  L: --  C: --</div>
-            <div class="flex flex-wrap gap-x-3 gap-y-0.5 text-[10px]">
-              <span id="hudMa50" class="text-blue-400">50 MA: --</span>
-              <span id="hudMa100" class="text-amber-400">100 MA: --</span>
-              <span id="hudMa200d" class="text-pink-400">200D MA: --</span>
-              <span id="hudMa200w" class="text-purple-400">200W MA: --</span>
-            </div>
-            <div class="flex flex-wrap gap-x-3 text-[10px] pt-0.5 border-t border-[#2a2e39]">
-              <span id="hudBuy" class="text-emerald-400 font-bold">🟢 Buy Zone: --</span>
-              <span id="hudSell" class="text-red-400 font-bold">🔴 Sell Zone: --</span>
-              <span id="hudPvsra" class="text-fuchsia-400 font-bold">🔮 PVSRA: --</span>
-              <span id="hudPl" class="text-teal-400 font-bold">📐 PL Dev: --</span>
-            </div>
-          </div>
-          <div id="tvChartContainer" class="w-full h-full"></div>
-        </div>
-
-        <div id="chartDecisionStrip" class="grid grid-cols-1 md:grid-cols-5 gap-3 pt-1 text-xs font-mono"></div>
+    <!-- Top persistent banner shown whenever unclosed alerts exist -->
+    <div id="topAlertBanner" class="banner-box" style="display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+        <strong>Active Unread Alerts (stay until closed)</strong>
+        <button onclick="switchTab('alerts')" style="padding:5px 10px;font-size:12px;">Open Alerts Tab</button>
       </div>
+      <div id="topAlertList"></div>
+    </div>
 
-      <!-- Sample Portfolio & Horizon Recommendation Success Rate Comparison -->
-      <div class="bg-[#1e222d] border border-[#2a2e39] rounded-xl p-5 shadow-sm space-y-4">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-[#2a2e39] pb-3">
+    <div class="tabs">
+      <button id="tab-chart" class="tab-btn active" onclick="switchTab('chart')">Power Law Chart</button>
+      <button id="tab-alerts" class="tab-btn" onclick="switchTab('alerts')">
+        Alerts <span id="alertBadge" class="badge" style="display:none;">0</span>
+      </button>
+      <button id="tab-calendar" class="tab-btn" onclick="switchTab('calendar')">FOMC &amp; Macro Calendar</button>
+    </div>
+
+    <div class="kpis">
+      <div class="card" style="margin-bottom:0;">
+        <div class="label">Power Law Trend</div>
+        <div id="kpiTrend" class="val">—</div>
+        <div id="kpiDays" class="sub">—</div>
+      </div>
+      <div class="card" style="margin-bottom:0;">
+        <div class="label">BTC Price vs Trend</div>
+        <div id="kpiMult" class="val">—</div>
+        <div id="kpiZone" class="sub">—</div>
+      </div>
+      <div class="card" style="margin-bottom:0;">
+        <div class="label">Corridor (- / + Band)</div>
+        <div id="kpiBands" class="val">—</div>
+        <div class="sub">Support &amp; Resistance</div>
+      </div>
+      <div class="card" style="margin-bottom:0;">
+        <div class="label">Macro Regime</div>
+        <div id="kpiRegime" class="val">—</div>
+        <div id="kpiEvent" class="sub">—</div>
+      </div>
+    </div>
+
+    <!-- TAB 1: POWER LAW CHART -->
+    <div id="panel-chart" class="tab-panel active">
+      <div class="card">
+        <div class="chart-box">
+          <canvas id="powerLawChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: PERSISTENT ALERTS -->
+    <div id="panel-alerts" class="tab-panel">
+      <div class="card">
+        <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;">
           <div>
-            <h2 class="text-sm font-extrabold text-white">💼 Sample Portfolio ($100,000 Model) & Recommendation Success Rate by Horizon</h2>
-            <p class="text-[11px] text-slate-400">Compares Short-Term (1–7d), Medium-Term (1–4w), and Long-Term (1–6m+) signal accuracy across core assets.</p>
+            <h3 style="margin:0;">On-Page Alerts</h3>
+            <div class="sub">Alerts stay displayed across page refreshes until you click <strong>Close</strong>. No external chat service required.</div>
           </div>
-          <div class="flex items-center space-x-2 text-xs font-mono">
-            <label for="horizonFilter" class="text-slate-400">Highlight Horizon:</label>
-            <select id="horizonFilter" onchange="renderPortfolioTable()" class="bg-[#131722] border border-[#2a2e39] rounded px-2 py-1 text-amber-400 font-bold">
-              <option value="all">All Horizons (ST / MT / LT)</option>
-              <option value="st">Short-Term (1–7 Days)</option>
-              <option value="mt">Medium-Term (1–4 Weeks)</option>
-              <option value="lt">Long-Term (1–6 Months+)</option>
-            </select>
+          <div style="display:flex;gap:8px;">
+            <button onclick="addTestAlert()">Add Test Alert</button>
+            <button onclick="restoreDismissedAlerts()">Restore Dismissed</button>
           </div>
         </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs font-mono">
-            <thead class="bg-[#131722] text-slate-400 uppercase">
-              <tr>
-                <th class="p-3">Asset</th>
-                <th class="p-3">Sample Alloc ($100k)</th>
-                <th class="p-3">Active Signal</th>
-                <th class="p-3">Short-Term (1–7d)</th>
-                <th class="p-3">Medium-Term (1–4w)</th>
-                <th class="p-3">Long-Term (1–6m+)</th>
-              </tr>
-            </thead>
-            <tbody id="portfolio-table-body" class="divide-y divide-[#2a2e39] text-slate-300"></tbody>
-          </table>
-        </div>
+        <div id="alertsPanelList" style="margin-top:12px;"></div>
       </div>
+    </div>
 
-      <div class="flex justify-between items-center pt-1">
-        <h2 class="text-sm font-extrabold text-white">📊 Watchlist Matrix, Power Law, PVSRA & Live Signals</h2>
+    <!-- TAB 3: FOMC & MACRO CALENDAR -->
+    <div id="panel-calendar" class="tab-panel">
+      <div class="card">
+        <h3 style="margin:0 0 6px 0;">FOMC &amp; Key Macro Schedule</h3>
+        <div class="sub" style="margin-bottom:14px;">Federal Reserve FOMC policy meetings (statement typically 2:00 PM ET / 20:00 CET on day 2) and tracked macro windows.</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Date / Window</th>
+              <th>Event</th>
+              <th>Status</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="calendarBody"></tbody>
+        </table>
       </div>
-      <div id="assets-grid-container" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
-    </section>
-
-    <!-- TAB 2: POWER LAW MODEL -->
-    <section id="powerlaw" class="tab-content space-y-6">
-      <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
-        <div class="border-b border-[#2a2e39] pb-4 flex justify-between items-center">
-          <div>
-            <h2 class="text-lg font-extrabold text-white">📐 Bitcoin Power Law Regression & Valuation Corridor</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Log-Log Fair Value Curve & Deviation Engine (Genesis: Jan 3, 2009)</p>
-          </div>
-          <span class="px-2.5 py-1 bg-teal-500/10 border border-teal-500/30 text-teal-400 text-xs font-bold rounded">Integrated in Algorithm</span>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs font-mono">
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
-            <span class="text-slate-400 block uppercase font-bold">Live BTC Spot</span>
-            <strong class="text-white text-lg" id="plLivePrice">$63,635</strong>
-          </div>
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
-            <span class="text-slate-400 block uppercase font-bold">Power Law Fair Value</span>
-            <strong class="text-teal-400 text-lg" id="plFairValue">$189,665</strong>
-          </div>
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
-            <span class="text-slate-400 block uppercase font-bold">Distance vs Fair Value</span>
-            <strong class="text-emerald-400 text-lg" id="plDistance">-66.4%</strong>
-          </div>
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
-            <span class="text-slate-400 block uppercase font-bold">Valuation Regime</span>
-            <strong class="text-emerald-400 text-sm" id="plRegime">Deep Discount / Buy Zone</strong>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 3: MARKET ANALYST REPORT -->
-    <section id="report" class="tab-content space-y-6">
-      <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
-        <div class="border-b border-[#2a2e39] pb-4 flex justify-between items-center">
-          <div>
-            <h2 class="text-xl font-extrabold text-white">🏛️ Director’s Desk // Market Analyst Report (Power Law + PVSRA)</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Short-, Medium-, and Long-Term Asset Outlooks with Volume & Power Law Context</p>
-          </div>
-          <span class="px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] font-bold rounded-lg">Master Report v4.7</span>
-        </div>
-
-        <div class="space-y-4 text-xs font-mono">
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="font-bold text-white text-sm">1. Bitcoin (BTC) — Power Law Discount + PVSRA Absorption</span>
-              <span class="text-emerald-400 font-bold" id="repBtcStatus">BUY / ADD</span>
-            </div>
-            <p class="text-slate-300">Trading well below the Power Law regression fair value curve while PVSRA highlights heavy volume absorption near support and MVRV remains in a long-term accumulation band.</p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 pt-1 text-[11px]">
-              <div class="p-2 rounded bg-slate-800/50 border border-slate-700"><strong>Short-Term (1–7d):</strong> Accumulate dips near support; watch SFP reversals & volume spikes.</div>
-              <div class="p-2 rounded bg-slate-800/50 border border-slate-700"><strong>Medium-Term (1–4w):</strong> Track 50/100/200 MWA trend reclaims and macro catalysts.</div>
-              <div class="p-2 rounded bg-slate-800/50 border border-slate-700"><strong>Long-Term (1–6m+):</strong> High-conviction Power Law & MVRV cycle accumulation.</div>
-            </div>
-          </div>
-
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="font-bold text-white text-sm">2. Ethereum (ETH) & High-Beta Alts (SOL, XRP, ONDO, HYPE)</span>
-              <span class="text-blue-400 font-bold">PVSRA + MWA Filtered</span>
-            </div>
-            <p class="text-slate-300">Altcoin recommendations combine moving average structure and PVSRA volume spread confirmation: reward PVSRA stopping volume at support, and trim into PVSRA climax spikes near resistance.</p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 pt-1 text-[11px]">
-              <div class="p-2 rounded bg-slate-800/50 border border-slate-700"><strong>Short-Term (1–7d):</strong> Fade climax spikes; buy SFP sweeps with tight risk.</div>
-              <div class="p-2 rounded bg-slate-800/50 border border-slate-700"><strong>Medium-Term (1–4w):</strong> Hold above MWA pivots; rotate profits into strength.</div>
-              <div class="p-2 rounded bg-slate-800/50 border border-slate-700"><strong>Long-Term (1–6m+):</strong> Scale core positions during deep drawdowns; trim euphoria bands.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 4: X FEED -->
-    <section id="xfeed" class="tab-content space-y-6">
-      <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-4">
-        <h2 class="text-lg font-extrabold text-white">🐦 X Feed & Key Market Posts</h2>
-        <p class="text-xs text-slate-400">Tracked handles: @seth_fin, @KobeissiLetter, @TedPillows, @CW8900, @aktionaer, @KillaXBT, @DrProfitCrypto</p>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
-            <div class="font-bold text-amber-400">@DrProfitCrypto</div>
-            <p class="text-slate-300 text-[11px]">"Watch major liquidity pockets and power-law valuation zones rather than emotional retail panic."</p>
-          </div>
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
-            <div class="font-bold text-blue-400">@KobeissiLetter</div>
-            <p class="text-slate-300 text-[11px]">"Macro rates, inflation prints, and FOMC liquidity expectations remain key volatility catalysts across risk assets."</p>
-          </div>
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
-            <div class="font-bold text-fuchsia-400">@TedPillows & @KillaXBT</div>
-            <p class="text-slate-300 text-[11px]">"Liquidity sweeps (SFP), spot CVD absorption, and volume climax bars often precede sharp directional moves."</p>
-          </div>
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
-            <div class="font-bold text-cyan-400">@seth_fin, @CW8900 & @aktionaer</div>
-            <p class="text-slate-300 text-[11px]">"Track moving average reclaims, RWA/on-chain adoption trends, and disciplined risk sizing across timeframes."</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 5: MACRO CALENDAR -->
-    <section id="macro" class="tab-content space-y-6">
-      <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-4">
-        <h2 class="text-lg font-extrabold text-white">📅 Macro & Fed Calendar</h2>
-        <p class="text-xs text-slate-400">Monitor FOMC rate decisions and U.S. CPI releases for elevated cross-asset volatility.</p>
-      </div>
-    </section>
-
-    <!-- TAB 6: BACKTEST & ROI -->
-    <section id="backtest" class="tab-content space-y-6">
-      <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-4">
-        <h2 class="text-lg font-bold text-white">📈 Strategy Backtest & ROI Matrix</h2>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs font-mono">
-            <thead class="bg-[#131722] text-slate-400 uppercase">
-              <tr>
-                <th class="p-3">Asset</th>
-                <th class="p-3">Strategy</th>
-                <th class="p-3">PVSRA Regime</th>
-                <th class="p-3">Correlation</th>
-                <th class="p-3">ROI</th>
-                <th class="p-3">Accuracy</th>
-              </tr>
-            </thead>
-            <tbody id="backtest-table-body" class="divide-y divide-[#2a2e39] text-slate-300"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 7: ASSET MANAGER -->
-    <section id="manager" class="tab-content space-y-6">
-      <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-4">
-        <h2 class="text-lg font-bold text-white">Universal Asset Onboarding</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 pt-2">
-          <input type="text" id="new-ticker" placeholder="Ticker (e.g. LINK)" class="bg-[#131722] border border-[#2a2e39] rounded p-2.5 text-xs text-white uppercase font-mono" />
-          <input type="number" id="new-mcap" placeholder="Market Cap ($B)" class="bg-[#131722] border border-[#2a2e39] rounded p-2.5 text-xs text-white font-mono" />
-          <input type="number" step="0.05" id="new-mvrv" placeholder="MVRV Ratio" class="bg-[#131722] border border-[#2a2e39] rounded p-2.5 text-xs text-white font-mono" />
-          <input type="number" id="new-energy" placeholder="Energy Floor ($)" class="bg-[#131722] border border-[#2a2e39] rounded p-2.5 text-xs text-white font-mono" />
-          <button onclick="registerCustomAsset()" class="py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-xs rounded shadow transition">Register Asset</button>
-        </div>
-      </div>
-    </section>
-
-  </main>
+    </div>
+  </div>
 
   <script>
-    const assetsStore = {
-      BTC: { name: 'Bitcoin', price: 63635.16, mvrv: 1.15, electrical_cost: 54500, buyZone: 60150, sellZone: 76000, weight: 0.40, winST: '72%', winMT: '84%', winLT: '93%', winProb: '74%', accuracy: '99.49%', roi: '+39.8%', correlation: '98.7%', strategy: 'Power Law + PVSRA Accumulate', pvsraStatus: 'Institutional Absorption', pvsraScore: 1, weekly200Base: 41000 },
-      ETH: { name: 'Ethereum', price: 1761.48, mvrv: 1.65, buyZone: 1650, sellZone: 2150, weight: 0.20, winST: '68%', winMT: '79%', winLT: '88%', winProb: '69%', accuracy: '99.18%', roi: '+25.4%', correlation: '97.5%', strategy: 'Swing Long + PVSRA', pvsraStatus: 'Rising Demand Spreads', pvsraScore: 1, weekly200Base: 1450 },
-      SOL: { name: 'Solana', price: 74.12, mvrv: 2.10, buyZone: 68.50, sellZone: 92.00, weight: 0.15, winST: '61%', winMT: '74%', winLT: '83%', winProb: '61%', accuracy: '89.80%', roi: '+47.2%', correlation: '94.6%', strategy: 'Climax Trim + Pullback Buy', pvsraStatus: 'Distribution Climax Watch', pvsraScore: -1, weekly200Base: 48.50 },
-      XRP: { name: 'XRP', price: 0.9708, mvrv: 1.85, buyZone: 0.90, sellZone: 1.25, weight: 0.10, winST: '65%', winMT: '77%', winLT: '86%', winProb: '65%', accuracy: '91.10%', roi: '+21.2%', correlation: '92.4%', strategy: 'Trend + Volume Velocity', pvsraStatus: 'Effort-Result Confirmed', pvsraScore: 1, weekly200Base: 0.55 },
-      ONDO: { name: 'Ondo Finance', price: 0.584, mvrv: 1.40, buyZone: 0.45, sellZone: 0.85, weight: 0.10, winST: '63%', winMT: '75%', winLT: '85%', winProb: '64%', accuracy: '88.60%', roi: '+32.5%', correlation: '93.1%', strategy: 'RWA Base Accumulation', pvsraStatus: 'Stealth Base Absorption', pvsraScore: 1, weekly200Base: 0.35 },
-      SUI: { name: 'Sui', price: 0.968, mvrv: 1.50, buyZone: 0.84, sellZone: 1.15, weight: 0.00, winST: '62%', winMT: '73%', winLT: '82%', winProb: '64%', accuracy: '87.00%', roi: '+29.8%', correlation: '90.8%', strategy: 'Swing Hold', pvsraStatus: 'Normal Volume Flow', pvsraScore: 0, weekly200Base: 0.65 },
-      SEI: { name: 'Sei', price: 0.0485, mvrv: 1.30, buyZone: 0.045, sellZone: 0.075, weight: 0.00, winST: '60%', winMT: '71%', winLT: '80%', winProb: '61%', accuracy: '85.20%', roi: '+19.6%', correlation: '89.5%', strategy: 'Base Accumulation', pvsraStatus: 'Stopping Volume Base', pvsraScore: 1, weekly200Base: 0.038 },
-      HBAR: { name: 'Hedera', price: 0.1175, mvrv: 1.55, buyZone: 0.095, sellZone: 0.150, weight: 0.00, winST: '61%', winMT: '72%', winLT: '81%', winProb: '62%', accuracy: '86.40%', roi: '+23.1%', correlation: '90.1%', strategy: 'Breakout Accumulation', pvsraStatus: 'Normal Volume Flow', pvsraScore: 0, weekly200Base: 0.068 },
-      HYPE: { name: 'Hyperliquid', price: 24.50, mvrv: 1.70, buyZone: 18.50, sellZone: 32.00, weight: 0.05, winST: '64%', winMT: '76%', winLT: '84%', winProb: '66%', accuracy: '90.10%', roi: '+54.0%', correlation: '95.6%', strategy: 'Perp DEX Growth + PVSRA', pvsraStatus: 'Rising Demand Spreads', pvsraScore: 1, weekly200Base: 12.40 }
-    };
+    const STORAGE_ACTIVE_KEY = "cryptoanalyst_active_alerts_v1";
+    const STORAGE_DISMISSED_KEY = "cryptoanalyst_dismissed_alerts_v1";
 
-    let currentTimeframe = '1d';
-    let tvChart = null;
-    let candleSeries = null;
-    let seriesMap = { ma50: null, ma100: null, ma200d: null, ma200w: null, plTrend: null, buyZoneLine: null, sellZoneLine: null, energyLine: null };
-    let visibilityState = { ma50: true, ma100: true, ma200d: true, ma200w: true, zones: true, energy: true, sfp: true, pvsra: true, pl: true };
+    const DEFAULT_CALENDAR_EVENTS = [
+      { date: "2026-06-12", end: "2026-06-12", title: "SpaceX IPO (SPCX) Macro Window", notes: "Tracked liquidity & proxy rotation regime (-30d / +28d)" },
+      { date: "2026-12-08", end: "2026-12-09", title: "FOMC Meeting (Dec 2026)", notes: "Rate decision & Summary of Economic Projections" },
+      { date: "2027-01-26", end: "2027-01-27", title: "FOMC Meeting (Jan 2027)", notes: "Scheduled FOMC policy meeting" },
+      { date: "2027-03-16", end: "2027-03-17", title: "FOMC Meeting (Mar 2027)", notes: "Scheduled FOMC policy meeting" },
+      { date: "2027-04-27", end: "2027-04-28", title: "FOMC Meeting (Apr 2027)", notes: "Scheduled FOMC policy meeting" },
+      { date: "2027-06-08", end: "2027-06-09", title: "FOMC Meeting (Jun 2027)", notes: "Scheduled FOMC policy meeting" },
+      { date: "2027-07-27", end: "2027-07-28", title: "FOMC Meeting (Jul 2027)", notes: "Scheduled FOMC policy meeting" },
+      { date: "2027-09-14", end: "2027-09-15", title: "FOMC Meeting (Sep 2027)", notes: "Scheduled FOMC policy meeting" },
+      { date: "2027-10-26", end: "2027-10-27", title: "FOMC Meeting (Oct 2027)", notes: "Scheduled FOMC policy meeting" },
+      { date: "2027-11-16", end: "2027-11-17", title: "FOMC Meeting (Nov 2027)", notes: "Scheduled FOMC policy meeting" }
+    ];
 
-    function calcPowerLawValue(unixSec) {
-      const genesisSec = Date.UTC(2009, 0, 3) / 1000;
-      const days = Math.max(1, (unixSec - genesisSec) / 86400);
-      return 1.01174e-17 * Math.pow(days, 5.82);
-    }
+    let chartInstance = null;
+    let currentData = null;
+    let scaleType = "logarithmic";
+    let activeTab = "chart";
 
-    function initTradingViewChart() {
-      const container = document.getElementById('tvChartContainer');
-      container.innerHTML = '';
-
-      tvChart = LightweightCharts.createChart(container, {
-        width: container.clientWidth,
-        height: container.clientHeight,
-        layout: { background: { type: 'solid', color: '#131722' }, textColor: '#d1d4dc' },
-        grid: { vertLines: { color: '#1e222d' }, horzLines: { color: '#1e222d' } },
-        crosshair: {
-          mode: LightweightCharts.CrosshairMode.Normal,
-          vertLine: { width: 1, color: '#758696', style: LightweightCharts.LineStyle.Dashed },
-          horzLine: { width: 1, color: '#758696', style: LightweightCharts.LineStyle.Dashed },
-        },
-        rightPriceScale: { borderColor: '#2a2e39', scaleMargins: { top: 0.15, bottom: 0.15 } },
-        timeScale: { borderColor: '#2a2e39', timeVisible: true, secondsVisible: false },
-      });
-
-      candleSeries = tvChart.addCandlestickSeries({
-        upColor: '#26a69a', downColor: '#ef5350', borderVisible: false,
-        wickUpColor: '#26a69a', wickDownColor: '#ef5350',
-      });
-
-      seriesMap.ma50 = tvChart.addLineSeries({ color: '#3b82f6', lineWidth: 2, title: '50 MA', priceLineVisible: false });
-      seriesMap.ma100 = tvChart.addLineSeries({ color: '#f59e0b', lineWidth: 2, title: '100 MA', priceLineVisible: false });
-      seriesMap.ma200d = tvChart.addLineSeries({ color: '#ec4899', lineWidth: 2, title: '200D MA', priceLineVisible: false });
-      seriesMap.ma200w = tvChart.addLineSeries({ color: '#a855f7', lineWidth: 2.5, lineStyle: LightweightCharts.LineStyle.Dashed, title: '200W MA', priceLineVisible: false });
-      seriesMap.plTrend = tvChart.addLineSeries({ color: '#14b8a6', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dotted, title: 'Power Law Fair', priceLineVisible: false });
-
-      window.addEventListener('resize', () => {
-        if (tvChart && container) tvChart.applyOptions({ width: container.clientWidth, height: container.clientHeight });
-      });
-    }
-
-    function calculateSMA(candles, period) {
-      const result = [];
-      for (let i = 0; i < candles.length; i++) {
-        if (i < period - 1) continue;
-        let sum = 0;
-        for (let j = 0; j < period; j++) sum += candles[i - j].close;
-        result.push({ time: candles[i].time, value: sum / period });
+    function readJsonStorage(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch (_) {
+        return fallback;
       }
-      return result;
     }
 
-    function processPVSRAAndSFP(rawKlines, asset) {
-      const candles = [];
-      const markers = [];
-      const volumes = rawKlines.map(k => parseFloat(k[5]));
-      let latestPvsraRegime = asset.pvsraStatus;
-      let latestPvsraScore = asset.pvsraScore;
+    function writeJsonStorage(key, val) {
+      try {
+        localStorage.setItem(key, JSON.stringify(val));
+      } catch (_) {}
+    }
 
-      for (let i = 0; i < rawKlines.length; i++) {
-        const k = rawKlines[i];
-        const time = Math.floor(k[0] / 1000);
-        const open = parseFloat(k[1]);
-        const high = parseFloat(k[2]);
-        const low = parseFloat(k[3]);
-        const close = parseFloat(k[4]);
-        const vol = parseFloat(k[5]);
+    function switchTab(tabName) {
+      activeTab = tabName;
+      document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+      document.querySelectorAll(".tab-panel").forEach(panel => panel.classList.remove("active"));
+      document.getElementById("tab-" + tabName).classList.add("active");
+      document.getElementById("panel-" + tabName).classList.add("active");
+      if (tabName === "chart" && currentData) {
+        renderPowerLawChart(currentData);
+      }
+    }
 
-        let volSum = 0, count = 0;
-        for (let j = Math.max(0, i - 19); j <= i; j++) { volSum += volumes[j]; count++; }
-        const avgVol = volSum / count;
-        const spread = Math.max(high - low, 0.000001);
-        const closePos = (close - low) / spread;
-        const isClimax = vol >= (avgVol * 2.0);
-        const isRisingVol = vol >= (avgVol * 1.5) && !isClimax;
+    function setScale(type) {
+      scaleType = type;
+      document.getElementById("btnLog").classList.toggle("active", type === "logarithmic");
+      document.getElementById("btnLin").classList.toggle("active", type === "linear");
+      if (currentData) renderPowerLawChart(currentData);
+    }
 
-        let candleColor = close >= open ? '#26a69a' : '#ef5350';
-        let wickColor = candleColor;
+    function syncAlertsFromData(data) {
+      const dismissed = new Set(readJsonStorage(STORAGE_DISMISSED_KEY, []));
+      let stored = readJsonStorage(STORAGE_ACTIVE_KEY, []);
+      const byId = new Map(stored.map(item => [item.id, item]));
 
-        if (visibilityState.pvsra) {
-          if (isClimax) { candleColor = '#d946ef'; wickColor = '#d946ef'; }
-          else if (isRisingVol) { candleColor = close >= open ? '#38bdf8' : '#fb923c'; wickColor = candleColor; }
+      const incomingTexts = [];
+      if (Array.isArray(data.active_transitions)) {
+        data.active_transitions.forEach(t => incomingTexts.push(typeof t === "string" ? t : JSON.stringify(t)));
+      }
+      if (Array.isArray(data.alerts)) {
+        data.alerts.forEach(a => incomingTexts.push(typeof a === "string" ? a : (a.message || JSON.stringify(a))));
+      }
+      if (data.elec_floor_breached) {
+        incomingTexts.push("BTC is currently below the electrical cost floor.");
+      }
+
+      const stamp = data.updated_at_utc || new Date().toISOString();
+      incomingTexts.forEach(msg => {
+        const id = "alert::" + stamp.slice(0, 10) + "::" + msg;
+        if (!dismissed.has(id) && !byId.has(id)) {
+          byId.set(id, { id, message: msg, timestamp: stamp });
         }
+      });
 
-        candles.push({ time, open, high, low, close, color: candleColor, wickColor });
+      const merged = Array.from(byId.values()).filter(item => !dismissed.has(item.id));
+      writeJsonStorage(STORAGE_ACTIVE_KEY, merged);
+      renderAlertsUI();
+    }
 
-        if (i >= rawKlines.length - 3) {
-          if (isClimax && closePos >= 0.55) { latestPvsraRegime = 'PVSRA Stopping Absorption'; latestPvsraScore = 1; }
-          else if (isClimax && closePos <= 0.45) { latestPvsraRegime = 'PVSRA Distribution Climax'; latestPvsraScore = -1; }
-          else if (isRisingVol && close >= open) { latestPvsraRegime = 'PVSRA Rising Demand'; latestPvsraScore = 1; }
+    function dismissAlert(id) {
+      const dismissed = new Set(readJsonStorage(STORAGE_DISMISSED_KEY, []));
+      dismissed.add(id);
+      writeJsonStorage(STORAGE_DISMISSED_KEY, Array.from(dismissed));
+
+      const remaining = readJsonStorage(STORAGE_ACTIVE_KEY, []).filter(item => item.id !== id);
+      writeJsonStorage(STORAGE_ACTIVE_KEY, remaining);
+      renderAlertsUI();
+    }
+
+    function restoreDismissedAlerts() {
+      writeJsonStorage(STORAGE_DISMISSED_KEY, []);
+      if (currentData) syncAlertsFromData(currentData);
+      renderAlertsUI();
+    }
+
+    function addTestAlert() {
+      const id = "manual::" + Date.now();
+      const list = readJsonStorage(STORAGE_ACTIVE_KEY, []);
+      list.unshift({
+        id,
+        message: "Manual check alert — stays visible across refreshes until closed.",
+        timestamp: new Date().toISOString()
+      });
+      writeJsonStorage(STORAGE_ACTIVE_KEY, list);
+      renderAlertsUI();
+    }
+
+    function renderAlertsUI() {
+      const alerts = readJsonStorage(STORAGE_ACTIVE_KEY, []);
+      const count = alerts.length;
+      const tabBtn = document.getElementById("tab-alerts");
+      const badge = document.getElementById("alertBadge");
+      const topBanner = document.getElementById("topAlertBanner");
+      const topList = document.getElementById("topAlertList");
+      const panelList = document.getElementById("alertsPanelList");
+
+      if (count > 0) {
+        tabBtn.classList.add("flare");
+        badge.style.display = "inline-block";
+        badge.textContent = String(count);
+        topBanner.style.display = "block";
+      } else {
+        tabBtn.classList.remove("flare");
+        badge.style.display = "none";
+        topBanner.style.display = "none";
+      }
+
+      const buildCardsHtml = (items) => {
+        if (!items.length) {
+          return '<div class="sub" style="padding:12px 0;">No active alerts right now.</div>';
         }
+        return items.map(item => `
+          <div class="alert-item">
+            <div>
+              <div style="font-weight:600;">${escapeHtml(item.message)}</div>
+              <div class="sub">${escapeHtml(item.timestamp || "")}</div>
+            </div>
+            <button class="close-btn" onclick="dismissAlert('${escapeAttr(item.id)}')">Close</button>
+          </div>
+        `).join("");
+      };
 
-        if (i >= 5 && visibilityState.sfp) {
-          const prevLow = Math.min(parseFloat(rawKlines[i-1][3]), parseFloat(rawKlines[i-2][3]), parseFloat(rawKlines[i-3][3]));
-          if (low < prevLow && close > prevLow) {
-            markers.push({ time, position: 'belowBar', color: '#ef5350', shape: 'arrowUp', text: isClimax ? 'SFP + PVSRA' : 'SFP Trap' });
+      topList.innerHTML = buildCardsHtml(alerts.slice(0, 3));
+      panelList.innerHTML = buildCardsHtml(alerts);
+    }
+
+    function buildFallbackCurve(data) {
+      const genesis = new Date("2009-01-03T00:00:00Z");
+      const logA = data?.power_law?.params?.log_a ?? -16.493;
+      const beta = data?.power_law?.params?.beta ?? 5.688;
+      const band = data?.power_law?.params?.band_log10 ?? 0.35;
+      const spot = Number(data?.btc_price ?? data?.power_law?.current?.btc_price ?? 0) || null;
+
+      const points = [];
+      const start = new Date("2017-01-01T00:00:00Z");
+      const end = new Date("2030-12-31T00:00:00Z");
+      const now = new Date();
+
+      for (let d = new Date(start); d <= end; d.setUTCDate(d.getUTCDate() + 21)) {
+        const t = Math.max(1, Math.round((d - genesis) / 86400000));
+        const trend = Math.pow(10, logA + beta * Math.log10(t));
+        points.push({
+          date: d.toISOString().slice(0, 10),
+          trend: Number(trend.toFixed(2)),
+          support: Number((trend * Math.pow(10, -band)).toFixed(2)),
+          resistance: Number((trend * Math.pow(10, band)).toFixed(2)),
+          btc_price: d <= now ? spot : null
+        });
+      }
+      return points;
+    }
+
+    function renderPowerLawChart(data) {
+      if (typeof Chart === "undefined") {
+        showError("Chart.js failed to load from CDN. Check network/ad-blocker settings.");
+        return;
+      }
+      const rawCurve = Array.isArray(data?.power_law?.curve) && data.power_law.curve.length > 0
+        ? data.power_law.curve
+        : buildFallbackCurve(data);
+
+      const canvas = document.getElementById("powerLawChart");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      if (chartInstance) chartInstance.destroy();
+
+      chartInstance = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: rawCurve.map(p => p.date),
+          datasets: [
+            {
+              label: "BTC Price",
+              data: rawCurve.map(p => (typeof p.btc_price === "number" ? p.btc_price : null)),
+              borderColor: "#f59e0b",
+              borderWidth: 2.2,
+              pointRadius: 0,
+              spanGaps: false
+            },
+            {
+              label: "Resistance (+Band)",
+              data: rawCurve.map(p => p.resistance),
+              borderColor: "#ef4444",
+              borderDash: [5, 5],
+              borderWidth: 1.5,
+              pointRadius: 0
+            },
+            {
+              label: "Power Law Trend",
+              data: rawCurve.map(p => p.trend),
+              borderColor: "#38bdf8",
+              borderWidth: 2.5,
+              pointRadius: 0
+            },
+            {
+              label: "Support (-Band)",
+              data: rawCurve.map(p => p.support),
+              borderColor: "#22c55e",
+              borderDash: [5, 5],
+              borderWidth: 1.5,
+              pointRadius: 0
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          scales: {
+            y: {
+              type: scaleType,
+              ticks: {
+                color: "#8fa0b8",
+                callback: v => "$" + Number(v).toLocaleString()
+              },
+              grid: { color: "#1e293b" }
+            },
+            x: {
+              ticks: { color: "#8fa0b8", maxTicksLimit: 10 },
+              grid: { color: "#1e293b" }
+            }
+          },
+          plugins: {
+            legend: { labels: { color: "#e6edf7" } }
           }
         }
-      }
-
-      asset.pvsraStatus = latestPvsraRegime;
-      asset.pvsraScore = latestPvsraScore;
-      return { candles, markers };
+      });
     }
 
-    async function fetchRealHistoricalKlines(ticker, interval) {
-      const symbol = `${ticker}USDT`;
-      try {
-        const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=300`);
-        if (!res.ok) throw new Error('Offline');
-        const raw = await res.json();
-        return processPVSRAAndSFP(raw, assetsStore[ticker]);
-      } catch (err) {
-        const raw = [];
-        const nowSec = Math.floor(Date.now() / 1000);
-        const stepSec = interval === '15m' ? 900 : interval === '1h' ? 3600 : interval === '4h' ? 14400 : interval === '1d' ? 86400 : 604800;
-        let price = assetsStore[ticker].price * 0.95;
-        for (let i = 200; i >= 0; i--) {
-          const t = (nowSec - (i * stepSec)) * 1000;
-          const open = price;
-          const close = Math.max(assetsStore[ticker].price * 0.2, price + (Math.random() - 0.48) * (assetsStore[ticker].price * 0.012));
-          raw.push([t, open.toString(), Math.max(open, close).toString(), Math.min(open, close).toString(), close.toString(), (Math.random() * 5e6 + 1e6).toString()]);
-          price = close;
+    function renderCalendar(data) {
+      const extra = Array.isArray(data?.calendar_events) ? data.calendar_events : [];
+      const combined = [...DEFAULT_CALENDAR_EVENTS, ...extra];
+      const todayStr = new Date().toISOString().slice(0, 10);
+
+      // Find the next upcoming event start date
+      const upcomingStarts = combined.map(e => e.date).filter(d => d && d >= todayStr).sort();
+      const nextDate = upcomingStarts[0] || null;
+
+      const tbody = document.getElementById("calendarBody");
+      tbody.innerHTML = combined.map(ev => {
+        const endDate = ev.end || ev.date;
+        let statusHtml = '<span class="pill pill-past">Completed</span>';
+        if (ev.date === nextDate) {
+          statusHtml = '<span class="pill pill-next">Next Up</span>';
+        } else if (endDate >= todayStr) {
+          statusHtml = '<span class="pill pill-upcoming">Upcoming</span>';
         }
-        return processPVSRAAndSFP(raw, assetsStore[ticker]);
-      }
-    }
-
-    function getPowerLawMetrics(price) {
-      const fair = calcPowerLawValue(Math.floor(Date.now() / 1000));
-      const pctDiff = ((price - fair) / fair) * 100;
-      return { fair, pctDiff };
-    }
-
-    function computeRecommendation(asset) {
-      const p = asset.price, buy = asset.buyZone, sell = asset.sellZone, mvrv = asset.mvrv, pvsra = asset.pvsraScore || 0;
-      const pl = asset.name === 'Bitcoin' ? getPowerLawMetrics(p) : null;
-
-      if ((pl && pl.pctDiff < -35) || mvrv < 1.2 || p <= buy * 1.03) {
-        return {
-          action: pvsra > 0 ? 'BUY / ADD (+25% • PL + PVSRA)' : 'BUY / ADD (+25%)',
-          badgeClass: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40'
-        };
-      }
-      if (p >= sell || mvrv > 2.4 || (pl && pl.pctDiff > 80)) {
-        return {
-          action: pvsra < 0 ? 'SELL / REDUCE (-25% • PVSRA Climax)' : 'SELL / REDUCE (-25%)',
-          badgeClass: 'bg-red-500/15 text-red-400 border-red-500/40'
-        };
-      }
-      if (p >= sell * 0.90 && pvsra < 0) {
-        return {
-          action: 'REDUCE / TRIM (-15% • PVSRA Alert)',
-          badgeClass: 'bg-amber-500/15 text-amber-400 border-amber-500/40'
-        };
-      }
-      return {
-        action: pvsra > 0 ? 'HOLD / ACCUMULATE DIPS (PVSRA +)' : 'HOLD (CORE POSITION)',
-        badgeClass: 'bg-blue-500/15 text-blue-400 border-blue-500/40'
-      };
-    }
-
-    function updatePowerLawPanel(btcPrice) {
-      const { fair, pctDiff } = getPowerLawMetrics(btcPrice);
-      const sign = pctDiff >= 0 ? '+' : '';
-      document.getElementById('plLivePrice').innerText = `$${btcPrice.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
-      document.getElementById('plFairValue').innerText = `$${fair.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
-      document.getElementById('plDistance').innerText = `${sign}${pctDiff.toFixed(1)}% vs Fair`;
-      document.getElementById('plRegime').innerText = pctDiff < -35 ? 'Undervalued / Accumulation' : pctDiff > 60 ? 'Overextended / Trim Zone' : 'Fair Value Corridor';
-    }
-
-    async function loadChartData() {
-      const ticker = document.getElementById('topAssetSelect').value;
-      const asset = assetsStore[ticker];
-      const { candles, markers } = await fetchRealHistoricalKlines(ticker, currentTimeframe);
-
-      if (candles.length > 0) {
-        const latest = candles[candles.length - 1];
-        asset.price = latest.close;
-        candleSeries.setData(candles);
-
-        const ma50 = calculateSMA(candles, 50);
-        const ma100 = calculateSMA(candles, 100);
-        const ma200d = calculateSMA(candles, 200);
-        const ma200w = candles.map((c, idx) => ({ time: c.time, value: asset.weekly200Base * (1 + (idx / candles.length) * 0.08) }));
-        const plSeries = ticker === 'BTC' ? candles.map(c => ({ time: c.time, value: calcPowerLawValue(c.time) })) : [];
-
-        seriesMap.ma50.setData(ma50);
-        seriesMap.ma100.setData(ma100);
-        seriesMap.ma200d.setData(ma200d);
-        seriesMap.ma200w.setData(ma200w);
-        seriesMap.plTrend.setData(plSeries);
-        candleSeries.setMarkers(markers);
-
-        const dec = asset.price < 1 ? 4 : 2;
-        document.getElementById('hudTicker').innerText = `${ticker}USDT`;
-        document.getElementById('hudTf').innerText = currentTimeframe.toUpperCase();
-        document.getElementById('hudOHLC').innerText = `O: ${latest.open.toFixed(dec)}  H: ${latest.high.toFixed(dec)}  L: ${latest.low.toFixed(dec)}  C: ${latest.close.toFixed(dec)}`;
-        if (ma50.length) document.getElementById('hudMa50').innerText = `50 MA: $${ma50[ma50.length - 1].value.toLocaleString(undefined, { maximumFractionDigits: 4 })}`;
-        if (ma100.length) document.getElementById('hudMa100').innerText = `100 MA: $${ma100[ma100.length - 1].value.toLocaleString(undefined, { maximumFractionDigits: 4 })}`;
-        if (ma200d.length) document.getElementById('hudMa200d').innerText = `200D MA: $${ma200d[ma200d.length - 1].value.toLocaleString(undefined, { maximumFractionDigits: 4 })}`;
-        if (ma200w.length) document.getElementById('hudMa200w').innerText = `200W MA: $${ma200w[ma200w.length - 1].value.toLocaleString(undefined, { maximumFractionDigits: 4 })}`;
-
-        const plInfo = ticker === 'BTC' ? `${getPowerLawMetrics(asset.price).pctDiff.toFixed(1)}% vs PL` : 'BTC Model';
-        document.getElementById('hudPl').innerText = `📐 ${plInfo}`;
-
-        renderPriceLines(asset);
-        applyVisibilityStates();
-        tvChart.timeScale().fitContent();
-      }
-
-      updatePowerLawPanel(assetsStore.BTC.price);
-      const rec = computeRecommendation(asset);
-      const hudSig = document.getElementById('hudSignal');
-      hudSig.className = `text-[10px] px-2 py-0.5 rounded font-bold border ${rec.badgeClass}`;
-      hudSig.innerText = rec.action;
-      document.getElementById('hudBuy').innerText = `🟢 Buy Zone: ≤ $${asset.buyZone}`;
-      document.getElementById('hudSell').innerText = `🔴 Sell Zone: ≥ $${asset.sellZone}`;
-      document.getElementById('hudPvsra').innerText = `🔮 ${asset.pvsraStatus}`;
-
-      document.getElementById('chartDecisionStrip').innerHTML = `
-        <div class="p-2.5 rounded bg-[#131722] border border-[#2a2e39]"><span class="text-slate-400 block">Live Spot</span><strong class="text-white text-sm">$${asset.price.toLocaleString(undefined, { maximumFractionDigits: 4 })}</strong></div>
-        <div class="p-2.5 rounded bg-emerald-500/5 border border-emerald-500/30"><span class="text-emerald-400 font-bold block">🟢 BUY ZONE</span><strong class="text-emerald-400 text-sm">&le; $${asset.buyZone}</strong></div>
-        <div class="p-2.5 rounded bg-red-500/5 border border-red-500/30"><span class="text-red-400 font-bold block">🔴 SELL ZONE</span><strong class="text-red-400 text-sm">&ge; $${asset.sellZone}</strong></div>
-        <div class="p-2.5 rounded bg-fuchsia-500/5 border border-fuchsia-500/30"><span class="text-fuchsia-400 font-bold block">🔮 PVSRA</span><strong class="text-fuchsia-300 text-xs">${asset.pvsraStatus}</strong></div>
-        <div class="p-2.5 rounded bg-teal-500/5 border border-teal-500/30"><span class="text-teal-400 font-bold block">📐 PL / ROI</span><strong class="text-teal-300 text-xs">${ticker === 'BTC' ? getPowerLawMetrics(asset.price).pctDiff.toFixed(1) + '% vs PL' : asset.roi}</strong></div>
-      `;
-
-      document.getElementById('liveFeedBadge').innerText = `Feed: Live (${ticker} Synced)`;
-      renderPortfolioTable();
-      renderDashboardGrid();
-      renderBacktestTable();
-    }
-
-    function renderPriceLines(asset) {
-      if (seriesMap.buyZoneLine) { candleSeries.removePriceLine(seriesMap.buyZoneLine); seriesMap.buyZoneLine = null; }
-      if (seriesMap.sellZoneLine) { candleSeries.removePriceLine(seriesMap.sellZoneLine); seriesMap.sellZoneLine = null; }
-      if (seriesMap.energyLine) { candleSeries.removePriceLine(seriesMap.energyLine); seriesMap.energyLine = null; }
-
-      if (visibilityState.zones) {
-        seriesMap.buyZoneLine = candleSeries.createPriceLine({ price: asset.buyZone, color: '#26a69a', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'BUY ZONE' });
-        seriesMap.sellZoneLine = candleSeries.createPriceLine({ price: asset.sellZone, color: '#ef5350', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'SELL ZONE' });
-      }
-      if (visibilityState.energy && asset.electrical_cost) {
-        seriesMap.energyLine = candleSeries.createPriceLine({ price: asset.electrical_cost, color: '#06b6d4', lineWidth: 1.5, lineStyle: LightweightCharts.LineStyle.Dotted, axisLabelVisible: true, title: '⚡ ENERGY FLOOR' });
-      }
-    }
-
-    function toggleSeries(key) {
-      visibilityState[key] = !visibilityState[key];
-      const btn = document.getElementById(`btn-${key}`);
-      btn.classList.toggle('opacity-40', !visibilityState[key]);
-      if (key === 'zones' || key === 'energy') renderPriceLines(assetsStore[document.getElementById('topAssetSelect').value]);
-      else if (key === 'sfp' || key === 'pvsra') loadChartData();
-      else applyVisibilityStates();
-    }
-
-    function applyVisibilityStates() {
-      if (seriesMap.ma50) seriesMap.ma50.applyOptions({ visible: visibilityState.ma50 });
-      if (seriesMap.ma100) seriesMap.ma100.applyOptions({ visible: visibilityState.ma100 });
-      if (seriesMap.ma200d) seriesMap.ma200d.applyOptions({ visible: visibilityState.ma200d });
-      if (seriesMap.ma200w) seriesMap.ma200w.applyOptions({ visible: visibilityState.ma200w });
-      if (seriesMap.plTrend) seriesMap.plTrend.applyOptions({ visible: visibilityState.pl });
-    }
-
-    function setTimeframe(tf) {
-      currentTimeframe = tf;
-      document.querySelectorAll('.tf-btn').forEach(btn => {
-        const map = { '15m': '15m', '1h': '1h', '4h': '4h', 'daily': '1d', 'weekly': '1w', 'monthly': '1M' };
-        btn.className = map[btn.innerText.toLowerCase()] === tf
-          ? 'tf-btn px-2.5 py-1 text-[11px] font-mono rounded bg-amber-500 text-slate-900 font-bold border border-amber-500'
-          : 'tf-btn px-2.5 py-1 text-[11px] font-mono rounded bg-[#131722] text-slate-400 hover:text-white border border-[#2a2e39]';
-      });
-      loadChartData();
-    }
-
-    function fitChartContent() { if (tvChart) tvChart.timeScale().fitContent(); }
-    function selectAssetForTopChart(ticker) { document.getElementById('topAssetSelect').value = ticker; loadChartData(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-
-    function renderPortfolioTable() {
-      const horizon = document.getElementById('horizonFilter')?.value || 'all';
-      const activeTickers = Object.keys(assetsStore).filter(t => assetsStore[t].weight > 0);
-      document.getElementById('portfolio-table-body').innerHTML = activeTickers.map(t => {
-        const a = assetsStore[t], rec = computeRecommendation(a);
-        const allocUsd = (a.weight * 100000).toLocaleString();
-        const stCls = horizon === 'st' ? 'text-amber-400 font-extrabold bg-amber-500/10 rounded px-1.5 py-0.5' : 'text-slate-300';
-        const mtCls = horizon === 'mt' ? 'text-amber-400 font-extrabold bg-amber-500/10 rounded px-1.5 py-0.5' : 'text-cyan-400 font-bold';
-        const ltCls = horizon === 'lt' ? 'text-amber-400 font-extrabold bg-amber-500/10 rounded px-1.5 py-0.5' : 'text-emerald-400 font-bold';
+        const dateLabel = ev.end && ev.end !== ev.date ? `${ev.date} to ${ev.end}` : ev.date;
         return `
-          <tr onclick="selectAssetForTopChart('${t}')" class="cursor-pointer hover:bg-[#131722]/60">
-            <td class="p-3 font-bold text-amber-500">${t} (${a.name})</td>
-            <td class="p-3 text-white">$${allocUsd} (${(a.weight * 100).toFixed(0)}%)</td>
-            <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${rec.badgeClass}">${rec.action}</span></td>
-            <td class="p-3"><span class="${stCls}">${a.winST}</span></td>
-            <td class="p-3"><span class="${mtCls}">${a.winMT}</span></td>
-            <td class="p-3"><span class="${ltCls}">${a.winLT}</span></td>
-          </tr>`;
-      }).join('');
+          <tr>
+            <td><strong>${escapeHtml(dateLabel)}</strong></td>
+            <td>${escapeHtml(ev.title)}</td>
+            <td>${statusHtml}</td>
+            <td style="color:var(--muted);">${escapeHtml(ev.notes || "")}</td>
+          </tr>
+        `;
+      }).join("");
     }
 
-    function renderDashboardGrid() {
-      document.getElementById('assets-grid-container').innerHTML = Object.keys(assetsStore).map(t => {
-        const a = assetsStore[t], rec = computeRecommendation(a);
-        return `
-          <div onclick="selectAssetForTopChart('${t}')" class="cursor-pointer bg-[#1e222d] border border-[#2a2e39] p-4 rounded-xl hover:border-amber-500 transition space-y-2">
-            <div class="flex justify-between items-center gap-1">
-              <span class="font-bold text-amber-500 font-mono">${t}USDT</span>
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${rec.badgeClass}">${rec.action}</span>
-            </div>
-            <div class="text-[10px] font-mono text-fuchsia-400 bg-fuchsia-500/10 border border-fuchsia-500/20 px-2 py-0.5 rounded inline-block">🔮 ${a.pvsraStatus}</div>
-            <div class="grid grid-cols-2 gap-2 text-xs font-mono pt-1">
-              <div>Spot: <strong class="text-white">$${a.price.toLocaleString(undefined, { maximumFractionDigits: 4 })}</strong></div>
-              <div>MVRV: <strong class="text-blue-400">${a.mvrv}</strong></div>
-              <div>ST / MT / LT: <strong class="text-emerald-400">${a.winST}/${a.winMT}/${a.winLT}</strong></div>
-              <div>ROI: <strong class="text-emerald-400">${a.roi}</strong></div>
-            </div>
-          </div>`;
-      }).join('');
+    function renderKpis(data) {
+      const pl = data?.power_law?.current || {};
+      const btc = Number(data?.btc_price ?? pl.btc_price ?? 0);
+      const trend = Number(pl.trend ?? 0);
+      const mult = trend > 0 ? (btc / trend) : Number(pl.multiple_to_trend ?? 0);
+
+      document.getElementById("kpiTrend").textContent = trend ? "$" + trend.toLocaleString() : "—";
+      document.getElementById("kpiDays").textContent = pl.days_since_genesis
+        ? "t = " + Number(pl.days_since_genesis).toLocaleString() + " days"
+        : "Power Law corridor";
+      document.getElementById("kpiMult").textContent = mult ? mult.toFixed(2) + "x" : "—";
+      document.getElementById("kpiZone").textContent = (pl.zone || "CORRIDOR") + (btc ? ` ($${btc.toLocaleString()})` : "");
+      document.getElementById("kpiBands").textContent = (pl.support && pl.resistance)
+        ? `$${Number(pl.support).toLocaleString()} – $${Number(pl.resistance).toLocaleString()}`
+        : "—";
+      document.getElementById("kpiRegime").textContent = data?.macro_regime?.regime || "NORMAL";
+      document.getElementById("kpiEvent").textContent = data?.macro_regime?.event_name || "FOMC & macro tracked";
     }
 
-    function renderBacktestTable() {
-      document.getElementById('backtest-table-body').innerHTML = Object.keys(assetsStore).map(t => {
-        const a = assetsStore[t];
-        return `
-          <tr class="hover:bg-[#131722]/50">
-            <td class="p-3 font-bold text-amber-500">${t} (${a.name})</td>
-            <td class="p-3 text-slate-200">${a.strategy}</td>
-            <td class="p-3 text-fuchsia-400">${a.pvsraStatus}</td>
-            <td class="p-3 text-cyan-400 font-bold">${a.correlation}</td>
-            <td class="p-3 text-emerald-400 font-extrabold">${a.roi}</td>
-            <td class="p-3 text-amber-400">${a.accuracy}</td>
-          </tr>`;
-      }).join('');
+    function showError(msg) {
+      const box = document.getElementById("errBox");
+      box.textContent = msg;
+      box.style.display = "block";
     }
 
-    function registerCustomAsset() {
-      const ticker = document.getElementById('new-ticker').value.trim().toUpperCase();
-      if (!ticker) return;
-      assetsStore[ticker] = { name: ticker, price: 10.0, mvrv: 1.4, buyZone: 8.5, sellZone: 15.0, weight: 0.0, winST: '61%', winMT: '73%', winLT: '82%', winProb: '62%', accuracy: '85.0%', roi: '+15.0%', correlation: '90.0%', strategy: 'Spot Accumulation', pvsraStatus: 'Normal Volume Flow', pvsraScore: 0, weekly200Base: 6.5 };
-      document.getElementById('topAssetSelect').innerHTML += `<option value="${ticker}">${ticker}USDT</option>`;
-      selectAssetForTopChart(ticker);
+    function clearError() {
+      const box = document.getElementById("errBox");
+      box.textContent = "";
+      box.style.display = "none";
     }
 
-    function switchTab(tabId) {
-      document.querySelectorAll('.nav-btn').forEach(b => {
-        b.classList.toggle('bg-amber-500', b.getAttribute('data-tab') === tabId);
-        b.classList.toggle('text-slate-900', b.getAttribute('data-tab') === tabId);
-        b.classList.toggle('font-bold', b.getAttribute('data-tab') === tabId);
-      });
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === tabId));
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
     }
 
-    document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', () => switchTab(b.getAttribute('data-tab'))));
-    initTradingViewChart();
-    loadChartData();
+    function escapeAttr(str) {
+      return String(str).replace(/'/g, "\\'");
+    }
+
+    async function loadDashboard(manualClick = false) {
+      clearError();
+      const cacheBuster = "cb=" + Date.now();
+      document.getElementById("statusLine").textContent = manualClick
+        ? "Fetching fresh ./dashboard_data.json..."
+        : "Loading ./dashboard_data.json...";
+
+      try {
+        const res = await fetch(`./dashboard_data.json?${cacheBuster}`, {
+          cache: "no-store",
+          headers: { "Cache-Control": "no-cache" }
+        });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        currentData = data;
+        document.getElementById("statusLine").textContent =
+          "Data timestamp (UTC): " + (data.updated_at_utc || "unknown") + " | Checked: " + new Date().toLocaleTimeString();
+
+        renderKpis(data);
+        renderPowerLawChart(data);
+        syncAlertsFromData(data);
+        renderCalendar(data);
+      } catch (err) {
+        document.getElementById("statusLine").textContent = "Could not load ./dashboard_data.json (" + err.message + ")";
+        showError("Error loading ./dashboard_data.json: " + err.message + ". Using fallback calendar and saved alerts.");
+        renderCalendar({});
+        renderAlertsUI();
+      }
+    }
+
+    // Initial boot
+    renderAlertsUI();
+    renderCalendar({});
+    loadDashboard(false);
   </script>
 </body>
 </html>
