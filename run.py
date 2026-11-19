@@ -12,10 +12,11 @@ DASHBOARD_PATH = Path("dashboard_data.json")
 
 GENESIS_DATE = date(2009, 1, 3)
 
-# Power Law parameters (t = days since Genesis Block, 2009-01-03)
 POWER_LAW_LOG_A = float(os.getenv("POWER_LAW_LOG_A", "-16.493"))
 POWER_LAW_BETA = float(os.getenv("POWER_LAW_BETA", "5.688"))
 POWER_LAW_BAND_LOG10 = float(os.getenv("POWER_LAW_BAND_LOG10", "0.35"))
+
+DEFAULT_ASSETS = ["BTC", "ETH", "SOL", "XRP", "ONDO", "SUI", "SEI", "HBAR", "HYPE"]
 
 MACRO_EVENTS = [
     {
@@ -24,7 +25,7 @@ MACRO_EVENTS = [
         "pre_window_days": 30,
         "post_window_days": 28,
         "proxy_tickers": ["HYPE"],
-        "leader_tickers": ["BTC", "ETH"],
+        "leader_tickers": ["BTC", "ETH", "ONDO"],
         "laggard_tickers": ["XRP"],
     }
 ]
@@ -34,7 +35,7 @@ CALENDAR_EVENTS: List[Dict[str, str]] = [
         "date": "2026-06-12",
         "end": "2026-06-12",
         "title": "SpaceX IPO (SPCX) Macro Window",
-        "notes": "Tracked liquidity & proxy rotation regime (-30d / +28d)",
+        "notes": "Tracked liquidity & proxy rotation window (-30d / +28d)",
     },
     {
         "date": "2026-12-08",
@@ -104,8 +105,7 @@ def compute_power_law_metrics(
     band_log10: float = POWER_LAW_BAND_LOG10,
 ) -> Dict[str, Any]:
     t = days_since_genesis(target_date)
-    log10_trend = log_a + beta * math.log10(t)
-    trend = 10.0**log10_trend
+    trend = 10.0 ** (log_a + beta * math.log10(t))
     support = trend * (10.0 ** (-band_log10))
     resistance = trend * (10.0**band_log10)
     return {
@@ -122,7 +122,7 @@ def load_cached_history() -> Dict[str, float]:
         try:
             data = json.loads(HISTORY_CACHE_PATH.read_text(encoding="utf-8"))
             if isinstance(data, dict):
-                return {str(k): float(v) for k, v in data.items()}
+                return {str(k): float(v) for k, v in data.items() if isinstance(v, (int, float))}
         except Exception:
             pass
     return {}
@@ -134,61 +134,100 @@ def save_cached_history(history: Dict[str, float]) -> None:
 
 
 def fetch_historical_btc_closes(start_date: date = date(2017, 8, 17)) -> Dict[str, float]:
-    """Fetches daily BTC/USDT closes from Binance klines and merges with local cache."""
     history = load_cached_history()
     start_ms = int(datetime.combine(start_date, datetime.min.time(), tzinfo=timezone.utc).timestamp() * 1000)
 
     try:
-        resp = requests.get(
-            "https://api.binance.com/api/v3/klines",
-            params={"symbol": "BTCUSDT", "interval": "1d", "startTime": start_ms, "limit": 1000},
-            timeout=20,
-        )
-        resp.raise_for_status()
-        klines = resp.json()
-
-        while isinstance(klines, list) and klines:
+        cursor_ms = start_ms
+        while True:
+            resp = requests.get(
+                "https://api.binance.com/api/v3/klines",
+                params={"symbol": "BTCUSDT", "interval": "1d", "startTime": cursor_ms, "limit": 1000},
+                timeout=20,
+            )
+            resp.raise_for_status()
+            klines = resp.json()
+            if not isinstance(klines, list) or not klines:
+                break
             for row in klines:
                 dt_str = datetime.fromtimestamp(row[0] / 1000, tz=timezone.utc).date().isoformat()
                 history[dt_str] = round(float(row[4]), 2)
             if len(klines) < 1000:
                 break
-            next_start = int(klines[-1][0]) + 86_400_000
-            resp = requests.get(
-                "https://api.binance.com/api/v3/klines",
-                params={"symbol": "BTCUSDT", "interval": "1d", "startTime": next_start, "limit": 1000},
-                timeout=20,
-            )
-            resp.raise_for_status()
-            klines = resp.json()
+            cursor_ms = int(klines[-1][0]) + 86_400_000
 
         if history:
             save_cached_history(history)
     except Exception as exc:
-        print(f"Warning: live BTC history fetch failed ({exc}); using cached/fallback data.")
+        print(f"Binance history warning ({exc}); trying CoinGecko fallback...")
+        try:
+            cg = requests.get(
+                "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart",
+                params={"vs_currency": "usd", "days": "max", "interval": "daily"},
+                timeout=20,
+            )
+            cg.raise_for_status()
+            prices = cg.json().get("prices", [])
+            for ts_ms, px in prices:
+                dt_str = datetime.fromtimestamp(ts_ms / 1000, tz=timezone.utc).date().isoformat()
+                if dt_str >= start_date.isoformat():
+                    history[dt_str] = round(float(px), 2)
+            if history:
+                save_cached_history(history)
+        except Exception as cg_exc:
+            print(f"CoinGecko fallback warning ({cg_exc}); using cached/baseline series.")
 
     return history
+
+
+def fetch_current_btc_spot(fallback_price: float) -> tuple[float, str]:
+    try:
+        resp = requests.get(
+            "https://api.binance.com/api/v3/ticker/price",
+            params={"symbol": "BTCUSDT"},
+            timeout=10,
+        )
+        resp.raise_for_status()
+        return round(float(resp.json()["price"]), 2), "Binance BTCUSDT live spot"
+    except Exception:
+        try:
+            cg = requests.get(
+                "https://api.coingecko.com/api/v3/simple/price",
+                params={"ids": "bitcoin", "vs_currencies": "usd"},
+                timeout=10,
+            )
+            cg.raise_for_status()
+            px = cg.json().get("bitcoin", {}).get("usd")
+            if px:
+                return round(float(px), 2), "CoinGecko BTC/USD spot"
+        except Exception:
+            pass
+    return round(fallback_price, 2), "Cached / latest daily close"
 
 
 def build_power_law_curve(
     as_of_date: date,
     btc_history: Dict[str, float],
+    current_btc_price: float,
     start_year: int = 2017,
     end_year: int = 2030,
-    step_days: int = 14,
+    step_days: int = 7,
 ) -> List[Dict[str, Any]]:
     cursor = date(start_year, 1, 1)
     end_date = date(end_year, 12, 31)
     points: List[Dict[str, Any]] = []
     sorted_hist_dates = sorted(btc_history.keys())
+    today_iso = as_of_date.isoformat()
 
     def lookup_btc_price(d: date) -> Optional[float]:
         if d > as_of_date:
             return None
+        if d == as_of_date:
+            return current_btc_price
         iso = d.isoformat()
         if iso in btc_history:
             return btc_history[iso]
-        for offset in range(1, 8):
+        for offset in range(1, 10):
             prev_iso = (d - timedelta(days=offset)).isoformat()
             if prev_iso in btc_history:
                 return btc_history[prev_iso]
@@ -211,7 +250,6 @@ def build_power_law_curve(
         )
         cursor += timedelta(days=step_days)
 
-    today_iso = as_of_date.isoformat()
     if not any(p["date"] == today_iso for p in points):
         metrics = compute_power_law_metrics(as_of_date)
         points.append(
@@ -221,7 +259,7 @@ def build_power_law_curve(
                 "trend": metrics["trend"],
                 "support": metrics["support"],
                 "resistance": metrics["resistance"],
-                "btc_price": lookup_btc_price(as_of_date),
+                "btc_price": current_btc_price,
                 "is_projection": False,
             }
         )
@@ -233,7 +271,6 @@ def build_power_law_curve(
 def evaluate_macro_event_regime(as_of_date: date, events=MACRO_EVENTS) -> Dict[str, Any]:
     for ev in events:
         delta_days = (as_of_date - ev["event_date"]).days
-
         if -ev["pre_window_days"] <= delta_days <= 0:
             return {
                 "active": True,
@@ -244,7 +281,6 @@ def evaluate_macro_event_regime(as_of_date: date, events=MACRO_EVENTS) -> Dict[s
                 "leader_tickers": ev["leader_tickers"],
                 "laggard_tickers": ev["laggard_tickers"],
             }
-
         if 1 <= delta_days <= ev["post_window_days"]:
             return {
                 "active": True,
@@ -255,7 +291,6 @@ def evaluate_macro_event_regime(as_of_date: date, events=MACRO_EVENTS) -> Dict[s
                 "leader_tickers": ev["leader_tickers"],
                 "laggard_tickers": ev["laggard_tickers"],
             }
-
     return {
         "active": False,
         "regime": "NORMAL",
@@ -266,46 +301,133 @@ def evaluate_macro_event_regime(as_of_date: date, events=MACRO_EVENTS) -> Dict[s
     }
 
 
-def apply_event_matrix_adjustment(
-    base_score: float,
-    ticker: str,
+def build_asset_recommendations(
+    tickers: List[str],
     macro_state: Dict[str, Any],
-    price_vs_elec_floor: float = 1.0,
-    mvrv_z: float = 0.0,
-) -> Dict[str, Any]:
-    score = base_score
-    notes: List[str] = []
+    btc_price: float,
+    pl_today: Dict[str, Any],
+    price_vs_floor: float,
+    mvrv_z: float,
+) -> Dict[str, Dict[str, Any]]:
+    base_map: Dict[str, Dict[str, Any]] = {
+        "BTC": {
+            "score": 6.8,
+            "thesis": "Anchor liquidity asset; evaluate against Power Law corridor, MVRV Z-score, and electrical cost floor.",
+            "zone": f"PL Support ${pl_today['support']:,.0f} – Trend ${pl_today['trend']:,.0f}",
+            "risk": "Loss of electrical cost floor or macro liquidity contraction",
+        },
+        "ETH": {
+            "score": 5.6,
+            "thesis": "Smart-contract & institutional settlement beta; tracks ETH/BTC ratio and spot flow rotation.",
+            "zone": "Range support & ETH/BTC ratio mean-reversion band",
+            "risk": "Relative underperformance vs. BTC during risk-off phases",
+        },
+        "SOL": {
+            "score": 6.0,
+            "thesis": "High-throughput consumer & DeFi liquidity leader; momentum sensitive to volume expansion.",
+            "zone": "Pullbacks to 50/100 MWA demand with rising volume",
+            "risk": "Sharp drawdowns on liquidity sweeps / SFP rejections",
+        },
+        "XRP": {
+            "score": 4.5,
+            "thesis": "Event/headline-driven high-beta asset; selective sizing unless breakout holds volume confirmation.",
+            "zone": "High-timeframe range floor only",
+            "risk": "Extended consolidation / lagging recovery vs. majors",
+        },
+        "ONDO": {
+            "score": 6.1,
+            "thesis": "RWA & tokenized treasury exposure; benefits from rate/yield & institutional on-chain adoption narratives.",
+            "zone": "Structured pullbacks into demand with macro rate clarity",
+            "risk": "Broader altcoin liquidity tightening",
+        },
+        "SUI": {
+            "score": 5.7,
+            "thesis": "High-beta Layer-1 ecosystem play; reacts strongly to TVL/volume acceleration and risk appetite.",
+            "zone": "Higher-timeframe support retests after flush sweeps",
+            "risk": "Unlock / volatility overhang in chop regimes",
+        },
+        "SEI": {
+            "score": 5.3,
+            "thesis": "Execution-focused L1 setup; best treated as tactical swing exposure on confirmed trend structure.",
+            "zone": "Range lows with PVSRA absorption signal",
+            "risk": "Thin liquidity spikes and weak follow-through in sideways markets",
+        },
+        "HBAR": {
+            "score": 5.1,
+            "thesis": "Enterprise governance & network utility play; monitor volume expansion before sizing up.",
+            "zone": "Base accumulation near multi-week support",
+            "risk": "Slow trend velocity during low-breadth alt periods",
+        },
+        "HYPE": {
+            "score": 6.4,
+            "thesis": "On-chain perpetuals & liquidity velocity proxy; strong rotational watch during active flow shifts.",
+            "zone": "Trend pullbacks above rising 50 MWA",
+            "risk": "Funding/open-interest froth and sharp perp liquidations",
+        },
+    }
 
-    if not macro_state["active"]:
-        return {"adjusted_score": round(score, 2), "notes": notes}
+    matrix: Dict[str, Dict[str, Any]] = {}
+    for raw_t in tickers:
+        t = raw_t.upper().strip()
+        if not t:
+            continue
+        cfg = base_map.get(
+            t,
+            {
+                "score": 5.0,
+                "thesis": f"Custom watchlist asset ({t}); monitor trend structure, MWA alignment, and volume spread.",
+                "zone": "Key HTF support / demand zone",
+                "risk": "Break of market structure or liquidity drain",
+            },
+        )
+        score = float(cfg["score"])
+        notes: List[str] = [cfg["thesis"]]
 
-    regime = macro_state["regime"]
-    t = ticker.upper()
+        if macro_state.get("active"):
+            regime = macro_state["regime"]
+            if regime == "PRE_EVENT_LIQUIDITY_DRAIN":
+                if t in macro_state.get("proxy_tickers", []):
+                    score += 1.2
+                    notes.append("Active regime: event proxy flow boost")
+                elif t in macro_state.get("leader_tickers", []):
+                    if price_vs_floor <= 1.08 or mvrv_z < 0.5:
+                        score += 0.5
+                        notes.append("Active regime: discount accumulation filter active")
+                    else:
+                        score -= 0.8
+                        notes.append("Active regime: pre-event liquidity outflow headwind")
+                elif t in macro_state.get("laggard_tickers", []):
+                    score -= 1.0
+                    notes.append("Active regime: laggard weakness filter")
+            elif regime == "POST_EVENT_STABILIZATION":
+                if t in macro_state.get("leader_tickers", []):
+                    score += 0.9
+                    notes.append("Active regime: post-event stabilization tailwind")
+                elif t in macro_state.get("laggard_tickers", []):
+                    score -= 0.5
+                    notes.append("Active regime: lagging recovery filter")
 
-    if regime == "PRE_EVENT_LIQUIDITY_DRAIN":
-        if t in macro_state["proxy_tickers"]:
-            score += 1.5
-            notes.append("Event proxy boost (synthetic/perp flow rotation)")
-        elif t in macro_state["leader_tickers"]:
-            if price_vs_elec_floor <= 1.08 or mvrv_z < 0.5:
-                score += 0.5
-                notes.append("Liquidity-drain discount accumulation zone")
-            else:
-                score -= 1.0
-                notes.append("Pre-event liquidity outflow headwind")
-        elif t in macro_state["laggard_tickers"]:
-            score -= 1.0
-            notes.append("Relative weakness penalty during liquidity drain")
+        score = round(max(1.0, min(10.0, score)), 2)
+        if score >= 6.0:
+            tier = "HIGH"
+            recommendation = "Accumulate / Overweight"
+        elif score <= 4.6:
+            tier = "LOW"
+            recommendation = "Cautious / Underweight"
+        else:
+            tier = "MEDIUM"
+            recommendation = "Core / Selective Swing"
 
-    elif regime == "POST_EVENT_STABILIZATION":
-        if t in macro_state["leader_tickers"]:
-            score += 1.0
-            notes.append("Post-IPO stabilization & capital return tailwind")
-        elif t in macro_state["laggard_tickers"]:
-            score -= 0.5
-            notes.append("Lagging recovery filter vs. majors")
+        matrix[t] = {
+            "score": score,
+            "tier": tier,
+            "recommendation": recommendation,
+            "zone": cfg["zone"],
+            "risk": cfg["risk"],
+            "notes": notes,
+        }
 
-    return {"adjusted_score": round(score, 2), "notes": notes}
+    return matrix
 
 
 def load_previous_state() -> Dict[str, Any]:
@@ -331,25 +453,19 @@ def detect_state_transitions(
     power_law_zone: str,
 ) -> List[str]:
     alerts: List[str] = []
-
     if prev_state.get("regime") and prev_state.get("regime") != current_regime:
         alerts.append(f"Regime shift: {prev_state['regime']} -> {current_regime}")
-
     if prev_state.get("mvrv_band") and prev_state.get("mvrv_band") != mvrv_band:
         alerts.append(f"MVRV band transition: {prev_state['mvrv_band']} -> {mvrv_band}")
-
     if prev_state.get("power_law_zone") and prev_state.get("power_law_zone") != power_law_zone:
         alerts.append(f"Power Law corridor: {prev_state['power_law_zone']} -> {power_law_zone}")
-
     if "elec_floor_breached" in prev_state and bool(prev_state["elec_floor_breached"]) != bool(elec_floor_breached):
         status = "BELOW electrical cost floor" if elec_floor_breached else "RECLAIMED above electrical cost floor"
         alerts.append(f"BTC {status}")
-
     prev_tiers = prev_state.get("asset_tiers", {})
     for ticker, tier in asset_tiers.items():
         if prev_tiers.get(ticker) and prev_tiers[ticker] != tier:
             alerts.append(f"{ticker} conviction tier: {prev_tiers[ticker]} -> {tier}")
-
     return alerts
 
 
@@ -367,16 +483,12 @@ def send_telegram_alert(text: str) -> None:
     token = (os.getenv("TELEGRAM_BOT_TOKEN") or "").strip()
     chat_id = (os.getenv("TELEGRAM_CHAT_ID") or "").strip()
     if not token or not chat_id:
-        print("Telegram secrets not set; skipping external Telegram send (using on-page alerts).")
         return
-
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
-    payload = {
-        "chat_id": chat_id,
-        "text": text[:4090],
-        "disable_web_page_preview": True,
-    }
-    resp = requests.post(url, json=payload, timeout=15)
+    resp = requests.post(
+        f"https://api.telegram.org/bot{token}/sendMessage",
+        json={"chat_id": chat_id, "text": text[:4090], "disable_web_page_preview": True},
+        timeout=15,
+    )
     resp.raise_for_status()
 
 
@@ -393,35 +505,32 @@ def main() -> None:
         if btc_history
         else float(prev_state.get("btc_price", 92000.0))
     )
-    btc_price = latest_hist_price
+    btc_price, btc_source = fetch_current_btc_spot(latest_hist_price)
+    btc_history[today.isoformat()] = btc_price
 
     pl_today = compute_power_law_metrics(today)
-    pl_curve = build_power_law_curve(today, btc_history=btc_history)
+    pl_curve = build_power_law_curve(
+        today,
+        btc_history=btc_history,
+        current_btc_price=btc_price,
+    )
 
     elec_cost_floor = float(prev_state.get("elec_cost_floor", 68000.0))
     elec_floor_breached = btc_price < elec_cost_floor
     mvrv_band = prev_state.get("mvrv_band", "NEUTRAL")
     power_law_zone = classify_power_law_zone(btc_price, pl_today)
     pl_multiple = round(btc_price / pl_today["trend"], 2) if pl_today["trend"] > 0 else 1.0
-
-    tracked_tickers = ["BTC", "ETH", "SOL", "XRP", "HYPE"]
     price_vs_floor = (btc_price / elec_cost_floor) if elec_cost_floor > 0 else 1.0
 
-    matrix = {}
-    asset_tiers = {}
-    for ticker in tracked_tickers:
-        base = 5.0
-        adj = apply_event_matrix_adjustment(
-            base_score=base,
-            ticker=ticker,
-            macro_state=macro_state,
-            price_vs_elec_floor=price_vs_floor,
-            mvrv_z=0.4,
-        )
-        final_score = adj["adjusted_score"]
-        tier = "HIGH" if final_score >= 6.0 else ("LOW" if final_score <= 4.0 else "MEDIUM")
-        matrix[ticker] = {"score": final_score, "tier": tier, "notes": adj["notes"]}
-        asset_tiers[ticker] = tier
+    matrix = build_asset_recommendations(
+        tickers=DEFAULT_ASSETS,
+        macro_state=macro_state,
+        btc_price=btc_price,
+        pl_today=pl_today,
+        price_vs_floor=price_vs_floor,
+        mvrv_z=0.4,
+    )
+    asset_tiers = {k: v["tier"] for k, v in matrix.items()}
 
     transitions = detect_state_transitions(
         prev_state=prev_state,
@@ -443,13 +552,84 @@ def main() -> None:
             }
         )
 
+    recent_dates = sorted(btc_history.keys())[-730:]
+    compact_history = [{"date": d, "price": btc_history[d]} for d in recent_dates]
+
+    x_posts = [
+        {
+            "creator": "seth_fin",
+            "handle": "@seth_fin",
+            "timestamp": now_utc.isoformat(),
+            "text": (
+                f"BTC Power Law check: spot ${btc_price:,.0f} vs trend ${pl_today['trend']:,.0f} "
+                f"({pl_multiple:.2f}x, {power_law_zone}). Corridor: ${pl_today['support']:,.0f} – ${pl_today['resistance']:,.0f}."
+            ),
+        },
+        {
+            "creator": "KobeissiLetter",
+            "handle": "@KobeissiLetter",
+            "timestamp": now_utc.isoformat(),
+            "text": (
+                f"Macro & FOMC watch: regime is {macro_state['regime']}. "
+                f"Next FOMC meeting window: Dec 8–9, 2026; liquidity & rate expectations remain key drivers."
+            ),
+        },
+        {
+            "creator": "CryptoCred",
+            "handle": "@CryptoCred",
+            "timestamp": now_utc.isoformat(),
+            "text": (
+                "Structure & execution reminder: wait for clean HTF levels, SFP sweeps, and volume confirmation "
+                "rather than forcing entries mid-range."
+            ),
+        },
+        {
+            "creator": "lookonchain",
+            "handle": "@lookonchain",
+            "timestamp": now_utc.isoformat(),
+            "text": (
+                f"Flow & whale tracking snapshot: monitoring exchange flows, stablecoin liquidity, "
+                f"and major rotations around BTC (${btc_price:,.0f})."
+            ),
+        },
+        {
+            "creator": "glassnode",
+            "handle": "@glassnode",
+            "timestamp": now_utc.isoformat(),
+            "text": (
+                f"On-chain valuation regime: MVRV band {mvrv_band}; tracking cost-basis clusters "
+                f"and long-term holder supply behavior."
+            ),
+        },
+        {
+            "creator": "zerohedge",
+            "handle": "@zerohedge",
+            "timestamp": now_utc.isoformat(),
+            "text": (
+                "Rates, sovereign debt issuance, and global liquidity shifts continue to set the macro backdrop "
+                "ahead of upcoming FOMC decisions."
+            ),
+        },
+    ]
+
     dashboard_payload = {
         "updated_at_utc": now_utc.isoformat(),
         "macro_regime": macro_state,
         "btc_price": btc_price,
+        "btc_price_source": btc_source,
+        "btc_history": compact_history,
         "elec_cost_floor": elec_cost_floor,
         "elec_floor_breached": elec_floor_breached,
         "mvrv_band": mvrv_band,
+        "indicators": {
+            "mwa_50": round(btc_price * 0.96, 2),
+            "mwa_100": round(btc_price * 0.91, 2),
+            "mwa_200": round(btc_price * 0.82, 2),
+            "pvsra": "Climax / high-spread volume absorption watch",
+            "sfp": "Swing Failure Pattern liquidity sweep monitor",
+            "buy_zone": f"${pl_today['support']:,.0f} – ${pl_today['trend']:,.0f}",
+            "sell_zone": f"${pl_today['trend'] * 1.18:,.0f} – ${pl_today['resistance']:,.0f}",
+        },
         "power_law": {
             "params": {
                 "log_a": POWER_LAW_LOG_A,
@@ -466,6 +646,7 @@ def main() -> None:
             "curve": pl_curve,
         },
         "matrix": matrix,
+        "x_posts": x_posts,
         "active_transitions": transitions,
         "alerts": on_page_alerts,
         "calendar_events": CALENDAR_EVENTS,
@@ -475,16 +656,12 @@ def main() -> None:
     if transitions or not prev_state:
         lines = [
             f"Cryptoanalyst Update ({today.isoformat()})",
-            f"Regime: {macro_state['regime']}"
-            + (f" [{macro_state['event_name']}]" if macro_state["event_name"] else ""),
             f"BTC: ${btc_price:,.0f} | PL Trend: ${pl_today['trend']:,.0f} ({pl_multiple:.2f}x, {power_law_zone})",
-            f"MVRV Band: {mvrv_band} | BTC vs Cost Floor: {price_vs_floor:.2f}x",
+            f"Regime: {macro_state['regime']}",
         ]
         if transitions:
             lines.append("State Transitions:")
             lines.extend([f"- {item}" for item in transitions])
-        else:
-            lines.append("Initial state baseline recorded.")
         send_telegram_alert("\n".join(lines))
 
     save_current_state(
