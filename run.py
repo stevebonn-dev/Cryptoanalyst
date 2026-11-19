@@ -1,101 +1,46 @@
-from datetime import date
-from typing import Dict, Any
+import json
+from pathlib import Path
+from typing import Dict, Any, List
 
-MACRO_EVENTS = [
-    {
-        "name": "SpaceX IPO (SPCX)",
-        "event_date": date(2026, 6, 12),
-        "pre_window_days": 30,
-        "post_window_days": 28,
-        "proxy_tickers": ["HYPE"],
-        "leader_tickers": ["BTC", "ETH"],
-        "laggard_tickers": ["XRP"],
-    }
-]
+STATE_PATH = Path("state/last_run.json")
 
 
-def evaluate_macro_event_regime(as_of_date: date, events=MACRO_EVENTS) -> Dict[str, Any]:
-    """
-    Returns active liquidity-drain or post-event stabilization regime metadata.
-    """
-    for ev in events:
-        delta_days = (as_of_date - ev["event_date"]).days
-
-        if -ev["pre_window_days"] <= delta_days <= 0:
-            return {
-                "active": True,
-                "regime": "PRE_EVENT_LIQUIDITY_DRAIN",
-                "event_name": ev["name"],
-                "days_to_event": abs(delta_days),
-                "proxy_tickers": ev["proxy_tickers"],
-                "leader_tickers": ev["leader_tickers"],
-                "laggard_tickers": ev["laggard_tickers"],
-            }
-
-        if 1 <= delta_days <= ev["post_window_days"]:
-            return {
-                "active": True,
-                "regime": "POST_EVENT_STABILIZATION",
-                "event_name": ev["name"],
-                "days_since_event": delta_days,
-                "proxy_tickers": ev["proxy_tickers"],
-                "leader_tickers": ev["leader_tickers"],
-                "laggard_tickers": ev["laggard_tickers"],
-            }
-
-    return {
-        "active": False,
-        "regime": "NORMAL",
-        "event_name": None,
-        "proxy_tickers": [],
-        "leader_tickers": [],
-        "laggard_tickers": [],
-    }
+def load_previous_state() -> Dict[str, Any]:
+    if STATE_PATH.exists():
+        try:
+            return json.loads(STATE_PATH.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+    return {}
 
 
-def apply_event_matrix_adjustment(
-    base_score: float,
-    ticker: str,
-    macro_state: Dict[str, Any],
-    price_vs_elec_floor: float = 1.0,
-    mvrv_z: float = 0.0,
-) -> Dict[str, Any]:
-    """
-    Modifies asset matrix score during mega-event liquidity rotation windows.
-    - price_vs_elec_floor: spot / BTC electrical cost floor ratio (>=1.0 means above floor)
-    - mvrv_z: MVRV Z-score (lower values indicate deeper valuation discount)
-    """
-    score = base_score
-    notes = []
+def save_current_state(payload: Dict[str, Any]) -> None:
+    STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    STATE_PATH.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
-    if not macro_state["active"]:
-        return {"adjusted_score": round(score, 2), "notes": notes}
 
-    regime = macro_state["regime"]
-    t = ticker.upper()
+def detect_state_transitions(
+    prev_state: Dict[str, Any],
+    current_regime: str,
+    asset_tiers: Dict[str, str],
+    elec_floor_breached: bool,
+    mvrv_band: str,
+) -> List[str]:
+    alerts: List[str] = []
 
-    if regime == "PRE_EVENT_LIQUIDITY_DRAIN":
-        if t in macro_state["proxy_tickers"]:
-            score += 1.5
-            notes.append("Event proxy boost (synthetic/perp flow rotation)")
-        elif t in macro_state["leader_tickers"]:
-            # Dampen aggressive chase scores unless near valuation/cost support
-            if price_vs_elec_floor <= 1.08 or mvrv_z < 0.5:
-                score += 0.5
-                notes.append("Liquidity-drain discount accumulation zone")
-            else:
-                score -= 1.0
-                notes.append("Pre-event liquidity outflow headwind")
-        elif t in macro_state["laggard_tickers"]:
-            score -= 1.0
-            notes.append("Relative weakness penalty during liquidity drain")
+    if prev_state.get("regime") and prev_state.get("regime") != current_regime:
+        alerts.append(f"Regime shift: {prev_state['regime']} -> {current_regime}")
 
-    elif regime == "POST_EVENT_STABILIZATION":
-        if t in macro_state["leader_tickers"]:
-            score += 1.0
-            notes.append("Post-IPO stabilization & capital return tailwind")
-        elif t in macro_state["laggard_tickers"]:
-            score -= 0.5
-            notes.append("Lagging recovery filter vs. majors")
+    if prev_state.get("mvrv_band") and prev_state.get("mvrv_band") != mvrv_band:
+        alerts.append(f"MVRV band transition: {prev_state['mvrv_band']} -> {mvrv_band}")
 
-    return {"adjusted_score": round(score, 2), "notes": notes}
+    if bool(prev_state.get("elec_floor_breached")) != bool(elec_floor_breached):
+        status = "BELOW electrical cost floor" if elec_floor_breached else "RECLAIMED above electrical cost floor"
+        alerts.append(f"BTC {status}")
+
+    prev_tiers = prev_state.get("asset_tiers", {})
+    for ticker, tier in asset_tiers.items():
+        if prev_tiers.get(ticker) and prev_tiers.get(ticker) != tier:
+            alerts.append(f"{ticker} conviction tier: {prev_tiers[ticker]} -> {tier}")
+
+    return alerts
