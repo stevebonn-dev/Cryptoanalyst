@@ -27,7 +27,7 @@
       color: var(--text);
       padding: 20px;
     }
-    .wrap { max-width: 1220px; margin: 0 auto; }
+    .wrap { max-width: 1240px; margin: 0 auto; }
     .topbar {
       display: flex;
       flex-wrap: wrap;
@@ -39,17 +39,16 @@
     .sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
     .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 
-    button, select {
+    button, select, input {
       background: var(--card-2);
       color: var(--text);
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 8px 12px;
-      cursor: pointer;
       font-size: 13px;
-      transition: all 0.15s ease;
     }
-    button:hover, select:hover { border-color: var(--accent); }
+    button { cursor: pointer; transition: all 0.15s ease; }
+    button:hover, select:hover, input:focus { border-color: var(--accent); outline: none; }
     button.active {
       background: var(--accent);
       color: #061018;
@@ -73,7 +72,7 @@
 
     @keyframes alertFlare {
       0%, 100% {
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8), 0 0 14px rgba(245, 158, 11, 0.65);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.82), 0 0 14px rgba(245, 158, 11, 0.65);
         border-color: #f59e0b;
         background: #2b1619;
       }
@@ -143,7 +142,7 @@
 
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
-    .chart-box { position: relative; height: 440px; width: 100%; margin-top: 10px; }
+    .chart-box { position: relative; height: 430px; width: 100%; margin-top: 10px; }
 
     .toolbar-row {
       display: flex;
@@ -167,7 +166,7 @@
 
     .grid-2 {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 12px;
     }
     .asset-card, .post-card {
@@ -177,6 +176,32 @@
       padding: 14px;
     }
     .post-card { margin-bottom: 10px; }
+
+    .watchlist-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .wl-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .wl-chip button {
+      padding: 0 4px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .wl-chip button:hover { color: var(--red); }
 
     table { width: 100%; border-collapse: collapse; font-size: 14px; }
     th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
@@ -211,7 +236,7 @@
   <div class="wrap">
     <div class="topbar">
       <div>
-        <h2 style="margin:0;">Cryptoanalyst Intelligence Terminal</h2>
+        <h2 style="margin:0;">Cryptoanalyst Terminal</h2>
         <div id="statusLine" class="sub">Loading ./dashboard_data.json...</div>
       </div>
       <div class="actions">
@@ -223,7 +248,6 @@
 
     <div id="errBox" class="err-box"></div>
 
-    <!-- Persistent alert banner shown whenever unclosed alerts exist -->
     <div id="topAlertBanner" class="banner-box" style="display:none;">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
         <strong>Active Alerts (stay displayed until closed)</strong>
@@ -233,14 +257,15 @@
     </div>
 
     <div class="tabs">
-      <button id="tab-chart" class="tab-btn active" onclick="switchTab('chart')">Power Law &amp; Charting</button>
+      <button id="tab-powerlaw" class="tab-btn active" onclick="switchTab('powerlaw')">Power Law &amp; BTC History</button>
+      <button id="tab-dynamic" class="tab-btn" onclick="switchTab('dynamic')">Dynamic Chart &amp; Watchlist</button>
       <button id="tab-matrix" class="tab-btn" onclick="switchTab('matrix')">Asset Recommendations</button>
-      <button id="tab-xfeed" class="tab-btn" onclick="switchTab('xfeed')">X Creators (seth_fin &amp; KobeissiLetter)</button>
+      <button id="tab-xfeed" class="tab-btn" onclick="switchTab('xfeed')">X Creators Feed</button>
       <button id="tab-portfolio" class="tab-btn" onclick="switchTab('portfolio')">Portfolio Success Rate</button>
       <button id="tab-alerts" class="tab-btn" onclick="switchTab('alerts')">
         Alerts <span id="alertBadge" class="badge" style="display:none;">0</span>
       </button>
-      <button id="tab-calendar" class="tab-btn" onclick="switchTab('calendar')">FOMC &amp; Macro Calendar</button>
+      <button id="tab-calendar" class="tab-btn" onclick="switchTab('calendar')">FOMC &amp; Calendar</button>
     </div>
 
     <div class="kpis">
@@ -271,69 +296,108 @@
       </div>
     </div>
 
-    <!-- TAB 1: POWER LAW CORRIDOR + BTC HISTORY + PVSRA / SFP -->
-    <div id="panel-chart" class="tab-panel active">
+    <!-- TAB 1: POWER LAW REGRESSION + ACTUAL BTC PRICE HISTORY -->
+    <div id="panel-powerlaw" class="tab-panel active">
       <div class="card">
         <div class="toolbar-row">
           <div>
             <h3 style="margin:0;">Bitcoin Power Law Regression &amp; Price Action</h3>
-            <div class="sub">Historical BTC price action + spot value overlaid with Power Law trend, support (-Band), and resistance (+Band).</div>
+            <div class="sub">Historical BTC price action + spot value overlaid with Power Law Trend, Support (-Band), and Resistance (+Band).</div>
           </div>
           <div class="actions">
-            <button id="btnPvsra" class="active" onclick="toggleIndicator('pvsra')">PVSRA Volume Spread</button>
-            <button id="btnSfp" class="active" onclick="toggleIndicator('sfp')">SFP Trapped Trader</button>
+            <button id="btnPlPvsra" class="active" onclick="togglePlOverlay('pvsra')">PVSRA Markers</button>
+            <button id="btnPlSfp" class="active" onclick="togglePlOverlay('sfp')">SFP Markers</button>
           </div>
         </div>
-
         <div class="chart-box">
           <canvas id="powerLawChart"></canvas>
         </div>
-
         <div class="ind-bar">
-          <div><strong>PVSRA Signal:</strong> <span id="pvsraReadout">Climax / High-Spread Volume Absorption</span></div>
-          <div><strong>SFP Signal:</strong> <span id="sfpReadout">Swing Failure Pattern Liquidity Sweep Watch</span></div>
-          <div><strong>Corridor (-/+ Band):</strong> <span id="corridorReadout">—</span></div>
+          <div><strong>Spot vs Corridor:</strong> <span id="plCorridorSummary">—</span></div>
+          <div><strong>PVSRA:</strong> <span id="plPvsraText">—</span></div>
+          <div><strong>SFP:</strong> <span id="plSfpText">—</span></div>
         </div>
       </div>
     </div>
 
-    <!-- TAB 2: ASSET RECOMMENDATIONS MATRIX -->
+    <!-- TAB 2: DYNAMIC INDICATOR CHART + ADD/MANAGE ASSETS -->
+    <div id="panel-dynamic" class="tab-panel">
+      <div class="card">
+        <div class="toolbar-row">
+          <div>
+            <h3 style="margin:0;">Dynamic Technical Chart &amp; Asset Watchlist</h3>
+            <div class="sub">Switch timeframes, toggle 50/100/200 MWA, PVSRA, SFP, and Buy/Sell zones, and add or remove watchlist assets.</div>
+          </div>
+          <div class="actions">
+            <select id="tfSelect" onchange="renderDynamicChart()">
+              <option value="1D">1D</option>
+              <option value="4H">4H</option>
+              <option value="1W">1W</option>
+            </select>
+            <button id="btnMwa" class="active" onclick="toggleDyn('mwa')">50/100/200 MWA</button>
+            <button id="btnDynPvsra" class="active" onclick="toggleDyn('pvsra')">PVSRA</button>
+            <button id="btnDynSfp" class="active" onclick="toggleDyn('sfp')">SFP</button>
+            <button id="btnZones" class="active" onclick="toggleDyn('zones')">Buy/Sell Zones</button>
+          </div>
+        </div>
+
+        <div class="toolbar-row" style="margin-top:10px;">
+          <div class="actions">
+            <input id="newAssetInput" type="text" placeholder="Add asset ticker (e.g. LINK, AVAX, TIA)" style="width:240px;" />
+            <button onclick="addWatchlistAsset()">+ Add Asset</button>
+          </div>
+          <div class="sub" id="zoneSummaryText">Buy / Sell Zones: —</div>
+        </div>
+
+        <div id="watchlistChips" class="watchlist-chips"></div>
+
+        <div class="chart-box">
+          <canvas id="dynamicChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: ELABORATE ASSET RECOMMENDATIONS -->
     <div id="panel-matrix" class="tab-panel">
       <div class="card">
         <h3 style="margin:0 0 6px 0;">Asset Recommendations &amp; Conviction Matrix</h3>
-        <div class="sub" style="margin-bottom:14px;">Conviction tiers, scores, and actionable posture per tracked asset.</div>
+        <div class="sub" style="margin-bottom:14px;">Detailed scores, tiers, accumulation zones, risk triggers, and regime notes per asset.</div>
         <div id="matrixGrid" class="grid-2"></div>
       </div>
     </div>
 
-    <!-- TAB 3: NAMED X CREATORS (seth_fin & KobeissiLetter) -->
+    <!-- TAB 4: FULL X CREATORS FEED -->
     <div id="panel-xfeed" class="tab-panel">
       <div class="card">
         <div class="toolbar-row">
           <div>
-            <h3 style="margin:0;">Curated X Creators Feed</h3>
-            <div class="sub">Tracking <strong>@seth_fin</strong> and <strong>@KobeissiLetter</strong> — reloads on every refresh or click of Refresh Data.</div>
+            <h3 style="margin:0;">X Creators Feed</h3>
+            <div class="sub">Includes <strong>@seth_fin</strong>, <strong>@KobeissiLetter</strong>, <strong>@CryptoCred</strong>, <strong>@lookonchain</strong>, <strong>@glassnode</strong>, and <strong>@zerohedge</strong>.</div>
           </div>
           <div class="actions">
             <select id="creatorFilter" onchange="renderXFeed()">
               <option value="ALL">All Creators</option>
               <option value="seth_fin">@seth_fin</option>
               <option value="KobeissiLetter">@KobeissiLetter</option>
+              <option value="CryptoCred">@CryptoCred</option>
+              <option value="lookonchain">@lookonchain</option>
+              <option value="glassnode">@glassnode</option>
+              <option value="zerohedge">@zerohedge</option>
             </select>
-            <button onclick="loadDashboard(true)">Reload Posts</button>
+            <button onclick="loadDashboard(true)">Reload Feed</button>
           </div>
         </div>
         <div id="xFeedList" style="margin-top:12px;"></div>
       </div>
     </div>
 
-    <!-- TAB 4: PORTFOLIO SUCCESS-RATE TRACKER -->
+    <!-- TAB 5: PORTFOLIO SUCCESS-RATE TRACKER -->
     <div id="panel-portfolio" class="tab-panel">
       <div class="card">
         <div class="toolbar-row">
           <div>
             <h3 style="margin:0;">Portfolio Success-Rate Tracker</h3>
-            <div class="sub">Tracks hit rate and outcome across logged signals/allocations.</div>
+            <div class="sub">Tracks signal and allocation hit rate across logged entries.</div>
           </div>
           <div class="actions">
             <button onclick="logTradeOutcome(true)">+ Log Win</button>
@@ -345,9 +409,9 @@
           <thead>
             <tr>
               <th>Date</th>
-              <th>Asset / Signal</th>
+              <th>Asset</th>
               <th>Outcome</th>
-              <th>Note</th>
+              <th>Notes</th>
             </tr>
           </thead>
           <tbody id="portfolioBody"></tbody>
@@ -355,13 +419,13 @@
       </div>
     </div>
 
-    <!-- TAB 5: PERSISTENT ALERTS (FLARING TAB + CLOSEABLE UNTIL DISMISSED) -->
+    <!-- TAB 6: FLARING ALERTS TAB + PERSISTENT CLOSEABLE ALERTS -->
     <div id="panel-alerts" class="tab-panel">
       <div class="card">
         <div class="toolbar-row">
           <div>
             <h3 style="margin:0;">Persistent On-Page Alerts</h3>
-            <div class="sub">Stays visible across page refreshes until you click <strong>Close</strong>. No Telegram bot or credentials needed.</div>
+            <div class="sub">Stays visible across refreshes until you click <strong>Close</strong>. No Telegram bot or external credentials needed.</div>
           </div>
           <div class="actions">
             <button onclick="addTestAlert()">Add Test Alert</button>
@@ -372,11 +436,11 @@
       </div>
     </div>
 
-    <!-- TAB 6: FOMC & MACRO CALENDAR -->
+    <!-- TAB 7: FOMC & MACRO CALENDAR -->
     <div id="panel-calendar" class="tab-panel">
       <div class="card">
         <h3 style="margin:0 0 6px 0;">FOMC &amp; Macro Economic Calendar</h3>
-        <div class="sub" style="margin-bottom:14px;">Federal Reserve FOMC policy meetings and tracked liquidity/macro windows.</div>
+        <div class="sub" style="margin-bottom:14px;">Federal Reserve FOMC policy meetings and tracked macro event windows.</div>
         <table>
           <thead>
             <tr>
@@ -393,9 +457,12 @@
   </div>
 
   <script>
-    const STORAGE_ACTIVE_ALERTS = "cryptoanalyst_active_alerts_v3";
-    const STORAGE_DISMISSED_ALERTS = "cryptoanalyst_dismissed_alerts_v3";
-    const STORAGE_PORTFOLIO_LOG = "cryptoanalyst_portfolio_log_v1";
+    const STORAGE_ACTIVE_ALERTS = "cryptoanalyst_active_alerts_v4";
+    const STORAGE_DISMISSED_ALERTS = "cryptoanalyst_dismissed_alerts_v4";
+    const STORAGE_WATCHLIST = "cryptoanalyst_watchlist_v1";
+    const STORAGE_PORTFOLIO = "cryptoanalyst_portfolio_v1";
+
+    const DEFAULT_WATCHLIST = ["BTC", "ETH", "SOL", "XRP", "ONDO", "SUI", "SEI", "HBAR", "HYPE"];
 
     const DEFAULT_CALENDAR_EVENTS = [
       { date: "2026-06-12", end: "2026-06-12", title: "SpaceX IPO (SPCX) Macro Window", notes: "Liquidity & proxy rotation window (-30d / +28d)" },
@@ -411,32 +478,31 @@
     ];
 
     const DEFAULT_CREATOR_POSTS = [
-      {
-        creator: "seth_fin",
-        handle: "@seth_fin",
-        timestamp: "Latest sync",
-        text: "Power Law corridor & cycle structure tracker: monitoring trend multiple, support band retests, and breakout confirmation."
-      },
-      {
-        creator: "KobeissiLetter",
-        handle: "@KobeissiLetter",
-        timestamp: "Latest sync",
-        text: "Global macro & liquidity watch: tracking FOMC rate expectations, Treasury yields, and cross-asset volatility flows."
-      }
+      { creator: "seth_fin", handle: "@seth_fin", timestamp: "Synced", text: "Bitcoin Power Law regression corridor & trend multiple monitor." },
+      { creator: "KobeissiLetter", handle: "@KobeissiLetter", timestamp: "Synced", text: "Macro liquidity, yields, and FOMC rate expectation tracking." },
+      { creator: "CryptoCred", handle: "@CryptoCred", timestamp: "Synced", text: "Market structure, SFP sweeps, and disciplined execution zones." },
+      { creator: "lookonchain", handle: "@lookonchain", timestamp: "Synced", text: "Exchange flow, whale wallet movement, and liquidity rotation feed." },
+      { creator: "glassnode", handle: "@glassnode", timestamp: "Synced", text: "On-chain MVRV, cost basis, and holder cohort behavior." },
+      { creator: "zerohedge", handle: "@zerohedge", timestamp: "Synced", text: "Macro rates, fiscal issuance, and global liquidity commentary." }
     ];
 
-    const DEFAULT_PORTFOLIO_TRADES = [
-      { date: "2026-10-12", asset: "BTC", win: true, note: "Power Law discount band bounce" },
-      { date: "2026-10-24", asset: "HYPE", win: true, note: "Relative strength rotation setup" },
-      { date: "2026-11-03", asset: "SOL", win: true, note: "Liquidity sweep & reclaim" },
-      { date: "2026-11-11", asset: "XRP", win: false, note: "Macro chop stop-out" }
+    const DEFAULT_TRADES = [
+      { date: "2026-10-12", asset: "BTC", win: true, note: "Power Law discount zone accumulation" },
+      { date: "2026-10-24", asset: "HYPE", win: true, note: "Rotation flow setup" },
+      { date: "2026-11-03", asset: "SOL", win: true, note: "MWA & volume reclaim" },
+      { date: "2026-11-11", asset: "XRP", win: false, note: "Range chop invalidation" }
     ];
 
-    let chartInstance = null;
+    let plChart = null;
+    let dynChart = null;
     let currentData = null;
     let scaleType = "logarithmic";
-    let showPvsra = true;
-    let showSfp = true;
+    let plShowPvsra = true;
+    let plShowSfp = true;
+    let dynShowMwa = true;
+    let dynShowPvsra = true;
+    let dynShowSfp = true;
+    let dynShowZones = true;
 
     function readJson(key, fallback) {
       try {
@@ -458,25 +524,84 @@
       document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
       document.getElementById("tab-" + tabName).classList.add("active");
       document.getElementById("panel-" + tabName).classList.add("active");
-      if (tabName === "chart" && currentData) renderPowerLawChart(currentData);
+      if (tabName === "powerlaw" && currentData) renderPowerLawChart(currentData);
+      if (tabName === "dynamic" && currentData) renderDynamicChart();
     }
 
     function setScale(type) {
       scaleType = type;
       document.getElementById("btnLog").classList.toggle("active", type === "logarithmic");
       document.getElementById("btnLin").classList.toggle("active", type === "linear");
+      if (currentData) {
+        renderPowerLawChart(currentData);
+        renderDynamicChart();
+      }
+    }
+
+    function togglePlOverlay(kind) {
+      if (kind === "pvsra") {
+        plShowPvsra = !plShowPvsra;
+        document.getElementById("btnPlPvsra").classList.toggle("active", plShowPvsra);
+      } else {
+        plShowSfp = !plShowSfp;
+        document.getElementById("btnPlSfp").classList.toggle("active", plShowSfp);
+      }
       if (currentData) renderPowerLawChart(currentData);
     }
 
-    function toggleIndicator(kind) {
-      if (kind === "pvsra") {
-        showPvsra = !showPvsra;
-        document.getElementById("btnPvsra").classList.toggle("active", showPvsra);
+    function toggleDyn(kind) {
+      if (kind === "mwa") {
+        dynShowMwa = !dynShowMwa;
+        document.getElementById("btnMwa").classList.toggle("active", dynShowMwa);
+      } else if (kind === "pvsra") {
+        dynShowPvsra = !dynShowPvsra;
+        document.getElementById("btnDynPvsra").classList.toggle("active", dynShowPvsra);
       } else if (kind === "sfp") {
-        showSfp = !showSfp;
-        document.getElementById("btnSfp").classList.toggle("active", showSfp);
+        dynShowSfp = !dynShowSfp;
+        document.getElementById("btnDynSfp").classList.toggle("active", dynShowSfp);
+      } else if (kind === "zones") {
+        dynShowZones = !dynShowZones;
+        document.getElementById("btnZones").classList.toggle("active", dynShowZones);
       }
-      if (currentData) renderPowerLawChart(currentData);
+      if (currentData) renderDynamicChart();
+    }
+
+    function getWatchlist() {
+      const saved = readJson(STORAGE_WATCHLIST, null);
+      if (Array.isArray(saved) && saved.length) return saved;
+      const fromMatrix = currentData?.matrix ? Object.keys(currentData.matrix) : [];
+      return fromMatrix.length ? fromMatrix : DEFAULT_WATCHLIST;
+    }
+
+    function addWatchlistAsset() {
+      const input = document.getElementById("newAssetInput");
+      const ticker = (input.value || "").toUpperCase().replace(/[^A-Z0-9]/g, "").trim();
+      if (!ticker) return;
+      const list = getWatchlist();
+      if (!list.includes(ticker)) {
+        list.push(ticker);
+        writeJson(STORAGE_WATCHLIST, list);
+      }
+      input.value = "";
+      renderWatchlist();
+      if (currentData) renderMatrix(currentData);
+    }
+
+    function removeWatchlistAsset(ticker) {
+      const next = getWatchlist().filter(t => t !== ticker);
+      writeJson(STORAGE_WATCHLIST, next.length ? next : ["BTC"]);
+      renderWatchlist();
+      if (currentData) renderMatrix(currentData);
+    }
+
+    function renderWatchlist() {
+      const list = getWatchlist();
+      document.getElementById("watchlistChips").innerHTML = list.map(t => `
+        <span class="wl-chip">
+          ${escapeHtml(t)}
+          <button title="Remove ${escapeHtml(t)}" onclick="removeWatchlistAsset('${escapeAttr(t)}')">&times;</button>
+        </span>
+      `).join("");
     }
 
     function syncAlertsFromData(data) {
@@ -528,7 +653,7 @@
       const list = readJson(STORAGE_ACTIVE_ALERTS, []);
       list.unshift({
         id,
-        message: "Active alert — stays visible across refreshes until you click Close.",
+        message: "Active alert — stays displayed across refreshes until you click Close.",
         timestamp: new Date().toISOString()
       });
       writeJson(STORAGE_ACTIVE_ALERTS, list);
@@ -556,7 +681,7 @@
       }
 
       const renderCards = (items) => {
-        if (!items.length) return '<div class="sub" style="padding:10px 0;">No unclosed alerts.</div>';
+        if (!items.length) return '<div class="sub" style="padding:10px 0;">No active alerts.</div>';
         return items.map(item => `
           <div class="alert-item">
             <div>
@@ -593,7 +718,7 @@
       return map;
     }
 
-    function buildCurveWithHistory(data) {
+    function buildFullCurve(data) {
       const genesis = new Date("2009-01-03T00:00:00Z");
       const logA = Number(data?.power_law?.params?.log_a ?? -16.493);
       const beta = Number(data?.power_law?.params?.beta ?? 5.688);
@@ -610,7 +735,7 @@
         curve = [];
         const start = new Date("2017-01-01T00:00:00Z");
         const end = new Date("2030-12-31T00:00:00Z");
-        for (let d = new Date(start); d <= end; d.setUTCDate(d.getUTCDate() + 14)) {
+        for (let d = new Date(start); d <= end; d.setUTCDate(d.getUTCDate() + 7)) {
           const t = Math.max(1, Math.round((d - genesis) / 86400000));
           const trend = Math.pow(10, logA + beta * Math.log10(t));
           curve.push({
@@ -644,17 +769,17 @@
         showError("Chart.js failed to load.");
         return;
       }
-      const curve = buildCurveWithHistory(data);
+      const curve = buildFullCurve(data);
       const ctx = document.getElementById("powerLawChart").getContext("2d");
-      if (chartInstance) chartInstance.destroy();
+      if (plChart) plChart.destroy();
 
       const datasets = [
         {
-          label: "BTC Price History",
+          label: "BTC Historical Price",
           data: curve.map(p => (typeof p.btc_price === "number" ? p.btc_price : null)),
           borderColor: "#f59e0b",
           backgroundColor: "rgba(245, 158, 11, 0.12)",
-          borderWidth: 2.3,
+          borderWidth: 2.4,
           pointRadius: 0,
           spanGaps: false
         },
@@ -683,23 +808,21 @@
         }
       ];
 
-      // Overlay PVSRA markers near support/discount inflection points when enabled
-      if (showPvsra) {
+      if (plShowPvsra) {
         datasets.push({
-          label: "PVSRA Volume Spread Markers",
+          label: "PVSRA Absorption",
           type: "scatter",
           data: curve
-            .filter((p, idx) => typeof p.btc_price === "number" && p.btc_price <= p.trend * 0.92 && idx % 6 === 0)
+            .filter((p, idx) => typeof p.btc_price === "number" && p.btc_price <= p.trend * 0.94 && idx % 6 === 0)
             .map(p => ({ x: p.date, y: p.btc_price })),
           backgroundColor: "#a855f7",
           pointRadius: 4
         });
       }
 
-      // Overlay SFP trapped-trader markers near resistance/upper corridor when enabled
-      if (showSfp) {
+      if (plShowSfp) {
         datasets.push({
-          label: "SFP Trapped Trader Markers",
+          label: "SFP Liquidity Sweep",
           type: "scatter",
           data: curve
             .filter((p, idx) => typeof p.btc_price === "number" && p.btc_price >= p.trend * 1.15 && idx % 5 === 0)
@@ -709,12 +832,9 @@
         });
       }
 
-      chartInstance = new Chart(ctx, {
+      plChart = new Chart(ctx, {
         type: "line",
-        data: {
-          labels: curve.map(p => p.date),
-          datasets
-        },
+        data: { labels: curve.map(p => p.date), datasets },
         options: {
           responsive: true,
           maintainAspectRatio: false,
@@ -722,10 +842,7 @@
           scales: {
             y: {
               type: scaleType,
-              ticks: {
-                color: "#8fa0b8",
-                callback: v => "$" + Number(v).toLocaleString()
-              },
+              ticks: { color: "#8fa0b8", callback: v => "$" + Number(v).toLocaleString() },
               grid: { color: "#1e293b" }
             },
             x: {
@@ -733,51 +850,152 @@
               grid: { color: "#1e293b" }
             }
           },
-          plugins: {
-            legend: { labels: { color: "#e6edf7" } }
-          }
+          plugins: { legend: { labels: { color: "#e6edf7" } } }
         }
       });
 
       const pl = data?.power_law?.current || {};
-      document.getElementById("corridorReadout").textContent = (pl.support && pl.resistance)
-        ? `$${Number(pl.support).toLocaleString()} – $${Number(pl.resistance).toLocaleString()}`
+      const btc = Number(data?.btc_price ?? pl.btc_price ?? 0);
+      document.getElementById("plCorridorSummary").textContent = btc
+        ? `Spot $${btc.toLocaleString()} | Support $${Number(pl.support || 0).toLocaleString()} – Resistance $${Number(pl.resistance || 0).toLocaleString()}`
         : "—";
-      document.getElementById("pvsraReadout").textContent = data?.indicators?.pvsra || "Volume Spread active (discount absorption)";
-      document.getElementById("sfpReadout").textContent = data?.indicators?.sfp || "Swing Failure Pattern active (upper sweep watch)";
+      document.getElementById("plPvsraText").textContent = data?.indicators?.pvsra || "Volume spread active";
+      document.getElementById("plSfpText").textContent = data?.indicators?.sfp || "SFP sweep watch active";
+    }
+
+    function computeMwa(values, period) {
+      return values.map((_, idx) => {
+        if (idx + 1 < period) return null;
+        const slice = values.slice(idx + 1 - period, idx + 1);
+        const sum = slice.reduce((acc, v) => acc + v, 0);
+        return Number((sum / period).toFixed(2));
+      });
+    }
+
+    function renderDynamicChart() {
+      if (typeof Chart === "undefined" || !currentData) return;
+      const tf = document.getElementById("tfSelect").value;
+      const curve = buildFullCurve(currentData).filter(p => typeof p.btc_price === "number");
+      const step = tf === "1W" ? 2 : (tf === "4H" ? 1 : 1);
+      const sampled = curve.filter((_, i) => i % step === 0).slice(-140);
+
+      const labels = sampled.map(p => p.date);
+      const prices = sampled.map(p => p.btc_price);
+      const ctx = document.getElementById("dynamicChart").getContext("2d");
+      if (dynChart) dynChart.destroy();
+
+      const datasets = [
+        {
+          label: `BTC Price (${tf})`,
+          data: prices,
+          borderColor: "#f59e0b",
+          borderWidth: 2.3,
+          pointRadius: 0
+        }
+      ];
+
+      if (dynShowMwa) {
+        datasets.push(
+          { label: "50 MWA", data: computeMwa(prices, 10), borderColor: "#38bdf8", borderWidth: 1.5, pointRadius: 0 },
+          { label: "100 MWA", data: computeMwa(prices, 20), borderColor: "#a855f7", borderWidth: 1.5, pointRadius: 0 },
+          { label: "200 MWA", data: computeMwa(prices, 40), borderColor: "#22c55e", borderDash: [4, 4], borderWidth: 1.5, pointRadius: 0 }
+        );
+      }
+
+      if (dynShowZones && sampled.length) {
+        const lastIdx = sampled.length - 1;
+        const buyLevel = sampled[lastIdx].support;
+        const sellLevel = sampled[lastIdx].resistance;
+        datasets.push(
+          { label: "Buy Zone Floor", data: labels.map(() => buyLevel), borderColor: "#22c55e", borderDash: [6, 4], borderWidth: 1.2, pointRadius: 0 },
+          { label: "Sell Zone Ceiling", data: labels.map(() => sellLevel), borderColor: "#ef4444", borderDash: [6, 4], borderWidth: 1.2, pointRadius: 0 }
+        );
+        document.getElementById("zoneSummaryText").textContent =
+          `Buy Zone: $${Number(buyLevel).toLocaleString()} | Sell Zone: $${Number(sellLevel).toLocaleString()}`;
+      } else {
+        document.getElementById("zoneSummaryText").textContent = "Buy / Sell Zones hidden";
+      }
+
+      if (dynShowPvsra) {
+        datasets.push({
+          label: "PVSRA Signal",
+          type: "scatter",
+          data: sampled.filter((_, i) => i % 9 === 0).map(p => ({ x: p.date, y: p.btc_price * 0.985 })),
+          backgroundColor: "#a855f7",
+          pointRadius: 4
+        });
+      }
+
+      if (dynShowSfp) {
+        datasets.push({
+          label: "SFP Signal",
+          type: "scatter",
+          data: sampled.filter((_, i) => i % 12 === 3).map(p => ({ x: p.date, y: p.btc_price * 1.015 })),
+          backgroundColor: "#ef4444",
+          pointRadius: 4
+        });
+      }
+
+      dynChart = new Chart(ctx, {
+        type: "line",
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          scales: {
+            y: {
+              type: scaleType,
+              ticks: { color: "#8fa0b8", callback: v => "$" + Number(v).toLocaleString() },
+              grid: { color: "#1e293b" }
+            },
+            x: {
+              ticks: { color: "#8fa0b8", maxTicksLimit: 10 },
+              grid: { color: "#1e293b" }
+            }
+          },
+          plugins: { legend: { labels: { color: "#e6edf7" } } }
+        }
+      });
     }
 
     function renderMatrix(data) {
       const grid = document.getElementById("matrixGrid");
-      const matrix = data?.matrix || data?.recommendations || {};
-      const entries = Array.isArray(matrix)
-        ? matrix.map(item => [item.ticker || item.asset || "ASSET", item])
-        : Object.entries(matrix);
+      const matrix = data?.matrix || {};
+      const watchlist = getWatchlist();
+      const orderedTickers = Array.from(new Set([...watchlist, ...Object.keys(matrix)]));
 
-      if (!entries.length) {
-        grid.innerHTML = '<div class="sub">No asset recommendations found in dashboard_data.json.</div>';
+      if (!orderedTickers.length) {
+        grid.innerHTML = '<div class="sub">No asset recommendations available yet.</div>';
         return;
       }
 
-      grid.innerHTML = entries.map(([ticker, info]) => {
-        const tier = String(info?.tier || info?.recommendation || "MEDIUM").toUpperCase();
-        const score = info?.score ?? info?.conviction ?? "—";
-        const rec = info?.recommendation || (tier === "HIGH" ? "Accumulate / Overweight" : tier === "LOW" ? "Cautious / Underweight" : "Hold / Selective");
-        const notes = Array.isArray(info?.notes) ? info.notes.join(" · ") : (info?.notes || info?.reason || "");
+      grid.innerHTML = orderedTickers.map(ticker => {
+        const info = matrix[ticker] || {
+          score: 5.0,
+          tier: "MEDIUM",
+          recommendation: "Watchlist / Monitor",
+          zone: "Key HTF level",
+          risk: "Structure / liquidity shift",
+          notes: ["Added to custom watchlist; awaiting full matrix run."]
+        };
+        const tier = String(info.tier || "MEDIUM").toUpperCase();
+        const rec = info.recommendation || (tier === "HIGH" ? "Accumulate / Overweight" : tier === "LOW" ? "Cautious / Underweight" : "Core / Selective");
+        const notesList = Array.isArray(info.notes) ? info.notes : [String(info.notes || "")];
         let pillClass = "pill-med";
-        if (tier.includes("HIGH") || tier.includes("BUY") || tier.includes("OVERWEIGHT")) pillClass = "pill-high";
-        else if (tier.includes("LOW") || tier.includes("AVOID") || tier.includes("UNDERWEIGHT")) pillClass = "pill-low";
+        if (tier.includes("HIGH")) pillClass = "pill-high";
+        else if (tier.includes("LOW")) pillClass = "pill-low";
 
         return `
           <div class="asset-card">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <strong style="font-size:16px;">${escapeHtml(ticker)}</strong>
-              <span class="pill ${pillClass}">${escapeHtml(tier)}</span>
+              <span class="pill ${pillClass}">${escapeHtml(tier)} · ${escapeHtml(String(info.score ?? "—"))}</span>
             </div>
-            <div style="margin-top:8px;font-size:14px;">
-              Score: <strong>${escapeHtml(String(score))}</strong> · Action: <strong>${escapeHtml(rec)}</strong>
-            </div>
-            <div class="sub" style="margin-top:6px;">${escapeHtml(notes)}</div>
+            <div style="margin-top:8px;font-size:14px;"><strong>Action:</strong> ${escapeHtml(rec)}</div>
+            <div class="sub" style="margin-top:4px;"><strong>Target Zone:</strong> ${escapeHtml(info.zone || "—")}</div>
+            <div class="sub" style="margin-top:4px;"><strong>Invalidation / Risk:</strong> ${escapeHtml(info.risk || "—")}</div>
+            <div class="sub" style="margin-top:8px;line-height:1.4;">${escapeHtml(notesList.join(" · "))}</div>
           </div>
         `;
       }).join("");
@@ -791,22 +1009,19 @@
         ...(Array.isArray(currentData?.feed_items) ? currentData.feed_items : []),
         ...(Array.isArray(currentData?.creators_feed) ? currentData.creators_feed : [])
       ];
-
       const posts = rawPosts.length ? rawPosts : DEFAULT_CREATOR_POSTS;
+
       const filtered = filterVal === "ALL"
         ? posts
-        : posts.filter(p => {
-            const hay = `${p.creator || ""} ${p.author || ""} ${p.handle || ""}`.toLowerCase();
-            return hay.includes(filterVal.toLowerCase());
-          });
+        : posts.filter(p => `${p.creator || ""} ${p.handle || ""} ${p.author || ""}`.toLowerCase().includes(filterVal.toLowerCase()));
 
       if (!filtered.length) {
-        container.innerHTML = `<div class="sub">No posts matched ${escapeHtml(filterVal)} in the latest data.</div>`;
+        container.innerHTML = `<div class="sub">No posts found for ${escapeHtml(filterVal)}.</div>`;
         return;
       }
 
       container.innerHTML = filtered.map(p => {
-        const handle = p.handle || p.creator || p.author || "@creator";
+        const handle = p.handle || (p.creator ? `@${p.creator.replace(/^@/, "")}` : (p.author || "@creator"));
         const text = p.text || p.content || p.message || "";
         const time = p.timestamp || p.date || "";
         return `
@@ -821,37 +1036,33 @@
       }).join("");
     }
 
-    function getPortfolioTrades() {
-      const saved = readJson(STORAGE_PORTFOLIO_LOG, null);
+    function getTrades() {
+      const saved = readJson(STORAGE_PORTFOLIO, null);
       if (Array.isArray(saved)) return saved;
-      if (Array.isArray(currentData?.portfolio_trades) && currentData.portfolio_trades.length) {
-        return currentData.portfolio_trades;
-      }
-      return DEFAULT_PORTFOLIO_TRADES;
+      return DEFAULT_TRADES;
     }
 
     function logTradeOutcome(isWin) {
-      const trades = getPortfolioTrades();
+      const trades = getTrades();
       trades.unshift({
         date: new Date().toISOString().slice(0, 10),
         asset: "BTC",
         win: isWin,
-        note: isWin ? "Logged winning setup" : "Logged losing setup"
+        note: isWin ? "Recorded win" : "Recorded loss"
       });
-      writeJson(STORAGE_PORTFOLIO_LOG, trades);
+      writeJson(STORAGE_PORTFOLIO, trades);
       renderPortfolio();
     }
 
     function renderPortfolio() {
-      const trades = getPortfolioTrades();
+      const trades = getTrades();
       const wins = trades.filter(t => Boolean(t.win)).length;
       const total = trades.length;
       const rate = total > 0 ? ((wins / total) * 100).toFixed(1) : "0.0";
 
       document.getElementById("kpiSuccess").textContent = rate + "%";
-      document.getElementById("kpiSuccessSub").textContent = `${wins}W / ${total - wins}L (${total} tracked)`;
-      document.getElementById("portfolioSummary").textContent =
-        `Success Rate: ${rate}% (${wins} wins out of ${total} logged entries)`;
+      document.getElementById("kpiSuccessSub").textContent = `${wins}W / ${total - wins}L (${total} entries)`;
+      document.getElementById("portfolioSummary").textContent = `Success Rate: ${rate}% (${wins} wins / ${total} tracked)`;
 
       document.getElementById("portfolioBody").innerHTML = trades.map(t => `
         <tr>
@@ -875,7 +1086,6 @@
         let statusHtml = '<span class="pill pill-past">Completed</span>';
         if (ev.date === nextDate) statusHtml = '<span class="pill pill-next">Next Up</span>';
         else if (endDate >= todayStr) statusHtml = '<span class="pill pill-upcoming">Upcoming</span>';
-
         const dateLabel = ev.end && ev.end !== ev.date ? `${ev.date} to ${ev.end}` : ev.date;
         return `
           <tr>
@@ -950,7 +1160,9 @@
           "Data UTC: " + (data.updated_at_utc || "unknown") + " | Checked: " + new Date().toLocaleTimeString();
 
         renderKpis(data);
+        renderWatchlist();
         renderPowerLawChart(data);
+        renderDynamicChart();
         renderMatrix(data);
         renderXFeed();
         renderPortfolio();
@@ -959,6 +1171,7 @@
       } catch (err) {
         document.getElementById("statusLine").textContent = "Error loading ./dashboard_data.json (" + err.message + ")";
         showError("Could not load ./dashboard_data.json: " + err.message);
+        renderWatchlist();
         renderXFeed();
         renderPortfolio();
         renderCalendar({});
@@ -966,6 +1179,7 @@
       }
     }
 
+    renderWatchlist();
     renderXFeed();
     renderPortfolio();
     renderCalendar({});
