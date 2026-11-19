@@ -1,192 +1,143 @@
-"""
-Universal Institutional Crypto Intelligence Engine - Production Run Module
-Features:
-- Dual-Feed Hybrid Real-Time Price Ingestion (Binance Primary + Coinbase Fallback)
-- MVRV Ratio Valuation (< 1.2 Bottom Signal) & Thermodynamic Electrical Cost Floor ($68,500)
-- Automated Institutional Alerting & Self-Improving Feedback Telemetry (alpha = 0.08 / 0.12)
-"""
-import requests
 import json
-import datetime
+import os
+from datetime import datetime, timezone
+from typing import Dict, List, Any
+import urllib.request
+import numpy as np
+import pandas as pd
 
-class UniversalCryptoEngine:
-    def __init__(self):
-        self.watchlist = {
-            "BTC": {
-                "class": "Macro Anchor", "alpha": 0.08, "mvrv": 1.15,
-                "electrical_cost_floor": 68500.0, "sth_basis": 76150.0,
-                "buy_zone": 76150.0, "sell_zone": 93350.0
-            },
-            "ETH": {
-                "class": "Macro Anchor", "alpha": 0.08, "mvrv": 1.65,
-                "buy_zone": 2510.0, "sell_zone": 2950.0
-            },
-            "SOL": {
-                "class": "High-Beta Altcoin", "alpha": 0.12, "mvrv": 2.10,
-                "buy_zone": 108.50, "sell_zone": 135.00
-            },
-            "XRP": {
-                "class": "High-Beta Altcoin", "alpha": 0.12, "mvrv": 1.85,
-                "buy_zone": 1.41, "sell_zone": 1.75
-            },
-            "ONDO": {
-                "class": "High-Beta Altcoin", "alpha": 0.12, "mvrv": 1.40,
-                "buy_zone": 0.45, "sell_zone": 0.85
-            },
-            "SUI": {
-                "class": "High-Beta Altcoin", "alpha": 0.12, "mvrv": 1.50,
-                "buy_zone": 0.84, "sell_zone": 1.15
-            },
-            "SEI": {
-                "class": "High-Beta Altcoin", "alpha": 0.12, "mvrv": 1.30,
-                "buy_zone": 0.045, "sell_zone": 0.075
-            },
-            "HBAR": {
-                "class": "High-Beta Altcoin", "alpha": 0.12, "mvrv": 1.55,
-                "buy_zone": 0.095, "sell_zone": 0.150
-            },
-            "HYPE": {
-                "class": "High-Beta Altcoin", "alpha": 0.12, "mvrv": 1.70,
-                "buy_zone": 18.50, "sell_zone": 32.00
-            }
-        }
-        self.feedback_history = []
+from bottom_matrix import run_bottom_detector
 
-    def fetch_live_spot_price(self, ticker):
-        """
-        Fetches real-time spot price using Binance Public API as primary,
-        with automatic fallback to Coinbase Public API.
-        """
-        ticker = ticker.upper()
-        binance_symbol = f"{ticker}USDT"
-        coinbase_symbol = f"{ticker}-USD"
+WATCHLIST = ["BTC", "ETH", "SOL", "XRP", "ONDO", "SUI", "SEI", "HBAR", "HYPE"]
+OUTPUT_FILE = "data.json"
+TELEMETRY_LOG = "feedback_telemetry.json"
 
-        # 1. Primary: Binance Public REST API
-        try:
-            url = f"https://api.binance.com/api/v3/ticker/price?symbol={binance_symbol}"
-            response = requests.get(url, timeout=4)
-            if response.status_code == 200:
-                price = float(response.json()["price"])
-                return {"source": "Binance Spot", "price": price, "status": "Live"}
-        except Exception:
-            pass
 
-        # 2. Secondary: Coinbase Public API
-        try:
-            url = f"https://api.coinbase.com/v2/prices/{coinbase_symbol}/spot"
-            response = requests.get(url, timeout=4)
-            if response.status_code == 200:
-                price = float(response.json()["data"]["amount"])
-                return {"source": "Coinbase Spot", "price": price, "status": "Live (Fallback)"}
-        except Exception:
-            pass
+def fetch_binance_klines(symbol: str, limit: int = 210) -> pd.DataFrame:
+    """Fetches daily OHLCV candles from Binance Spot API for MWA calculation."""
+    url = f"https://api.binance.com/api/v3/klines?symbol={symbol}USDT&interval=1d&limit={limit}"
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Cryptoanalyst-Bot/1.0"})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            raw = json.loads(resp.read().decode("utf-8"))
+        df = pd.DataFrame(
+            raw,
+            columns=[
+                "open_time", "open", "high", "low", "close", "volume",
+                "close_time", "qav", "num_trades", "taker_base", "taker_quote", "ignore"
+            ],
+        )
+        df["close"] = df["close"].astype(float)
+        df["volume"] = df["volume"].astype(float)
+        return df
+    except Exception:
+        return pd.DataFrame()
 
-        # 3. Resilient Baseline Fallback
-        baselines = {
-            "BTC": 85478.23, "ETH": 2781.40, "SOL": 118.82,
-            "XRP": 1.5586, "ONDO": 0.584, "SUI": 0.968,
-            "SEI": 0.0485, "HBAR": 0.1175, "HYPE": 24.50
-        }
+
+def compute_asset_matrix(ticker: str, bottom_regime: str) -> Dict[str, Any]:
+    df = fetch_binance_klines(ticker, limit=210)
+    if df.empty or len(df) < 50:
         return {
-            "source": "Institutional Baseline",
-            "price": baselines.get(ticker, 1.00),
-            "status": "Offline Fallback"
+            "ticker": ticker,
+            "status": "NO_SPOT_PAIR_ON_BINANCE",
+            "price": None,
+            "mwa_50": None,
+            "mwa_100": None,
+            "mwa_200": None,
+            "signal": "HOLD",
         }
 
-    def evaluate_mvrv_valuation(self, mvrv_value):
-        if mvrv_value < 1.2:
-            return "Significantly Undervalued (Historical Market Bottom / Strong Buy)"
-        elif 1.2 <= mvrv_value <= 2.4:
-            return "Fairly Valued (Structural Accumulation / Neutral)"
-        else:
-            return "Overvalued (Euphoria / Distribution Zone)"
+    price = float(df["close"].iloc[-1])
+    mwa_50 = float(df["close"].rolling(50).mean().iloc[-1])
+    mwa_100 = float(df["close"].rolling(100).mean().iloc[-1]) if len(df) >= 100 else mwa_50
+    mwa_200 = float(df["close"].rolling(200).mean().iloc[-1]) if len(df) >= 200 else mwa_100
 
-    def generate_action_signal(self, ticker, spot_price):
-        """Determines BUY, HOLD, WAIT, REDUCE, or SELL action based on zones and MVRV."""
-        asset = self.watchlist.get(ticker, {})
-        mvrv = asset.get("mvrv", 1.5)
-        buy_zone = asset.get("buy_zone", spot_price * 0.90)
-        sell_zone = asset.get("sell_zone", spot_price * 1.15)
+    # Combine trend structure with macro BTC bottom regime
+    if price > mwa_200 and price > mwa_50:
+        signal = "BULLISH_TREND"
+    elif bottom_regime == "CONFIRMED_REVERSAL" and price < mwa_50:
+        signal = "ACCUMULATE_REVERSAL"
+    elif bottom_regime == "CAPITULATION_WATCH":
+        signal = "STAGED_BID_WATCH"
+    else:
+        signal = "DEFENSIVE"
 
-        if mvrv < 1.2 or spot_price <= buy_zone:
-            return "BUY / ADD (+20-25%)"
-        elif spot_price >= sell_zone or mvrv > 2.4:
-            return "SELL / REDUCE (-20-25%)"
-        elif spot_price >= sell_zone * 0.94:
-            return "REDUCE / TRIM (-10-15%)"
-        else:
-            return "HOLD / WAIT (Core Allocation)"
+    return {
+        "ticker": ticker,
+        "status": "ACTIVE",
+        "price": round(price, 4),
+        "mwa_50": round(mwa_50, 4),
+        "mwa_100": round(mwa_100, 4),
+        "mwa_200": round(mwa_200, 4),
+        "dist_200mwa_pct": round(((price - mwa_200) / mwa_200) * 100.0, 2),
+        "signal": signal,
+    }
 
-    def check_institutional_alerts(self, ticker, spot_price):
-        ticker = ticker.upper()
-        if ticker not in self.watchlist:
-            return []
 
-        asset = self.watchlist[ticker]
-        alerts = []
-        mvrv = asset.get("mvrv", 1.5)
+def update_feedback_loop(current_assets: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Maintains rolling 7-day predictive error tracking and dynamic weight calibration."""
+    history: List[Dict[str, Any]] = []
+    if os.path.exists(TELEMETRY_LOG):
+        try:
+            with open(TELEMETRY_LOG, "r", encoding="utf-8") as f:
+                history = json.load(f)
+        except Exception:
+            history = []
 
-        if mvrv < 1.2:
-            alerts.append({
-                "level": "CRITICAL_OPPORTUNITY",
-                "indicator": "MVRV Ratio",
-                "message": f"[{ticker}] MVRV is {mvrv} (< 1.2): Historical Market Bottom & Strong Buy Signal!"
-            })
+    btc_entry = next((a for a in current_assets if a["ticker"] == "BTC"), None)
+    btc_price = btc_entry["price"] if btc_entry else None
 
-        if ticker == "BTC" and "electrical_cost_floor" in asset:
-            energy_floor = asset["electrical_cost_floor"]
-            sth_basis = asset.get("sth_basis", 76150.0)
-            if spot_price <= energy_floor:
-                alerts.append({
-                    "level": "EMERGENCY_CAPITULATION",
-                    "indicator": "Electrical Cost Floor",
-                    "message": f"CRITICAL: BTC Spot (${spot_price:,.2f}) breached Thermodynamic Energy Floor (${energy_floor:,.2f})!"
-                })
-            elif spot_price <= sth_basis:
-                alerts.append({
-                    "level": "WARNING_SUPPORT",
-                    "indicator": "STH Cost Basis",
-                    "message": f"WARNING: BTC Spot (${spot_price:,.2f}) testing STH Cost Basis (${sth_basis:,.2f})."
-                })
-            else:
-                margin = ((spot_price - energy_floor) / energy_floor) * 100
-                alerts.append({
-                    "level": "INFO_STABLE",
-                    "indicator": "Thermodynamic Margin",
-                    "message": f"BTC Spot maintaining +{margin:.1f}% buffer above ${energy_floor:,.0f} electrical cost floor."
-                })
-        return alerts
+    # Calculate 7-day realized variance if historical snapshot exists
+    error_pct = 0.0
+    learning_rate = 0.05
+    if len(history) >= 7 and btc_price:
+        prior_btc = history[-7].get("btc_price")
+        prior_signal = history[-7].get("btc_signal")
+        if prior_btc:
+            realized_return = ((btc_price - prior_btc) / prior_btc) * 100.0
+            expected_return = 4.0 if prior_signal in ("BULLISH_TREND", "ACCUMULATE_REVERSAL") else -2.0
+            error_pct = round(abs(realized_return - expected_return), 2)
+            # Adaptive weight adjustment bounded between 0.01 and 0.15
+            learning_rate = round(float(np.clip(0.05 * (1 + error_pct / 20.0), 0.01, 0.15)), 4)
 
-    def run_full_cycle(self):
-        print(f"[INIT] Executing Institutional Intelligence Cycle at {datetime.datetime.now(datetime.timezone.utc).isoformat()}")
-        cycle_report = []
-        for ticker, meta in self.watchlist.items():
-            feed = self.fetch_live_spot_price(ticker)
-            spot = feed["price"]
-            signal = self.generate_action_signal(ticker, spot)
-            alerts = self.check_institutional_alerts(ticker, spot)
-            
-            # Benchmark against prior baseline for telemetry
-            error = 0.0025
-            accuracy = round(100.0 * (1.0 - error), 2)
-            adjustment = round(meta["alpha"] * error, 4)
+    snapshot = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "btc_price": btc_price,
+        "btc_signal": btc_entry["signal"] if btc_entry else "UNKNOWN",
+        "rolling_7d_error_pct": error_pct,
+        "dynamic_learning_rate": learning_rate,
+    }
+    history.append(snapshot)
+    history = history[-90:]  # Keep 90 runs
 
-            entry = {
-                "ticker": ticker,
-                "spot_price": spot,
-                "data_source": feed["source"],
-                "mvrv": meta["mvrv"],
-                "valuation": self.evaluate_mvrv_valuation(meta["mvrv"]),
-                "action_signal": signal,
-                "accuracy_score": accuracy,
-                "dynamic_adjustment": adjustment,
-                "alerts": alerts
-            }
-            cycle_report.append(entry)
-            self.feedback_history.append(entry)
-        return cycle_report
+    with open(TELEMETRY_LOG, "w", encoding="utf-8") as f:
+        json.dump(history, f, indent=2)
+
+    return snapshot
+
+
+def main() -> None:
+    bottom_report = run_bottom_detector()
+    regime = bottom_report["regime"]
+
+    asset_matrix = [compute_asset_matrix(ticker, regime) for ticker in WATCHLIST]
+    telemetry = update_feedback_loop(asset_matrix)
+
+    dashboard_payload = {
+        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "btc_bottom_matrix": bottom_report,
+        "assets": asset_matrix,
+        "feedback_telemetry": telemetry,
+    }
+
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+        json.dump(dashboard_payload, f, indent=2)
+
+    print(
+        f"[{dashboard_payload['generated_at_utc']}] Completed run | "
+        f"BTC Bottom Score: {bottom_report['total_score']}/100 ({regime})"
+    )
+
 
 if __name__ == "__main__":
-    engine = UniversalCryptoEngine()
-    results = engine.run_full_cycle()
-    print(json.dumps(results, indent=2))
+    main()
