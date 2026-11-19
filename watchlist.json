@@ -1,0 +1,2 @@
+active_watchlist = load_watchlist()
+asset_matrix = [compute_asset_matrix(ticker, regime) for ticker in active_watchlist]
