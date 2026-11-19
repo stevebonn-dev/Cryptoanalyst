@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cryptoanalyst — TradingView Terminal & Advisor</title>
+  <title>Cryptoanalyst — TradingView Terminal</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -25,18 +25,18 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
-      padding: 20px;
+      padding: 18px;
     }
-    .wrap { max-width: 1280px; margin: 0 auto; }
+    .wrap { max-width: 1360px; margin: 0 auto; }
     .topbar {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
-    .sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
     .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 
     button, select, input {
@@ -60,13 +60,13 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
     .tab-btn {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 14px;
+      padding: 9px 14px;
       font-weight: 600;
     }
 
@@ -98,25 +98,25 @@
     .kpis {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 10px;
+      margin-bottom: 14px;
     }
     .card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
+      padding: 15px;
+      margin-bottom: 14px;
     }
     .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-    .val { font-size: 20px; font-weight: 700; margin-top: 6px; }
+    .val { font-size: 20px; font-weight: 700; margin-top: 5px; }
 
     .banner-box {
       border: 1px solid rgba(245, 158, 11, 0.55);
       background: rgba(245, 158, 11, 0.09);
       border-radius: 12px;
-      padding: 14px 16px;
-      margin-bottom: 16px;
+      padding: 12px 16px;
+      margin-bottom: 14px;
     }
     .alert-item {
       display: flex;
@@ -142,7 +142,110 @@
 
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
-    .chart-box { position: relative; height: 450px; width: 100%; margin-top: 10px; }
+
+    /* TradingView-style layout: main OHLC + PVSRA canvas on left, Watchlist dock on right */
+    .tv-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 275px;
+      gap: 12px;
+      align-items: start;
+    }
+    @media (max-width: 980px) {
+      .tv-layout { grid-template-columns: 1fr; }
+    }
+    .tv-main {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+    }
+    .ohlc-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+      padding: 6px 10px;
+      background: #0f1622;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    .ohlc-strip b { color: var(--muted); font-weight: 600; }
+    .canvas-stack {
+      position: relative;
+      width: 100%;
+      background: #0d131d;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    #tvPriceCanvas {
+      display: block;
+      width: 100%;
+      height: 350px;
+      cursor: crosshair;
+    }
+    #tvPvsraCanvas {
+      display: block;
+      width: 100%;
+      height: 110px;
+      border-top: 1px solid var(--border);
+      cursor: crosshair;
+    }
+    .tv-side {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+    }
+    .add-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      margin-bottom: 10px;
+    }
+    .add-row input {
+      flex: 1;
+      min-width: 0;
+      padding: 7px 10px;
+      font-size: 12px;
+    }
+    .add-row button {
+      padding: 7px 11px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .wl-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 410px;
+      overflow-y: auto;
+    }
+    .wl-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #0f1622;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .wl-row.active {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.14);
+    }
+    .wl-del {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      padding: 2px 6px;
+      font-size: 14px;
+    }
+    .wl-del:hover { color: var(--red); }
 
     .toolbar-row {
       display: flex;
@@ -155,6 +258,7 @@
     .tf-group { display: flex; flex-wrap: wrap; gap: 6px; }
     .tf-btn { padding: 6px 10px; font-size: 12px; font-weight: 600; }
 
+    .chart-box { position: relative; height: 430px; width: 100%; margin-top: 10px; }
     .ind-bar {
       display: flex;
       flex-wrap: wrap;
@@ -163,53 +267,9 @@
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 10px 14px;
-      margin-top: 12px;
-      font-size: 13px;
-    }
-
-    .watchlist-bar {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 14px;
       margin-top: 10px;
-    }
-    .watchlist-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 12px 0;
-    }
-    .wl-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 5px 10px;
       font-size: 12px;
-      font-weight: 600;
     }
-    .wl-chip.selected {
-      border-color: var(--accent);
-      background: rgba(56, 189, 248, 0.14);
-    }
-    .wl-chip span { cursor: pointer; }
-    .wl-chip button {
-      padding: 0 4px;
-      border: none;
-      background: transparent;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1;
-    }
-    .wl-chip button:hover { color: var(--red); }
 
     .advisor-box {
       background: var(--card-2);
@@ -217,11 +277,11 @@
       border-left: 4px solid var(--accent);
       border-radius: 10px;
       padding: 16px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
     .grid-2 {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
       gap: 12px;
     }
     .asset-card, .post-card {
@@ -265,7 +325,7 @@
   <div class="wrap">
     <div class="topbar">
       <div>
-        <h2 style="margin:0;">Cryptoanalyst — Intelligence Terminal</h2>
+        <h2 style="margin:0;">Cryptoanalyst — TradingView Terminal</h2>
         <div id="statusLine" class="sub">Loading ./dashboard_data.json...</div>
       </div>
       <div class="actions">
@@ -286,9 +346,9 @@
     </div>
 
     <div class="tabs">
-      <button id="tab-dynamic" class="tab-btn active" onclick="switchTab('dynamic')">TradingView Chart &amp; Assets</button>
+      <button id="tab-dynamic" class="tab-btn active" onclick="switchTab('dynamic')">OHLC Chart &amp; Watchlist</button>
       <button id="tab-powerlaw" class="tab-btn" onclick="switchTab('powerlaw')">Power Law &amp; BTC History</button>
-      <button id="tab-advisor" class="tab-btn" onclick="switchTab('advisor')">Senior Advisor &amp; Recommendations</button>
+      <button id="tab-advisor" class="tab-btn" onclick="switchTab('advisor')">Senior Advisor &amp; Assets</button>
       <button id="tab-xfeed" class="tab-btn" onclick="switchTab('xfeed')">X Creators Feed</button>
       <button id="tab-portfolio" class="tab-btn" onclick="switchTab('portfolio')">Portfolio Success Rate</button>
       <button id="tab-alerts" class="tab-btn" onclick="switchTab('alerts')">
@@ -325,15 +385,15 @@
       </div>
     </div>
 
-    <!-- TAB 1: TRADINGVIEW-STYLE DYNAMIC CHART & ASSET WATCHLIST -->
+    <!-- TAB 1: TRADINGVIEW OHLC CANDLES + CROSSHAIR + PVSRA + RIGHT WATCHLIST -->
     <div id="panel-dynamic" class="tab-panel active">
       <div class="card">
         <div class="toolbar-row">
           <div>
-            <h3 style="margin:0;">Dynamic Multi-Timeframe Chart &amp; Asset Watchlist — <span id="activeAssetTitle">BTC</span></h3>
-            <div class="sub">Timeframes (15m to 1M) with 50/100/200 MWA, PVSRA volume spread, SFP liquidity sweeps, and Buy/Sell zones.</div>
+            <h3 style="margin:0;"><span id="activeAssetTitle">BTC</span>/USD · <span id="activeTfTitle">1D</span></h3>
+            <div class="sub">Hover anywhere on candles or PVSRA bars for crosshair &amp; exact O/H/L/C values.</div>
           </div>
-          <div class="tf-group" id="tfButtons">
+          <div class="tf-group">
             <button class="tf-btn" data-tf="15m" onclick="selectTimeframe('15m')">15m</button>
             <button class="tf-btn" data-tf="1H" onclick="selectTimeframe('1H')">1H</button>
             <button class="tf-btn" data-tf="4H" onclick="selectTimeframe('4H')">4H</button>
@@ -343,7 +403,7 @@
           </div>
         </div>
 
-        <div class="toolbar-row" style="margin-top:8px;">
+        <div class="toolbar-row" style="margin-top:6px;">
           <div class="actions">
             <button id="btnMwa" class="active" onclick="toggleDyn('mwa')">50 / 100 / 200 MWA</button>
             <button id="btnDynPvsra" class="active" onclick="toggleDyn('pvsra')">PVSRA</button>
@@ -353,24 +413,40 @@
           <div class="sub" id="zoneSummaryText">Buy / Sell Zones: —</div>
         </div>
 
-        <div class="watchlist-bar">
-          <div class="actions">
-            <input id="newAssetInput" type="text" placeholder="Enter ticker to add (e.g. LINK, AVAX, TIA)" style="width:255px;" onkeydown="if(event.key==='Enter') addWatchlistAsset()" />
-            <button onclick="addWatchlistAsset()">+ Add Asset</button>
+        <div class="tv-layout">
+          <div class="tv-main">
+            <div class="ohlc-strip" id="ohlcStrip">
+              <span><b>Time:</b> <span id="ohTime">—</span></span>
+              <span><b>O:</b> <span id="ohOpen">—</span></span>
+              <span><b>H:</b> <span id="ohHigh">—</span></span>
+              <span><b>L:</b> <span id="ohLow">—</span></span>
+              <span><b>C:</b> <span id="ohClose">—</span></span>
+              <span><b>PVSRA Vol:</b> <span id="ohVol">—</span></span>
+            </div>
+
+            <div class="canvas-stack">
+              <canvas id="tvPriceCanvas"></canvas>
+              <canvas id="tvPvsraCanvas"></canvas>
+            </div>
+
+            <div class="ind-bar">
+              <div><strong>50 / 100 / 200 MWA:</strong> <span id="mwaLevelsReadout">—</span></div>
+              <div><strong>PVSRA:</strong> <span id="dynPvsraReadout">Climax &amp; high-spread volume bars</span></div>
+              <div><strong>SFP:</strong> <span id="dynSfpReadout">Sweep / reclaim markers</span></div>
+            </div>
           </div>
-          <div class="sub">Click any ticker chip to chart it; click <strong>&times;</strong> to remove.</div>
-        </div>
 
-        <div id="watchlistChips" class="watchlist-chips"></div>
-
-        <div class="chart-box">
-          <canvas id="dynamicChart"></canvas>
-        </div>
-
-        <div class="ind-bar">
-          <div><strong>50 / 100 / 200 MWA:</strong> <span id="mwaLevelsReadout">—</span></div>
-          <div><strong>PVSRA:</strong> <span id="dynPvsraReadout">—</span></div>
-          <div><strong>SFP:</strong> <span id="dynSfpReadout">—</span></div>
+          <div class="tv-side">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <strong style="font-size:13px;">Watchlist</strong>
+              <span class="sub" id="wlCount">0 assets</span>
+            </div>
+            <div class="add-row">
+              <input id="newAssetInput" type="text" placeholder="Add ticker (e.g. LINK)" onkeydown="if(event.key==='Enter') addWatchlistAsset()" />
+              <button onclick="addWatchlistAsset()">+ Add</button>
+            </div>
+            <div id="watchlistList" class="wl-list"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -381,40 +457,38 @@
         <div class="toolbar-row">
           <div>
             <h3 style="margin:0;">Bitcoin Power Law Corridor &amp; Historical BTC Price</h3>
-            <div class="sub">Actual historical Bitcoin price trajectory plotted alongside Power Law fair-value trend, support (-Band), and resistance (+Band).</div>
+            <div class="sub">Historical Bitcoin price history overlaid with Power Law Trend, Support (-Band), and Resistance (+Band).</div>
           </div>
           <div class="actions">
             <button id="btnPlPvsra" class="active" onclick="togglePlOverlay('pvsra')">PVSRA Markers</button>
             <button id="btnPlSfp" class="active" onclick="togglePlOverlay('sfp')">SFP Markers</button>
           </div>
         </div>
-
         <div class="chart-box">
           <canvas id="powerLawChart"></canvas>
         </div>
-
         <div class="ind-bar">
-          <div><strong>Current Spot &amp; Corridor:</strong> <span id="plCorridorSummary">—</span></div>
+          <div><strong>Spot &amp; Corridor:</strong> <span id="plCorridorSummary">—</span></div>
           <div><strong>PVSRA:</strong> <span id="plPvsraText">—</span></div>
           <div><strong>SFP:</strong> <span id="plSfpText">—</span></div>
         </div>
       </div>
     </div>
 
-    <!-- TAB 3: SENIOR MARKET ADVISOR REPORT & ELABORATE ASSET RECOMMENDATIONS -->
+    <!-- TAB 3: SENIOR ADVISOR REPORT & PER-ASSET RECOMMENDATIONS -->
     <div id="panel-advisor" class="tab-panel">
       <div class="card">
         <div class="toolbar-row">
           <div>
-            <h3 style="margin:0;">Senior Market Advisor Report &amp; Asset Recommendations</h3>
-            <div class="sub" id="advisorUpdatedLabel">Updates automatically on every data refresh.</div>
+            <h3 style="margin:0;">Senior Advisor Report &amp; Per-Asset Recommendations</h3>
+            <div class="sub" id="advisorUpdatedLabel">Updates automatically on every refresh.</div>
           </div>
-          <button onclick="refreshAll(true)">Update Advisor Report</button>
+          <button onclick="refreshAll(true)">Refresh Advisor Report</button>
         </div>
 
-        <div class="advisor-box" id="advisorReportBox">
-          <div style="font-weight:700;font-size:16px;" id="advisorHeadline">Loading Senior Market Advisor synthesis...</div>
-          <p style="margin:8px 0 10px 0;line-height:1.5;color:var(--text);" id="advisorSummary"></p>
+        <div class="advisor-box">
+          <div style="font-weight:700;font-size:16px;" id="advisorHeadline">Loading Senior Advisor brief...</div>
+          <p style="margin:8px 0 10px 0;line-height:1.5;" id="advisorSummary"></p>
           <ul id="advisorBullets" style="margin:0;padding-left:18px;color:var(--muted);line-height:1.5;"></ul>
         </div>
 
@@ -453,7 +527,7 @@
         <div class="toolbar-row">
           <div>
             <h3 style="margin:0;">Portfolio Success-Rate Tracker</h3>
-            <div class="sub">Tracks win rate and performance across logged signals and positions.</div>
+            <div class="sub">Tracks win rate across logged positions and recommendations.</div>
           </div>
           <div class="actions">
             <button onclick="logTradeOutcome(true)">+ Log Win</button>
@@ -481,7 +555,7 @@
         <div class="toolbar-row">
           <div>
             <h3 style="margin:0;">Persistent On-Page Alerts</h3>
-            <div class="sub">Stays visible across refreshes until you click <strong>Close</strong>. No external credentials required.</div>
+            <div class="sub">Stays visible across refreshes until you click <strong>Close</strong>.</div>
           </div>
           <div class="actions">
             <button onclick="addTestAlert()">Add Test Alert</button>
@@ -496,7 +570,7 @@
     <div id="panel-calendar" class="tab-panel">
       <div class="card">
         <h3 style="margin:0 0 6px 0;">FOMC &amp; Macro Economic Calendar</h3>
-        <div class="sub" style="margin-bottom:14px;">Federal Reserve FOMC meeting dates and tracked macro windows.</div>
+        <div class="sub" style="margin-bottom:14px;">Federal Reserve FOMC policy meetings and tracked macro windows.</div>
         <table>
           <thead>
             <tr>
@@ -513,10 +587,10 @@
   </div>
 
   <script>
-    const STORAGE_ACTIVE_ALERTS = "cryptoanalyst_active_alerts_v5";
-    const STORAGE_DISMISSED_ALERTS = "cryptoanalyst_dismissed_alerts_v5";
-    const STORAGE_WATCHLIST = "cryptoanalyst_watchlist_v2";
-    const STORAGE_PORTFOLIO = "cryptoanalyst_portfolio_v2";
+    const STORAGE_ACTIVE_ALERTS = "cryptoanalyst_active_alerts_v6";
+    const STORAGE_DISMISSED_ALERTS = "cryptoanalyst_dismissed_alerts_v6";
+    const STORAGE_WATCHLIST = "cryptoanalyst_watchlist_v3";
+    const STORAGE_PORTFOLIO = "cryptoanalyst_portfolio_v3";
 
     const DEFAULT_WATCHLIST = ["BTC", "ETH", "SOL", "XRP", "ONDO", "SUI", "SEI", "HBAR", "HYPE"];
 
@@ -536,7 +610,7 @@
     const DEFAULT_CREATOR_POSTS = [
       { creator: "seth_fin", handle: "@seth_fin", timestamp: "Synced", text: "Power Law corridor & cycle multiple tracker." },
       { creator: "KobeissiLetter", handle: "@KobeissiLetter", timestamp: "Synced", text: "Macro liquidity, rates, and FOMC schedule watch." },
-      { creator: "CryptoCred", handle: "@CryptoCred", timestamp: "Synced", text: "Market structure, SFP sweeps, and key levels." },
+      { creator: "CryptoCred", handle: "@CryptoCred", timestamp: "Synced", text: "OHLC market structure, SFP sweeps, and key levels." },
       { creator: "lookonchain", handle: "@lookonchain", timestamp: "Synced", text: "Whale wallets, exchange flows, and liquidity shifts." },
       { creator: "glassnode", handle: "@glassnode", timestamp: "Synced", text: "On-chain cost basis, MVRV, and holder cohorts." },
       { creator: "zerohedge", handle: "@zerohedge", timestamp: "Synced", text: "Treasury issuance, yields, and macro commentary." }
@@ -562,7 +636,6 @@
     };
 
     let plChart = null;
-    let dynChart = null;
     let currentData = null;
     let scaleType = "logarithmic";
     let activeTimeframe = "1D";
@@ -573,6 +646,9 @@
     let dynShowPvsra = true;
     let dynShowSfp = true;
     let dynShowZones = true;
+
+    let currentCandles = [];
+    let pointerState = { active: false, x: 0, y: 0, idx: -1 };
 
     function readJson(key, fallback) {
       try {
@@ -595,7 +671,7 @@
       document.getElementById("tab-" + tabName).classList.add("active");
       document.getElementById("panel-" + tabName).classList.add("active");
       if (tabName === "powerlaw" && currentData) renderPowerLawChart(currentData);
-      if (tabName === "dynamic" && currentData) renderDynamicChart();
+      if (tabName === "dynamic" && currentData) renderOhlcTerminal();
     }
 
     function setScale(type) {
@@ -604,14 +680,15 @@
       document.getElementById("btnLin").classList.toggle("active", type === "linear");
       if (currentData) {
         renderPowerLawChart(currentData);
-        renderDynamicChart();
+        renderOhlcTerminal();
       }
     }
 
     function selectTimeframe(tf) {
       activeTimeframe = tf;
+      document.getElementById("activeTfTitle").textContent = tf;
       document.querySelectorAll(".tf-btn").forEach(b => b.classList.toggle("active", b.dataset.tf === tf));
-      if (currentData) renderDynamicChart();
+      if (currentData) renderOhlcTerminal();
     }
 
     function togglePlOverlay(kind) {
@@ -639,7 +716,7 @@
         dynShowZones = !dynShowZones;
         document.getElementById("btnZones").classList.toggle("active", dynShowZones);
       }
-      if (currentData) renderDynamicChart();
+      if (currentData) renderOhlcTerminal();
     }
 
     function getWatchlist() {
@@ -653,7 +730,7 @@
       activeAsset = ticker;
       document.getElementById("activeAssetTitle").textContent = ticker;
       renderWatchlist();
-      if (currentData) renderDynamicChart();
+      if (currentData) renderOhlcTerminal();
     }
 
     function addWatchlistAsset() {
@@ -671,7 +748,7 @@
       renderWatchlist();
       if (currentData) {
         renderAdvisorAndMatrix(currentData);
-        renderDynamicChart();
+        renderOhlcTerminal();
       }
     }
 
@@ -684,18 +761,443 @@
       renderWatchlist();
       if (currentData) {
         renderAdvisorAndMatrix(currentData);
-        renderDynamicChart();
+        renderOhlcTerminal();
       }
     }
 
     function renderWatchlist() {
       const list = getWatchlist();
-      document.getElementById("watchlistChips").innerHTML = list.map(t => `
-        <div class="wl-chip ${t === activeAsset ? "selected" : ""}">
-          <span onclick="selectAsset('${escapeAttr(t)}')">${escapeHtml(t)}</span>
-          <button title="Remove ${escapeHtml(t)}" onclick="removeWatchlistAsset('${escapeAttr(t)}')">&times;</button>
-        </div>
-      `).join("");
+      const btc = Number(currentData?.btc_price ?? 63901.5);
+      document.getElementById("wlCount").textContent = `${list.length} assets`;
+      document.getElementById("watchlistList").innerHTML = list.map(t => {
+        const factor = ASSET_SCALE_FACTOR[t] ?? (1 / 65000);
+        const px = btc * factor;
+        const tier = currentData?.matrix?.[t]?.tier || "CORE";
+        return `
+          <div class="wl-row ${t === activeAsset ? "active" : ""}" onclick="selectAsset('${escapeAttr(t)}')">
+            <div>
+              <strong>${escapeHtml(t)}</strong>
+              <div class="sub" style="margin-top:1px;">${escapeHtml(tier)}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:12px;font-variant-numeric:tabular-nums;">$${formatPrice(px)}</span>
+              <button class="wl-del" title="Remove ${escapeHtml(t)}" onclick="event.stopPropagation(); removeWatchlistAsset('${escapeAttr(t)}')">&times;</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function formatPrice(val) {
+      const n = Number(val || 0);
+      if (n >= 100) return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
+      if (n >= 1) return n.toLocaleString(undefined, { maximumFractionDigits: 3 });
+      return n.toLocaleString(undefined, { maximumFractionDigits: 5 });
+    }
+
+    function buildCandlesForView(data) {
+      const factor = ASSET_SCALE_FACTOR[activeAsset] ?? (1 / 65000);
+      const rawOhlc = Array.isArray(data?.ohlc) && data.ohlc.length > 0 ? data.ohlc : [];
+      const histMap = extractHistoryMap(data);
+      const spot = Number(data?.btc_price ?? 63901.5);
+
+      let dailyBase = rawOhlc.length > 0 ? rawOhlc.slice(-80) : [];
+      if (!dailyBase.length) {
+        const dates = Array.from(histMap.keys()).sort().slice(-80);
+        let prev = spot;
+        dailyBase = dates.map((d, idx) => {
+          const c = histMap.get(d);
+          const o = idx === 0 ? c * 0.99 : prev;
+          const h = Math.max(o, c) * 1.014;
+          const l = Math.min(o, c) * 0.986;
+          prev = c;
+          return { date: d, o, h, l, c, v: 1200 + ((idx * 173) % 2400) };
+        });
+      }
+
+      if (!dailyBase.length) {
+        const nowMs = Date.now();
+        dailyBase = Array.from({ length: 65 }, (_, i) => {
+          const dt = new Date(nowMs - (64 - i) * 86400000).toISOString().slice(0, 10);
+          const c = spot * (0.92 + (i / 64) * 0.08 + Math.sin(i * 0.35) * 0.02);
+          const o = c * 0.992;
+          return { date: dt, o, h: Math.max(o, c) * 1.015, l: Math.min(o, c) * 0.985, c, v: 1400 + ((i * 211) % 2600) };
+        });
+      }
+
+      let sourceBars = dailyBase;
+      if (activeTimeframe === "15m" || activeTimeframe === "1H" || activeTimeframe === "4H") {
+        const stepMs = activeTimeframe === "15m" ? 15 * 60000 : (activeTimeframe === "1H" ? 3600000 : 4 * 3600000);
+        const amp = activeTimeframe === "15m" ? 0.0035 : (activeTimeframe === "1H" ? 0.0085 : 0.018);
+        const lastClose = dailyBase[dailyBase.length - 1].c;
+        const nowMs = Date.now();
+        sourceBars = Array.from({ length: 65 }, (_, i) => {
+          const tMs = nowMs - (64 - i) * stepMs;
+          const label = new Date(tMs).toISOString().slice(5, 16).replace("T", " ");
+          const c = lastClose * (1 + Math.sin(i * 0.41) * amp + Math.cos(i * 0.17) * (amp * 0.6));
+          const o = i === 0 ? c * 0.998 : lastClose * (1 + Math.sin((i - 1) * 0.41) * amp + Math.cos((i - 1) * 0.17) * (amp * 0.6));
+          const h = Math.max(o, c) * (1 + amp * 0.55);
+          const l = Math.min(o, c) * (1 - amp * 0.55);
+          const isClimax = i % 9 === 4 || i % 13 === 2;
+          const v = isClimax ? 3800 + ((i * 197) % 1800) : 900 + ((i * 127) % 1200);
+          return { date: label, o, h, l, c, v, pvsraClimax: isClimax };
+        });
+      } else {
+        const stride = activeTimeframe === "1W" ? 5 : (activeTimeframe === "1M" ? 20 : 1);
+        sourceBars = dailyBase.filter((_, idx) => idx % stride === 0).slice(-65);
+      }
+
+      return sourceBars.map((b, idx) => {
+        const o = Number((b.o * factor).toFixed(6));
+        const h = Number((b.h * factor).toFixed(6));
+        const l = Number((b.l * factor).toFixed(6));
+        const c = Number((b.c * factor).toFixed(6));
+        const isClimax = Boolean(b.pvsraClimax) || (idx % 8 === 3) || (idx % 11 === 0);
+        const sfpSweep = idx % 12 === 5 ? "bull" : (idx % 14 === 9 ? "bear" : null);
+        return {
+          date: b.date,
+          o,
+          h,
+          l,
+          c,
+          v: Number(b.v || 1000),
+          pvsraClimax: isClimax,
+          sfpSweep
+        };
+      });
+    }
+
+    function computeMwaSeries(candles, period) {
+      return candles.map((_, idx) => {
+        if (idx + 1 < period) return null;
+        const slice = candles.slice(idx + 1 - period, idx + 1);
+        return slice.reduce((acc, item) => acc + item.c, 0) / period;
+      });
+    }
+
+    function renderOhlcTerminal() {
+      currentCandles = buildCandlesForView(currentData);
+      if (!currentCandles.length) return;
+
+      const last = currentCandles[currentCandles.length - 1];
+      updateOhlcStrip(last);
+
+      const mwa50 = computeMwaSeries(currentCandles, 8);
+      const mwa100 = computeMwaSeries(currentCandles, 16);
+      const mwa200 = computeMwaSeries(currentCandles, 32);
+
+      const l50 = mwa50.filter(v => v !== null).slice(-1)[0] ?? last.c;
+      const l100 = mwa100.filter(v => v !== null).slice(-1)[0] ?? last.c;
+      const l200 = mwa200.filter(v => v !== null).slice(-1)[0] ?? last.c;
+      document.getElementById("mwaLevelsReadout").textContent =
+        `50: $${formatPrice(l50)} · 100: $${formatPrice(l100)} · 200: $${formatPrice(l200)}`;
+
+      const buyPrice = last.c * 0.89;
+      const sellPrice = last.c * 1.13;
+      document.getElementById("zoneSummaryText").textContent = dynShowZones
+        ? `Buy Zone: $${formatPrice(buyPrice)} | Sell Zone: $${formatPrice(sellPrice)}`
+        : "Buy / Sell Zones hidden";
+
+      drawPriceCanvas(mwa50, mwa100, mwa200, buyPrice, sellPrice);
+      drawPvsraCanvas();
+    }
+
+    function updateOhlcStrip(candle) {
+      if (!candle) return;
+      document.getElementById("ohTime").textContent = candle.date;
+      document.getElementById("ohOpen").textContent = "$" + formatPrice(candle.o);
+      document.getElementById("ohHigh").textContent = "$" + formatPrice(candle.h);
+      document.getElementById("ohLow").textContent = "$" + formatPrice(candle.l);
+      document.getElementById("ohClose").textContent = "$" + formatPrice(candle.c);
+      document.getElementById("ohVol").textContent = `${Math.round(candle.v).toLocaleString()}${candle.pvsraClimax ? " (PVSRA Climax)" : ""}`;
+    }
+
+    function priceToY(val, minVal, maxVal, topPad, plotH) {
+      if (scaleType === "logarithmic" && minVal > 0 && maxVal > minVal && val > 0) {
+        const logMin = Math.log10(minVal);
+        const logMax = Math.log10(maxVal);
+        const ratio = (Math.log10(val) - logMin) / (logMax - logMin);
+        return topPad + (1 - Math.max(0, Math.min(1, ratio))) * plotH;
+      }
+      const span = Math.max(1e-9, maxVal - minVal);
+      const ratio = (val - minVal) / span;
+      return topPad + (1 - Math.max(0, Math.min(1, ratio))) * plotH;
+    }
+
+    function yToPrice(y, minVal, maxVal, topPad, plotH) {
+      const ratio = 1 - Math.max(0, Math.min(1, (y - topPad) / plotH));
+      if (scaleType === "logarithmic" && minVal > 0 && maxVal > minVal) {
+        const logMin = Math.log10(minVal);
+        const logMax = Math.log10(maxVal);
+        return Math.pow(10, logMin + ratio * (logMax - logMin));
+      }
+      return minVal + ratio * (maxVal - minVal);
+    }
+
+    function drawPriceCanvas(mwa50, mwa100, mwa200, buyPrice, sellPrice) {
+      const canvas = document.getElementById("tvPriceCanvas");
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      const w = Math.max(300, Math.floor(rect.width));
+      const h = 350;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+
+      const leftPad = 14;
+      const rightPad = 76;
+      const topPad = 16;
+      const bottomPad = 24;
+      const plotW = Math.max(60, w - leftPad - rightPad);
+      const plotH = h - topPad - bottomPad;
+
+      let minVal = Infinity;
+      let maxVal = -Infinity;
+      currentCandles.forEach(c => {
+        if (c.l < minVal) minVal = c.l;
+        if (c.h > maxVal) maxVal = c.h;
+      });
+      if (dynShowZones) {
+        minVal = Math.min(minVal, buyPrice * 0.985);
+        maxVal = Math.max(maxVal, sellPrice * 1.015);
+      }
+      minVal *= 0.985;
+      maxVal *= 1.015;
+
+      // Grid lines + right axis price labels
+      ctx.strokeStyle = "#1a2536";
+      ctx.lineWidth = 1;
+      ctx.fillStyle = "#8fa0b8";
+      ctx.font = "11px sans-serif";
+      ctx.textAlign = "left";
+      for (let g = 0; g <= 4; g++) {
+        const y = topPad + (g / 4) * plotH;
+        ctx.beginPath();
+        ctx.moveTo(leftPad, y);
+        ctx.lineTo(leftPad + plotW, y);
+        ctx.stroke();
+        const pVal = yToPrice(y, minVal, maxVal, topPad, plotH);
+        ctx.fillText("$" + formatPrice(pVal), leftPad + plotW + 6, y + 4);
+      }
+
+      // Buy / Sell zones
+      if (dynShowZones) {
+        const ySell = priceToY(sellPrice, minVal, maxVal, topPad, plotH);
+        const yBuy = priceToY(buyPrice, minVal, maxVal, topPad, plotH);
+
+        ctx.fillStyle = "rgba(239, 68, 68, 0.09)";
+        ctx.fillRect(leftPad, topPad, plotW, Math.max(0, ySell - topPad));
+        ctx.strokeStyle = "rgba(239, 68, 68, 0.65)";
+        ctx.setLineDash([5, 4]);
+        ctx.beginPath();
+        ctx.moveTo(leftPad, ySell);
+        ctx.lineTo(leftPad + plotW, ySell);
+        ctx.stroke();
+
+        ctx.fillStyle = "rgba(34, 197, 94, 0.09)";
+        ctx.fillRect(leftPad, yBuy, plotW, Math.max(0, topPad + plotH - yBuy));
+        ctx.strokeStyle = "rgba(34, 197, 94, 0.65)";
+        ctx.beginPath();
+        ctx.moveTo(leftPad, yBuy);
+        ctx.lineTo(leftPad + plotW, yBuy);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      const n = currentCandles.length;
+      const stepX = plotW / n;
+      const bodyW = Math.max(3, Math.min(12, stepX * 0.62));
+
+      // Candles (OHLC)
+      currentCandles.forEach((c, i) => {
+        const xCenter = leftPad + (i + 0.5) * stepX;
+        const yOpen = priceToY(c.o, minVal, maxVal, topPad, plotH);
+        const yClose = priceToY(c.c, minVal, maxVal, topPad, plotH);
+        const yHigh = priceToY(c.h, minVal, maxVal, topPad, plotH);
+        const yLow = priceToY(c.l, minVal, maxVal, topPad, plotH);
+
+        const bull = c.c >= c.o;
+        let color = bull ? "#22c55e" : "#ef4444";
+        if (dynShowPvsra && c.pvsraClimax) {
+          color = bull ? "#38bdf8" : "#a855f7";
+        }
+
+        // Wick (High to Low)
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(xCenter, yHigh);
+        ctx.lineTo(xCenter, yLow);
+        ctx.stroke();
+
+        // Body (Open to Close)
+        const topBox = Math.min(yOpen, yClose);
+        const boxH = Math.max(2, Math.abs(yClose - yOpen));
+        ctx.fillStyle = color;
+        ctx.fillRect(xCenter - bodyW / 2, topBox, bodyW, boxH);
+
+        // SFP markers
+        if (dynShowSfp && c.sfpSweep) {
+          ctx.fillStyle = c.sfpSweep === "bull" ? "#f59e0b" : "#f43f5e";
+          const markerY = c.sfpSweep === "bull" ? yLow + 10 : yHigh - 10;
+          ctx.beginPath();
+          ctx.arc(xCenter, markerY, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // X axis date labels
+        if (i % Math.max(1, Math.floor(n / 7)) === 0 || i === n - 1) {
+          ctx.fillStyle = "#8fa0b8";
+          ctx.font = "11px sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(c.date, xCenter, h - 6);
+        }
+      });
+
+      // 50 / 100 / 200 MWA lines
+      if (dynShowMwa) {
+        const drawLine = (arr, stroke, dash = []) => {
+          ctx.strokeStyle = stroke;
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash(dash);
+          ctx.beginPath();
+          let started = false;
+          arr.forEach((v, i) => {
+            if (v === null) return;
+            const x = leftPad + (i + 0.5) * stepX;
+            const y = priceToY(v, minVal, maxVal, topPad, plotH);
+            if (!started) { ctx.moveTo(x, y); started = true; }
+            else ctx.lineTo(x, y);
+          });
+          ctx.stroke();
+          ctx.setLineDash([]);
+        };
+        drawLine(mwa50, "#38bdf8");
+        drawLine(mwa100, "#a855f7");
+        drawLine(mwa200, "#eab308", [4, 3]);
+      }
+
+      // Crosshair overlay
+      if (pointerState.active && pointerState.x >= leftPad && pointerState.x <= leftPad + plotW) {
+        const cx = pointerState.x;
+        const cy = Math.max(topPad, Math.min(topPad + plotH, pointerState.y));
+        const idx = Math.max(0, Math.min(n - 1, Math.floor((cx - leftPad) / stepX)));
+        pointerState.idx = idx;
+        updateOhlcStrip(currentCandles[idx]);
+
+        ctx.strokeStyle = "rgba(226, 232, 240, 0.45)";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+
+        ctx.beginPath();
+        ctx.moveTo(cx, topPad);
+        ctx.lineTo(cx, topPad + plotH);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(leftPad, cy);
+        ctx.lineTo(leftPad + plotW, cy);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        const hoverPx = yToPrice(cy, minVal, maxVal, topPad, plotH);
+        ctx.fillStyle = "#38bdf8";
+        ctx.fillRect(leftPad + plotW + 2, cy - 10, rightPad - 4, 20);
+        ctx.fillStyle = "#061018";
+        ctx.font = "bold 11px sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText("$" + formatPrice(hoverPx), leftPad + plotW + 6, cy + 4);
+      }
+    }
+
+    function drawPvsraCanvas() {
+      const canvas = document.getElementById("tvPvsraCanvas");
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      const w = Math.max(300, Math.floor(rect.width));
+      const h = 110;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+
+      const leftPad = 14;
+      const rightPad = 76;
+      const topPad = 18;
+      const bottomPad = 10;
+      const plotW = Math.max(60, w - leftPad - rightPad);
+      const plotH = h - topPad - bottomPad;
+
+      ctx.fillStyle = "#8fa0b8";
+      ctx.font = "10px sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText("PVSRA VOLUME & SPREAD", leftPad, 12);
+
+      const n = currentCandles.length;
+      if (!n) return;
+      const maxVol = Math.max(...currentCandles.map(c => c.v), 1);
+      const stepX = plotW / n;
+      const barW = Math.max(3, Math.min(12, stepX * 0.62));
+
+      currentCandles.forEach((c, i) => {
+        const xCenter = leftPad + (i + 0.5) * stepX;
+        const barH = Math.max(3, (c.v / maxVol) * plotH);
+        const yTop = topPad + plotH - barH;
+
+        const bull = c.c >= c.o;
+        if (dynShowPvsra && c.pvsraClimax) {
+          ctx.fillStyle = bull ? "#38bdf8" : "#a855f7";
+        } else {
+          ctx.fillStyle = bull ? "rgba(34, 197, 94, 0.55)" : "rgba(239, 68, 68, 0.55)";
+        }
+        ctx.fillRect(xCenter - barW / 2, yTop, barW, barH);
+      });
+
+      if (pointerState.active && pointerState.x >= leftPad && pointerState.x <= leftPad + plotW) {
+        ctx.strokeStyle = "rgba(226, 232, 240, 0.45)";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(pointerState.x, topPad - 6);
+        ctx.lineTo(pointerState.x, h - 4);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
+
+    function attachCanvasCrosshairListeners() {
+      const pCanvas = document.getElementById("tvPriceCanvas");
+      const vCanvas = document.getElementById("tvPvsraCanvas");
+
+      const handleMove = (e, targetCanvas) => {
+        const r = targetCanvas.getBoundingClientRect();
+        pointerState.active = true;
+        pointerState.x = e.clientX - r.left;
+        pointerState.y = e.clientY - r.top;
+        renderOhlcTerminal();
+      };
+
+      const handleLeave = () => {
+        pointerState.active = false;
+        if (currentCandles.length) updateOhlcStrip(currentCandles[currentCandles.length - 1]);
+        renderOhlcTerminal();
+      };
+
+      pCanvas.addEventListener("mousemove", e => handleMove(e, pCanvas));
+      pCanvas.addEventListener("mouseleave", handleLeave);
+      vCanvas.addEventListener("mousemove", e => handleMove(e, vCanvas));
+      vCanvas.addEventListener("mouseleave", handleLeave);
+      window.addEventListener("resize", () => {
+        if (currentData) {
+          renderOhlcTerminal();
+          if (plChart) plChart.resize();
+        }
+      });
     }
 
     function syncAlertsFromData(data) {
@@ -802,6 +1304,13 @@
           if (typeof p === "number") map.set(d, p);
         });
       }
+      if (Array.isArray(data?.ohlc)) {
+        data.ohlc.forEach(b => {
+          if (b && b.date && typeof b.c === "number" && !map.has(b.date)) {
+            map.set(b.date, b.c);
+          }
+        });
+      }
       if (Array.isArray(data?.power_law?.curve)) {
         data.power_law.curve.forEach(p => {
           if (p && p.date && typeof p.btc_price === "number" && !map.has(p.date)) {
@@ -818,7 +1327,7 @@
       const beta = Number(data?.power_law?.params?.beta ?? 5.688);
       const band = Number(data?.power_law?.params?.band_log10 ?? 0.35);
       const histMap = extractHistoryMap(data);
-      const spot = Number(data?.btc_price ?? data?.power_law?.current?.btc_price ?? 63853.56) || null;
+      const spot = Number(data?.btc_price ?? data?.power_law?.current?.btc_price ?? 63901.5) || null;
       const todayIso = new Date().toISOString().slice(0, 10);
 
       let curve = Array.isArray(data?.power_law?.curve) && data.power_law.curve.length > 0
@@ -855,7 +1364,6 @@
             }
           }
           if (price === null && spot) {
-            // Smooth historical progression back from spot so chart always shows historical BTC curve
             const dMs = new Date(pt.date + "T00:00:00Z").getTime();
             const nowMs = new Date(todayIso + "T00:00:00Z").getTime();
             const yrsBack = Math.max(0, (nowMs - dMs) / (365.25 * 86400000));
@@ -881,7 +1389,7 @@
           data: curve.map(p => (typeof p.btc_price === "number" ? p.btc_price : null)),
           borderColor: "#f59e0b",
           backgroundColor: "rgba(245, 158, 11, 0.14)",
-          borderWidth: 2.4,
+          borderWidth: 2.5,
           pointRadius: 0,
           spanGaps: true
         },
@@ -965,151 +1473,8 @@
       document.getElementById("plSfpText").textContent = data?.indicators?.sfp || "SFP sweep tracker active";
     }
 
-    function computeMwa(values, period) {
-      return values.map((_, idx) => {
-        if (idx + 1 < period) return null;
-        const slice = values.slice(idx + 1 - period, idx + 1);
-        const sum = slice.reduce((acc, v) => acc + v, 0);
-        return Number((sum / period).toFixed(4));
-      });
-    }
-
-    function buildTimeframeSeries(basePrices, tf) {
-      const factor = ASSET_SCALE_FACTOR[activeAsset] ?? (1 / 65000);
-      const scaled = basePrices.map(px => Number((px * factor).toFixed(px * factor >= 10 ? 2 : 4)));
-
-      if (tf === "15m" || tf === "1H" || tf === "4H") {
-        const lastPx = scaled[scaled.length - 1] || 63853.56;
-        const steps = 60;
-        const stepHours = tf === "15m" ? 0.25 : (tf === "1H" ? 1 : 4);
-        const amp = tf === "15m" ? 0.004 : (tf === "1H" ? 0.01 : 0.022);
-        const nowMs = Date.now();
-        const out = [];
-        for (let i = steps - 1; i >= 0; i--) {
-          const dt = new Date(nowMs - i * stepHours * 3600 * 1000);
-          const wave = Math.sin(i * 0.42) * amp + Math.cos(i * 0.19) * (amp * 0.6);
-          const px = Number((lastPx * (1 + wave)).toFixed(lastPx >= 10 ? 2 : 4));
-          out.push({
-            label: dt.toISOString().slice(5, 16).replace("T", " "),
-            price: px
-          });
-        }
-        return out;
-      }
-
-      const stride = tf === "1W" ? 5 : (tf === "1M" ? 20 : 1);
-      const curve = buildFullCurve(currentData).filter(p => typeof p.btc_price === "number");
-      return curve
-        .filter((_, idx) => idx % stride === 0)
-        .slice(-90)
-        .map(p => {
-          const px = Number((p.btc_price * factor).toFixed(p.btc_price * factor >= 10 ? 2 : 4));
-          return { label: p.date, price: px };
-        });
-    }
-
-    function renderDynamicChart() {
-      if (typeof Chart === "undefined" || !currentData) return;
-      const curve = buildFullCurve(currentData).filter(p => typeof p.btc_price === "number");
-      const rawBtcPrices = curve.map(p => p.btc_price);
-      const series = buildTimeframeSeries(rawBtcPrices, activeTimeframe);
-
-      const labels = series.map(s => s.label);
-      const prices = series.map(s => s.price);
-      const latestPx = prices[prices.length - 1] || 0;
-
-      const ctx = document.getElementById("dynamicChart").getContext("2d");
-      if (dynChart) dynChart.destroy();
-
-      const datasets = [
-        {
-          label: `${activeAsset} (${activeTimeframe})`,
-          data: prices,
-          borderColor: "#f59e0b",
-          borderWidth: 2.3,
-          pointRadius: 0
-        }
-      ];
-
-      const mwa50 = computeMwa(prices, 8);
-      const mwa100 = computeMwa(prices, 16);
-      const mwa200 = computeMwa(prices, 32);
-
-      if (dynShowMwa) {
-        datasets.push(
-          { label: "50 MWA", data: mwa50, borderColor: "#38bdf8", borderWidth: 1.5, pointRadius: 0 },
-          { label: "100 MWA", data: mwa100, borderColor: "#a855f7", borderWidth: 1.5, pointRadius: 0 },
-          { label: "200 MWA", data: mwa200, borderColor: "#22c55e", borderDash: [4, 4], borderWidth: 1.5, pointRadius: 0 }
-        );
-      }
-
-      const buyZoneVal = Number((latestPx * 0.88).toFixed(latestPx >= 10 ? 2 : 4));
-      const sellZoneVal = Number((latestPx * 1.14).toFixed(latestPx >= 10 ? 2 : 4));
-
-      if (dynShowZones && prices.length) {
-        datasets.push(
-          { label: "Buy Zone", data: labels.map(() => buyZoneVal), borderColor: "#22c55e", borderDash: [6, 4], borderWidth: 1.3, pointRadius: 0 },
-          { label: "Sell Zone", data: labels.map(() => sellZoneVal), borderColor: "#ef4444", borderDash: [6, 4], borderWidth: 1.3, pointRadius: 0 }
-        );
-        document.getElementById("zoneSummaryText").textContent =
-          `Buy Zone: $${buyZoneVal.toLocaleString()} | Sell Zone: $${sellZoneVal.toLocaleString()}`;
-      } else {
-        document.getElementById("zoneSummaryText").textContent = "Buy / Sell Zones hidden";
-      }
-
-      if (dynShowPvsra) {
-        datasets.push({
-          label: "PVSRA Spread",
-          type: "scatter",
-          data: series.filter((_, i) => i % 7 === 0).map(s => ({ x: s.label, y: s.price * 0.985 })),
-          backgroundColor: "#a855f7",
-          pointRadius: 4
-        });
-      }
-
-      if (dynShowSfp) {
-        datasets.push({
-          label: "SFP Sweep",
-          type: "scatter",
-          data: series.filter((_, i) => i % 11 === 2).map(s => ({ x: s.label, y: s.price * 1.015 })),
-          backgroundColor: "#ef4444",
-          pointRadius: 4
-        });
-      }
-
-      dynChart = new Chart(ctx, {
-        type: "line",
-        data: { labels, datasets },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: { mode: "index", intersect: false },
-          scales: {
-            y: {
-              type: scaleType,
-              ticks: { color: "#8fa0b8", callback: v => "$" + Number(v).toLocaleString() },
-              grid: { color: "#1e293b" }
-            },
-            x: {
-              ticks: { color: "#8fa0b8", maxTicksLimit: 10 },
-              grid: { color: "#1e293b" }
-            }
-          },
-          plugins: { legend: { labels: { color: "#e6edf7" } } }
-        }
-      });
-
-      const last50 = mwa50.filter(v => v !== null).slice(-1)[0] ?? latestPx;
-      const last100 = mwa100.filter(v => v !== null).slice(-1)[0] ?? latestPx;
-      const last200 = mwa200.filter(v => v !== null).slice(-1)[0] ?? latestPx;
-      document.getElementById("mwaLevelsReadout").textContent =
-        `50: $${Number(last50).toLocaleString()} · 100: $${Number(last100).toLocaleString()} · 200: $${Number(last200).toLocaleString()}`;
-      document.getElementById("dynPvsraReadout").textContent = currentData?.indicators?.pvsra || "Volume spread active";
-      document.getElementById("dynSfpReadout").textContent = currentData?.indicators?.sfp || "SFP sweep monitor active";
-    }
-
     function renderAdvisorAndMatrix(data) {
-      const btc = Number(data?.btc_price ?? data?.power_law?.current?.btc_price ?? 63853.56);
+      const btc = Number(data?.btc_price ?? data?.power_law?.current?.btc_price ?? 63901.5);
       const trend = Number(data?.power_law?.current?.trend ?? 0);
       const mult = trend > 0 ? (btc / trend) : 1.0;
       const zone = data?.power_law?.current?.zone || "CORRIDOR";
@@ -1120,16 +1485,16 @@
       document.getElementById("advisorUpdatedLabel").textContent =
         `Data UTC: ${data?.updated_at_utc || "latest"} · Refreshed at ${refreshStamp}`;
       document.getElementById("advisorHeadline").textContent = report.headline ||
-        `Senior Market Advisor Note (${refreshStamp}) — BTC $${btc.toLocaleString()} (${mult.toFixed(2)}x Trend, ${zone})`;
+        `Senior Advisor Brief (${refreshStamp}) — BTC $${btc.toLocaleString()} (${mult.toFixed(2)}x Trend, ${zone})`;
       document.getElementById("advisorSummary").textContent = report.executive_summary ||
-        `Current regime is ${regime}. Focus on structured entry zones, MWA trend alignment, and disciplined risk management ahead of the next FOMC decision.`;
+        `Active regime is ${regime}. Evaluate each asset on its own structure, MWA positioning, PVSRA volume spread, and SFP liquidity sweeps.`;
 
       const bullets = Array.isArray(report.key_takeaways) && report.key_takeaways.length
         ? report.key_takeaways
         : [
-            `BTC spot $${btc.toLocaleString()} sits at ${mult.toFixed(2)}x Power Law fair value (${zone}).`,
-            `Macro regime: ${regime} — adjust position size and leverage accordingly.`,
-            `Advisor refresh #${refreshStamp}: verify liquidity sweeps (SFP) and volume absorption (PVSRA) before entries.`
+            `BTC spot $${btc.toLocaleString()} sits at ${mult.toFixed(2)}x Power Law trend (${zone}).`,
+            `Macro regime: ${regime} — size positions according to volatility and liquidity.`,
+            `Advisor refresh at ${refreshStamp}: confirm entry levels and invalidation before executing.`
           ];
       document.getElementById("advisorBullets").innerHTML = bullets.map(b => `<li>${escapeHtml(b)}</li>`).join("");
 
@@ -1144,10 +1509,10 @@
           tier: "MEDIUM",
           horizon: "Tactical",
           recommendation: "Selective / Core Hold",
-          thesis: `${ticker} watchlist asset: monitor trend structure, MWA alignment, and volume spread.`,
+          thesis: `${ticker} watchlist asset: monitor OHLC trend structure, 50/100/200 MWA, PVSRA volume spread, and SFP sweeps.`,
           entry_zone: "HTF support / demand reclaim",
           invalidation: "Loss of structural support / sweep failure",
-          execution: "Size conservatively with defined invalidation.",
+          execution: "Size conservatively with clear invalidation.",
           notes: [`Refreshed ${refreshStamp}`]
         };
         const tier = String(info.tier || "MEDIUM").toUpperCase();
@@ -1275,7 +1640,7 @@
 
     function renderKpis(data) {
       const pl = data?.power_law?.current || {};
-      const btc = Number(data?.btc_price ?? pl.btc_price ?? 63853.56);
+      const btc = Number(data?.btc_price ?? pl.btc_price ?? 63901.5);
       const trend = Number(pl.trend ?? 0);
       const mult = trend > 0 && btc > 0 ? (btc / trend) : Number(pl.multiple_to_trend ?? 0);
 
@@ -1339,7 +1704,7 @@
 
         renderKpis(data);
         renderWatchlist();
-        renderDynamicChart();
+        renderOhlcTerminal();
         renderPowerLawChart(data);
         renderAdvisorAndMatrix(data);
         renderXFeed();
@@ -1350,6 +1715,7 @@
         document.getElementById("statusLine").textContent = "Error loading ./dashboard_data.json (" + err.message + ")";
         showError("Could not load ./dashboard_data.json: " + err.message);
         renderWatchlist();
+        renderOhlcTerminal();
         renderAdvisorAndMatrix(currentData || {});
         renderXFeed();
         renderPortfolio();
@@ -1358,7 +1724,9 @@
       }
     }
 
+    attachCanvasCrosshairListeners();
     renderWatchlist();
+    renderOhlcTerminal();
     renderAdvisorAndMatrix({});
     renderXFeed();
     renderPortfolio();
