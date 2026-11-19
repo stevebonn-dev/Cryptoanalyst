@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cryptoanalyst — Power Law, Asset Matrix, X Feed & Alerts</title>
+  <title>Cryptoanalyst — Intelligence Terminal</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -16,6 +16,7 @@
       --green: #22c55e;
       --amber: #f59e0b;
       --red: #ef4444;
+      --purple: #a855f7;
       --border: #232f42;
     }
     * { box-sizing: border-box; }
@@ -26,7 +27,7 @@
       color: var(--text);
       padding: 20px;
     }
-    .wrap { max-width: 1160px; margin: 0 auto; }
+    .wrap { max-width: 1220px; margin: 0 auto; }
     .topbar {
       display: flex;
       flex-wrap: wrap;
@@ -38,7 +39,7 @@
     .sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
     .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 
-    button {
+    button, select {
       background: var(--card-2);
       color: var(--text);
       border: 1px solid var(--border);
@@ -48,7 +49,7 @@
       font-size: 13px;
       transition: all 0.15s ease;
     }
-    button:hover { border-color: var(--accent); }
+    button:hover, select:hover { border-color: var(--accent); }
     button.active {
       background: var(--accent);
       color: #061018;
@@ -59,7 +60,7 @@
     .tabs {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
       margin-bottom: 16px;
     }
     .tab-btn {
@@ -72,14 +73,14 @@
 
     @keyframes alertFlare {
       0%, 100% {
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.75), 0 0 14px rgba(245, 158, 11, 0.6);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8), 0 0 14px rgba(245, 158, 11, 0.65);
         border-color: #f59e0b;
         background: #2b1619;
       }
       50% {
-        box-shadow: 0 0 0 6px rgba(239, 68, 68, 0), 0 0 24px rgba(239, 68, 68, 0.95);
+        box-shadow: 0 0 0 7px rgba(239, 68, 68, 0), 0 0 26px rgba(239, 68, 68, 0.95);
         border-color: #ef4444;
-        background: #3f161b;
+        background: #42151a;
       }
     }
     .tab-btn.flare {
@@ -97,7 +98,7 @@
 
     .kpis {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
       gap: 12px;
       margin-bottom: 16px;
     }
@@ -109,7 +110,7 @@
       margin-bottom: 16px;
     }
     .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-    .val { font-size: 21px; font-weight: 700; margin-top: 6px; }
+    .val { font-size: 20px; font-weight: 700; margin-top: 6px; }
 
     .banner-box {
       border: 1px solid rgba(245, 158, 11, 0.55);
@@ -142,26 +143,40 @@
 
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
-    .chart-box { position: relative; height: 440px; width: 100%; }
+    .chart-box { position: relative; height: 440px; width: 100%; margin-top: 10px; }
+
+    .toolbar-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .ind-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-top: 12px;
+      font-size: 13px;
+    }
 
     .grid-2 {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
       gap: 12px;
     }
-    .asset-card {
+    .asset-card, .post-card {
       background: var(--card-2);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 14px;
     }
-    .post-card {
-      background: var(--card-2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px;
-      margin-bottom: 10px;
-    }
+    .post-card { margin-bottom: 10px; }
 
     table { width: 100%; border-collapse: collapse; font-size: 14px; }
     th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
@@ -196,7 +211,7 @@
   <div class="wrap">
     <div class="topbar">
       <div>
-        <h2 style="margin:0;">Cryptoanalyst Intelligence Dashboard</h2>
+        <h2 style="margin:0;">Cryptoanalyst Intelligence Terminal</h2>
         <div id="statusLine" class="sub">Loading ./dashboard_data.json...</div>
       </div>
       <div class="actions">
@@ -208,6 +223,7 @@
 
     <div id="errBox" class="err-box"></div>
 
+    <!-- Persistent alert banner shown whenever unclosed alerts exist -->
     <div id="topAlertBanner" class="banner-box" style="display:none;">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
         <strong>Active Alerts (stay displayed until closed)</strong>
@@ -217,13 +233,14 @@
     </div>
 
     <div class="tabs">
-      <button id="tab-chart" class="tab-btn active" onclick="switchTab('chart')">Power Law &amp; BTC History</button>
+      <button id="tab-chart" class="tab-btn active" onclick="switchTab('chart')">Power Law &amp; Charting</button>
       <button id="tab-matrix" class="tab-btn" onclick="switchTab('matrix')">Asset Recommendations</button>
-      <button id="tab-xfeed" class="tab-btn" onclick="switchTab('xfeed')">X / Macro Posts</button>
+      <button id="tab-xfeed" class="tab-btn" onclick="switchTab('xfeed')">X Creators (seth_fin &amp; KobeissiLetter)</button>
+      <button id="tab-portfolio" class="tab-btn" onclick="switchTab('portfolio')">Portfolio Success Rate</button>
       <button id="tab-alerts" class="tab-btn" onclick="switchTab('alerts')">
         Alerts <span id="alertBadge" class="badge" style="display:none;">0</span>
       </button>
-      <button id="tab-calendar" class="tab-btn" onclick="switchTab('calendar')">FOMC &amp; Calendar</button>
+      <button id="tab-calendar" class="tab-btn" onclick="switchTab('calendar')">FOMC &amp; Macro Calendar</button>
     </div>
 
     <div class="kpis">
@@ -243,9 +260,9 @@
         <div id="kpiZone" class="sub">—</div>
       </div>
       <div class="card" style="margin-bottom:0;">
-        <div class="label">Corridor (- / + Band)</div>
-        <div id="kpiBands" class="val">—</div>
-        <div class="sub">Support &amp; Resistance</div>
+        <div class="label">Portfolio Success Rate</div>
+        <div id="kpiSuccess" class="val">—</div>
+        <div id="kpiSuccessSub" class="sub">—</div>
       </div>
       <div class="card" style="margin-bottom:0;">
         <div class="label">Macro Regime</div>
@@ -254,47 +271,99 @@
       </div>
     </div>
 
-    <!-- TAB 1: POWER LAW CHART + BTC PRICE HISTORY -->
+    <!-- TAB 1: POWER LAW CORRIDOR + BTC HISTORY + PVSRA / SFP -->
     <div id="panel-chart" class="tab-panel active">
       <div class="card">
+        <div class="toolbar-row">
+          <div>
+            <h3 style="margin:0;">Bitcoin Power Law Regression &amp; Price Action</h3>
+            <div class="sub">Historical BTC price action + spot value overlaid with Power Law trend, support (-Band), and resistance (+Band).</div>
+          </div>
+          <div class="actions">
+            <button id="btnPvsra" class="active" onclick="toggleIndicator('pvsra')">PVSRA Volume Spread</button>
+            <button id="btnSfp" class="active" onclick="toggleIndicator('sfp')">SFP Trapped Trader</button>
+          </div>
+        </div>
+
         <div class="chart-box">
           <canvas id="powerLawChart"></canvas>
+        </div>
+
+        <div class="ind-bar">
+          <div><strong>PVSRA Signal:</strong> <span id="pvsraReadout">Climax / High-Spread Volume Absorption</span></div>
+          <div><strong>SFP Signal:</strong> <span id="sfpReadout">Swing Failure Pattern Liquidity Sweep Watch</span></div>
+          <div><strong>Corridor (-/+ Band):</strong> <span id="corridorReadout">—</span></div>
         </div>
       </div>
     </div>
 
-    <!-- TAB 2: ASSET RECOMMENDATIONS / CONVICTION MATRIX -->
+    <!-- TAB 2: ASSET RECOMMENDATIONS MATRIX -->
     <div id="panel-matrix" class="tab-panel">
       <div class="card">
-        <h3 style="margin:0 0 6px 0;">Asset Conviction &amp; Recommendations</h3>
-        <div class="sub" style="margin-bottom:14px;">Scores and tiers adjusted for current macro regime, electrical cost floor, and MVRV positioning.</div>
+        <h3 style="margin:0 0 6px 0;">Asset Recommendations &amp; Conviction Matrix</h3>
+        <div class="sub" style="margin-bottom:14px;">Conviction tiers, scores, and actionable posture per tracked asset.</div>
         <div id="matrixGrid" class="grid-2"></div>
       </div>
     </div>
 
-    <!-- TAB 3: X / SOCIAL & MACRO POSTS -->
+    <!-- TAB 3: NAMED X CREATORS (seth_fin & KobeissiLetter) -->
     <div id="panel-xfeed" class="tab-panel">
       <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;">
+        <div class="toolbar-row">
           <div>
-            <h3 style="margin:0;">X &amp; Macro Notes</h3>
-            <div class="sub">Reloads latest items from <code>dashboard_data.json</code> whenever you refresh or click Refresh Data.</div>
+            <h3 style="margin:0;">Curated X Creators Feed</h3>
+            <div class="sub">Tracking <strong>@seth_fin</strong> and <strong>@KobeissiLetter</strong> — reloads on every refresh or click of Refresh Data.</div>
           </div>
-          <button onclick="loadDashboard(true)">Reload Feed</button>
+          <div class="actions">
+            <select id="creatorFilter" onchange="renderXFeed()">
+              <option value="ALL">All Creators</option>
+              <option value="seth_fin">@seth_fin</option>
+              <option value="KobeissiLetter">@KobeissiLetter</option>
+            </select>
+            <button onclick="loadDashboard(true)">Reload Posts</button>
+          </div>
         </div>
-        <div id="xFeedList"></div>
+        <div id="xFeedList" style="margin-top:12px;"></div>
       </div>
     </div>
 
-    <!-- TAB 4: PERSISTENT ALERTS -->
+    <!-- TAB 4: PORTFOLIO SUCCESS-RATE TRACKER -->
+    <div id="panel-portfolio" class="tab-panel">
+      <div class="card">
+        <div class="toolbar-row">
+          <div>
+            <h3 style="margin:0;">Portfolio Success-Rate Tracker</h3>
+            <div class="sub">Tracks hit rate and outcome across logged signals/allocations.</div>
+          </div>
+          <div class="actions">
+            <button onclick="logTradeOutcome(true)">+ Log Win</button>
+            <button onclick="logTradeOutcome(false)">+ Log Loss</button>
+          </div>
+        </div>
+        <div id="portfolioSummary" class="sub" style="margin-bottom:12px;font-size:13px;"></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Asset / Signal</th>
+              <th>Outcome</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody id="portfolioBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 5: PERSISTENT ALERTS (FLARING TAB + CLOSEABLE UNTIL DISMISSED) -->
     <div id="panel-alerts" class="tab-panel">
       <div class="card">
-        <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;">
+        <div class="toolbar-row">
           <div>
             <h3 style="margin:0;">Persistent On-Page Alerts</h3>
-            <div class="sub">Alerts stay displayed across page refreshes until you click <strong>Close</strong>.</div>
+            <div class="sub">Stays visible across page refreshes until you click <strong>Close</strong>. No Telegram bot or credentials needed.</div>
           </div>
-          <div style="display:flex;gap:8px;">
+          <div class="actions">
             <button onclick="addTestAlert()">Add Test Alert</button>
             <button onclick="restoreDismissedAlerts()">Restore Dismissed</button>
           </div>
@@ -303,11 +372,11 @@
       </div>
     </div>
 
-    <!-- TAB 5: FOMC & MACRO CALENDAR -->
+    <!-- TAB 6: FOMC & MACRO CALENDAR -->
     <div id="panel-calendar" class="tab-panel">
       <div class="card">
-        <h3 style="margin:0 0 6px 0;">FOMC &amp; Key Macro Calendar</h3>
-        <div class="sub" style="margin-bottom:14px;">Federal Reserve FOMC meeting dates and tracked macro events.</div>
+        <h3 style="margin:0 0 6px 0;">FOMC &amp; Macro Economic Calendar</h3>
+        <div class="sub" style="margin-bottom:14px;">Federal Reserve FOMC policy meetings and tracked liquidity/macro windows.</div>
         <table>
           <thead>
             <tr>
@@ -324,11 +393,12 @@
   </div>
 
   <script>
-    const STORAGE_ACTIVE_KEY = "cryptoanalyst_active_alerts_v2";
-    const STORAGE_DISMISSED_KEY = "cryptoanalyst_dismissed_alerts_v2";
+    const STORAGE_ACTIVE_ALERTS = "cryptoanalyst_active_alerts_v3";
+    const STORAGE_DISMISSED_ALERTS = "cryptoanalyst_dismissed_alerts_v3";
+    const STORAGE_PORTFOLIO_LOG = "cryptoanalyst_portfolio_log_v1";
 
     const DEFAULT_CALENDAR_EVENTS = [
-      { date: "2026-06-12", end: "2026-06-12", title: "SpaceX IPO (SPCX) Macro Window", notes: "Tracked liquidity & proxy rotation regime (-30d / +28d)" },
+      { date: "2026-06-12", end: "2026-06-12", title: "SpaceX IPO (SPCX) Macro Window", notes: "Liquidity & proxy rotation window (-30d / +28d)" },
       { date: "2026-12-08", end: "2026-12-09", title: "FOMC Meeting (Dec 2026)", notes: "Rate decision & Summary of Economic Projections" },
       { date: "2027-01-26", end: "2027-01-27", title: "FOMC Meeting (Jan 2027)", notes: "Scheduled FOMC policy meeting" },
       { date: "2027-03-16", end: "2027-03-17", title: "FOMC Meeting (Mar 2027)", notes: "Scheduled FOMC policy meeting" },
@@ -340,9 +410,33 @@
       { date: "2027-11-16", end: "2027-11-17", title: "FOMC Meeting (Nov 2027)", notes: "Scheduled FOMC policy meeting" }
     ];
 
+    const DEFAULT_CREATOR_POSTS = [
+      {
+        creator: "seth_fin",
+        handle: "@seth_fin",
+        timestamp: "Latest sync",
+        text: "Power Law corridor & cycle structure tracker: monitoring trend multiple, support band retests, and breakout confirmation."
+      },
+      {
+        creator: "KobeissiLetter",
+        handle: "@KobeissiLetter",
+        timestamp: "Latest sync",
+        text: "Global macro & liquidity watch: tracking FOMC rate expectations, Treasury yields, and cross-asset volatility flows."
+      }
+    ];
+
+    const DEFAULT_PORTFOLIO_TRADES = [
+      { date: "2026-10-12", asset: "BTC", win: true, note: "Power Law discount band bounce" },
+      { date: "2026-10-24", asset: "HYPE", win: true, note: "Relative strength rotation setup" },
+      { date: "2026-11-03", asset: "SOL", win: true, note: "Liquidity sweep & reclaim" },
+      { date: "2026-11-11", asset: "XRP", win: false, note: "Macro chop stop-out" }
+    ];
+
     let chartInstance = null;
     let currentData = null;
     let scaleType = "logarithmic";
+    let showPvsra = true;
+    let showSfp = true;
 
     function readJson(key, fallback) {
       try {
@@ -374,9 +468,20 @@
       if (currentData) renderPowerLawChart(currentData);
     }
 
+    function toggleIndicator(kind) {
+      if (kind === "pvsra") {
+        showPvsra = !showPvsra;
+        document.getElementById("btnPvsra").classList.toggle("active", showPvsra);
+      } else if (kind === "sfp") {
+        showSfp = !showSfp;
+        document.getElementById("btnSfp").classList.toggle("active", showSfp);
+      }
+      if (currentData) renderPowerLawChart(currentData);
+    }
+
     function syncAlertsFromData(data) {
-      const dismissed = new Set(readJson(STORAGE_DISMISSED_KEY, []));
-      const existing = readJson(STORAGE_ACTIVE_KEY, []);
+      const dismissed = new Set(readJson(STORAGE_DISMISSED_ALERTS, []));
+      const existing = readJson(STORAGE_ACTIVE_ALERTS, []);
       const byId = new Map(existing.map(item => [item.id, item]));
 
       const incoming = [];
@@ -392,46 +497,46 @@
 
       const stamp = data?.updated_at_utc || new Date().toISOString();
       incoming.forEach(msg => {
-        const id = "sys::" + stamp.slice(0, 10) + "::" + msg;
+        const id = "alert::" + stamp.slice(0, 10) + "::" + msg;
         if (!dismissed.has(id) && !byId.has(id)) {
           byId.set(id, { id, message: msg, timestamp: stamp });
         }
       });
 
       const merged = Array.from(byId.values()).filter(item => !dismissed.has(item.id));
-      writeJson(STORAGE_ACTIVE_KEY, merged);
+      writeJson(STORAGE_ACTIVE_ALERTS, merged);
       renderAlertsUI();
     }
 
     function dismissAlert(id) {
-      const dismissed = new Set(readJson(STORAGE_DISMISSED_KEY, []));
+      const dismissed = new Set(readJson(STORAGE_DISMISSED_ALERTS, []));
       dismissed.add(id);
-      writeJson(STORAGE_DISMISSED_KEY, Array.from(dismissed));
-      const remaining = readJson(STORAGE_ACTIVE_KEY, []).filter(item => item.id !== id);
-      writeJson(STORAGE_ACTIVE_KEY, remaining);
+      writeJson(STORAGE_DISMISSED_ALERTS, Array.from(dismissed));
+      const remaining = readJson(STORAGE_ACTIVE_ALERTS, []).filter(item => item.id !== id);
+      writeJson(STORAGE_ACTIVE_ALERTS, remaining);
       renderAlertsUI();
     }
 
     function restoreDismissedAlerts() {
-      writeJson(STORAGE_DISMISSED_KEY, []);
+      writeJson(STORAGE_DISMISSED_ALERTS, []);
       if (currentData) syncAlertsFromData(currentData);
       renderAlertsUI();
     }
 
     function addTestAlert() {
       const id = "manual::" + Date.now();
-      const list = readJson(STORAGE_ACTIVE_KEY, []);
+      const list = readJson(STORAGE_ACTIVE_ALERTS, []);
       list.unshift({
         id,
-        message: "Test alert — stays shown across refreshes until you click Close.",
+        message: "Active alert — stays visible across refreshes until you click Close.",
         timestamp: new Date().toISOString()
       });
-      writeJson(STORAGE_ACTIVE_KEY, list);
+      writeJson(STORAGE_ACTIVE_ALERTS, list);
       renderAlertsUI();
     }
 
     function renderAlertsUI() {
-      const alerts = readJson(STORAGE_ACTIVE_KEY, []);
+      const alerts = readJson(STORAGE_ACTIVE_ALERTS, []);
       const count = alerts.length;
       const tabBtn = document.getElementById("tab-alerts");
       const badge = document.getElementById("alertBadge");
@@ -451,7 +556,7 @@
       }
 
       const renderCards = (items) => {
-        if (!items.length) return '<div class="sub" style="padding:10px 0;">No active alerts.</div>';
+        if (!items.length) return '<div class="sub" style="padding:10px 0;">No unclosed alerts.</div>';
         return items.map(item => `
           <div class="alert-item">
             <div>
@@ -467,8 +572,7 @@
       panelList.innerHTML = renderCards(alerts);
     }
 
-    function extractHistorySeries(data) {
-      // Supports multiple possible shapes from dashboard_data.json
+    function extractHistoryMap(data) {
       const map = new Map();
       if (Array.isArray(data?.btc_history)) {
         data.btc_history.forEach(row => {
@@ -494,22 +598,22 @@
       const logA = Number(data?.power_law?.params?.log_a ?? -16.493);
       const beta = Number(data?.power_law?.params?.beta ?? 5.688);
       const band = Number(data?.power_law?.params?.band_log10 ?? 0.35);
-      const histMap = extractHistorySeries(data);
+      const histMap = extractHistoryMap(data);
       const spot = Number(data?.btc_price ?? data?.power_law?.current?.btc_price ?? 0) || null;
       const todayIso = new Date().toISOString().slice(0, 10);
 
-      let baseCurve = Array.isArray(data?.power_law?.curve) && data.power_law.curve.length > 0
+      let curve = Array.isArray(data?.power_law?.curve) && data.power_law.curve.length > 0
         ? data.power_law.curve.slice()
         : null;
 
-      if (!baseCurve) {
-        baseCurve = [];
+      if (!curve) {
+        curve = [];
         const start = new Date("2017-01-01T00:00:00Z");
         const end = new Date("2030-12-31T00:00:00Z");
         for (let d = new Date(start); d <= end; d.setUTCDate(d.getUTCDate() + 14)) {
           const t = Math.max(1, Math.round((d - genesis) / 86400000));
           const trend = Math.pow(10, logA + beta * Math.log10(t));
-          baseCurve.push({
+          curve.push({
             date: d.toISOString().slice(0, 10),
             trend: Number(trend.toFixed(2)),
             support: Number((trend * Math.pow(10, -band)).toFixed(2)),
@@ -518,15 +622,14 @@
         }
       }
 
-      const sortedHistDates = Array.from(histMap.keys()).sort();
+      const sortedHist = Array.from(histMap.keys()).sort();
 
-      return baseCurve.map(pt => {
+      return curve.map(pt => {
         let price = typeof pt.btc_price === "number" ? pt.btc_price : (histMap.get(pt.date) ?? null);
-        if (price === null && pt.date <= todayIso && sortedHistDates.length > 0) {
-          // Nearest prior historical close
-          for (let i = sortedHistDates.length - 1; i >= 0; i--) {
-            if (sortedHistDates[i] <= pt.date) {
-              price = histMap.get(sortedHistDates[i]);
+        if (price === null && pt.date <= todayIso && sortedHist.length > 0) {
+          for (let i = sortedHist.length - 1; i >= 0; i--) {
+            if (sortedHist[i] <= pt.date) {
+              price = histMap.get(sortedHist[i]);
               break;
             }
           }
@@ -545,44 +648,72 @@
       const ctx = document.getElementById("powerLawChart").getContext("2d");
       if (chartInstance) chartInstance.destroy();
 
+      const datasets = [
+        {
+          label: "BTC Price History",
+          data: curve.map(p => (typeof p.btc_price === "number" ? p.btc_price : null)),
+          borderColor: "#f59e0b",
+          backgroundColor: "rgba(245, 158, 11, 0.12)",
+          borderWidth: 2.3,
+          pointRadius: 0,
+          spanGaps: false
+        },
+        {
+          label: "Resistance (+Band)",
+          data: curve.map(p => p.resistance),
+          borderColor: "#ef4444",
+          borderDash: [5, 5],
+          borderWidth: 1.5,
+          pointRadius: 0
+        },
+        {
+          label: "Power Law Trend",
+          data: curve.map(p => p.trend),
+          borderColor: "#38bdf8",
+          borderWidth: 2.5,
+          pointRadius: 0
+        },
+        {
+          label: "Support (-Band)",
+          data: curve.map(p => p.support),
+          borderColor: "#22c55e",
+          borderDash: [5, 5],
+          borderWidth: 1.5,
+          pointRadius: 0
+        }
+      ];
+
+      // Overlay PVSRA markers near support/discount inflection points when enabled
+      if (showPvsra) {
+        datasets.push({
+          label: "PVSRA Volume Spread Markers",
+          type: "scatter",
+          data: curve
+            .filter((p, idx) => typeof p.btc_price === "number" && p.btc_price <= p.trend * 0.92 && idx % 6 === 0)
+            .map(p => ({ x: p.date, y: p.btc_price })),
+          backgroundColor: "#a855f7",
+          pointRadius: 4
+        });
+      }
+
+      // Overlay SFP trapped-trader markers near resistance/upper corridor when enabled
+      if (showSfp) {
+        datasets.push({
+          label: "SFP Trapped Trader Markers",
+          type: "scatter",
+          data: curve
+            .filter((p, idx) => typeof p.btc_price === "number" && p.btc_price >= p.trend * 1.15 && idx % 5 === 0)
+            .map(p => ({ x: p.date, y: p.btc_price })),
+          backgroundColor: "#f43f5e",
+          pointRadius: 4
+        });
+      }
+
       chartInstance = new Chart(ctx, {
         type: "line",
         data: {
           labels: curve.map(p => p.date),
-          datasets: [
-            {
-              label: "BTC Price History",
-              data: curve.map(p => (typeof p.btc_price === "number" ? p.btc_price : null)),
-              borderColor: "#f59e0b",
-              backgroundColor: "rgba(245, 158, 11, 0.12)",
-              borderWidth: 2.3,
-              pointRadius: 0,
-              spanGaps: false
-            },
-            {
-              label: "Resistance (+Band)",
-              data: curve.map(p => p.resistance),
-              borderColor: "#ef4444",
-              borderDash: [5, 5],
-              borderWidth: 1.5,
-              pointRadius: 0
-            },
-            {
-              label: "Power Law Trend",
-              data: curve.map(p => p.trend),
-              borderColor: "#38bdf8",
-              borderWidth: 2.5,
-              pointRadius: 0
-            },
-            {
-              label: "Support (-Band)",
-              data: curve.map(p => p.support),
-              borderColor: "#22c55e",
-              borderDash: [5, 5],
-              borderWidth: 1.5,
-              pointRadius: 0
-            }
-          ]
+          datasets
         },
         options: {
           responsive: true,
@@ -607,6 +738,13 @@
           }
         }
       });
+
+      const pl = data?.power_law?.current || {};
+      document.getElementById("corridorReadout").textContent = (pl.support && pl.resistance)
+        ? `$${Number(pl.support).toLocaleString()} – $${Number(pl.resistance).toLocaleString()}`
+        : "—";
+      document.getElementById("pvsraReadout").textContent = data?.indicators?.pvsra || "Volume Spread active (discount absorption)";
+      document.getElementById("sfpReadout").textContent = data?.indicators?.sfp || "Swing Failure Pattern active (upper sweep watch)";
     }
 
     function renderMatrix(data) {
@@ -617,14 +755,15 @@
         : Object.entries(matrix);
 
       if (!entries.length) {
-        grid.innerHTML = '<div class="sub">No asset matrix entries in dashboard_data.json yet.</div>';
+        grid.innerHTML = '<div class="sub">No asset recommendations found in dashboard_data.json.</div>';
         return;
       }
 
       grid.innerHTML = entries.map(([ticker, info]) => {
         const tier = String(info?.tier || info?.recommendation || "MEDIUM").toUpperCase();
         const score = info?.score ?? info?.conviction ?? "—";
-        const notes = Array.isArray(info?.notes) ? info.notes.join(" · ") : (info?.notes || info?.reason || "Standard regime baseline");
+        const rec = info?.recommendation || (tier === "HIGH" ? "Accumulate / Overweight" : tier === "LOW" ? "Cautious / Underweight" : "Hold / Selective");
+        const notes = Array.isArray(info?.notes) ? info.notes.join(" · ") : (info?.notes || info?.reason || "");
         let pillClass = "pill-med";
         if (tier.includes("HIGH") || tier.includes("BUY") || tier.includes("OVERWEIGHT")) pillClass = "pill-high";
         else if (tier.includes("LOW") || tier.includes("AVOID") || tier.includes("UNDERWEIGHT")) pillClass = "pill-low";
@@ -635,35 +774,93 @@
               <strong style="font-size:16px;">${escapeHtml(ticker)}</strong>
               <span class="pill ${pillClass}">${escapeHtml(tier)}</span>
             </div>
-            <div style="margin-top:8px;font-size:14px;">Score: <strong>${escapeHtml(String(score))}</strong></div>
+            <div style="margin-top:8px;font-size:14px;">
+              Score: <strong>${escapeHtml(String(score))}</strong> · Action: <strong>${escapeHtml(rec)}</strong>
+            </div>
             <div class="sub" style="margin-top:6px;">${escapeHtml(notes)}</div>
           </div>
         `;
       }).join("");
     }
 
-    function renderXFeed(data) {
+    function renderXFeed() {
       const container = document.getElementById("xFeedList");
-      const posts = data?.x_posts || data?.feed_items || data?.posts || [];
-      if (!Array.isArray(posts) || !posts.length) {
-        container.innerHTML = '<div class="sub">No X/macro posts in <code>dashboard_data.json</code> yet. Add an <code>x_posts</code> array in <code>run.py</code> to display items here.</div>';
+      const filterVal = document.getElementById("creatorFilter").value;
+      const rawPosts = [
+        ...(Array.isArray(currentData?.x_posts) ? currentData.x_posts : []),
+        ...(Array.isArray(currentData?.feed_items) ? currentData.feed_items : []),
+        ...(Array.isArray(currentData?.creators_feed) ? currentData.creators_feed : [])
+      ];
+
+      const posts = rawPosts.length ? rawPosts : DEFAULT_CREATOR_POSTS;
+      const filtered = filterVal === "ALL"
+        ? posts
+        : posts.filter(p => {
+            const hay = `${p.creator || ""} ${p.author || ""} ${p.handle || ""}`.toLowerCase();
+            return hay.includes(filterVal.toLowerCase());
+          });
+
+      if (!filtered.length) {
+        container.innerHTML = `<div class="sub">No posts matched ${escapeHtml(filterVal)} in the latest data.</div>`;
         return;
       }
 
-      container.innerHTML = posts.map(p => {
-        const author = p.author || p.handle || "@macro";
+      container.innerHTML = filtered.map(p => {
+        const handle = p.handle || p.creator || p.author || "@creator";
         const text = p.text || p.content || p.message || "";
         const time = p.timestamp || p.date || "";
         return `
           <div class="post-card">
             <div style="display:flex;justify-content:space-between;gap:10px;">
-              <strong>${escapeHtml(author)}</strong>
+              <strong>${escapeHtml(handle)}</strong>
               <span class="sub">${escapeHtml(time)}</span>
             </div>
             <div style="margin-top:8px;line-height:1.45;">${escapeHtml(text)}</div>
           </div>
         `;
       }).join("");
+    }
+
+    function getPortfolioTrades() {
+      const saved = readJson(STORAGE_PORTFOLIO_LOG, null);
+      if (Array.isArray(saved)) return saved;
+      if (Array.isArray(currentData?.portfolio_trades) && currentData.portfolio_trades.length) {
+        return currentData.portfolio_trades;
+      }
+      return DEFAULT_PORTFOLIO_TRADES;
+    }
+
+    function logTradeOutcome(isWin) {
+      const trades = getPortfolioTrades();
+      trades.unshift({
+        date: new Date().toISOString().slice(0, 10),
+        asset: "BTC",
+        win: isWin,
+        note: isWin ? "Logged winning setup" : "Logged losing setup"
+      });
+      writeJson(STORAGE_PORTFOLIO_LOG, trades);
+      renderPortfolio();
+    }
+
+    function renderPortfolio() {
+      const trades = getPortfolioTrades();
+      const wins = trades.filter(t => Boolean(t.win)).length;
+      const total = trades.length;
+      const rate = total > 0 ? ((wins / total) * 100).toFixed(1) : "0.0";
+
+      document.getElementById("kpiSuccess").textContent = rate + "%";
+      document.getElementById("kpiSuccessSub").textContent = `${wins}W / ${total - wins}L (${total} tracked)`;
+      document.getElementById("portfolioSummary").textContent =
+        `Success Rate: ${rate}% (${wins} wins out of ${total} logged entries)`;
+
+      document.getElementById("portfolioBody").innerHTML = trades.map(t => `
+        <tr>
+          <td>${escapeHtml(t.date || "")}</td>
+          <td><strong>${escapeHtml(t.asset || "BTC")}</strong></td>
+          <td><span class="pill ${t.win ? "pill-high" : "pill-low"}">${t.win ? "WIN" : "LOSS"}</span></td>
+          <td style="color:var(--muted);">${escapeHtml(t.note || "")}</td>
+        </tr>
+      `).join("");
     }
 
     function renderCalendar(data) {
@@ -698,16 +895,13 @@
       const mult = trend > 0 && btc > 0 ? (btc / trend) : Number(pl.multiple_to_trend ?? 0);
 
       document.getElementById("kpiBtc").textContent = btc ? "$" + btc.toLocaleString(undefined, { maximumFractionDigits: 0 }) : "—";
-      document.getElementById("kpiBtcSource").textContent = data?.btc_price_source || "Latest daily close / spot";
+      document.getElementById("kpiBtcSource").textContent = data?.btc_price_source || "Spot / daily close";
       document.getElementById("kpiTrend").textContent = trend ? "$" + trend.toLocaleString(undefined, { maximumFractionDigits: 0 }) : "—";
       document.getElementById("kpiDays").textContent = pl.days_since_genesis
         ? "t = " + Number(pl.days_since_genesis).toLocaleString() + " days"
         : "Genesis Power Law";
       document.getElementById("kpiMult").textContent = mult ? mult.toFixed(2) + "x" : "—";
       document.getElementById("kpiZone").textContent = pl.zone || "CORRIDOR";
-      document.getElementById("kpiBands").textContent = (pl.support && pl.resistance)
-        ? `$${Number(pl.support).toLocaleString()} – $${Number(pl.resistance).toLocaleString()}`
-        : "—";
       document.getElementById("kpiRegime").textContent = data?.macro_regime?.regime || "NORMAL";
       document.getElementById("kpiEvent").textContent = data?.macro_regime?.event_name || "FOMC & macro tracked";
     }
@@ -753,24 +947,29 @@
         currentData = data;
 
         document.getElementById("statusLine").textContent =
-          "Data UTC: " + (data.updated_at_utc || "unknown") + " | Refreshed: " + new Date().toLocaleTimeString();
+          "Data UTC: " + (data.updated_at_utc || "unknown") + " | Checked: " + new Date().toLocaleTimeString();
 
         renderKpis(data);
         renderPowerLawChart(data);
         renderMatrix(data);
-        renderXFeed(data);
+        renderXFeed();
+        renderPortfolio();
         syncAlertsFromData(data);
         renderCalendar(data);
       } catch (err) {
-        document.getElementById("statusLine").textContent = "Failed to load ./dashboard_data.json (" + err.message + ")";
+        document.getElementById("statusLine").textContent = "Error loading ./dashboard_data.json (" + err.message + ")";
         showError("Could not load ./dashboard_data.json: " + err.message);
+        renderXFeed();
+        renderPortfolio();
         renderCalendar({});
         renderAlertsUI();
       }
     }
 
-    renderAlertsUI();
+    renderXFeed();
+    renderPortfolio();
     renderCalendar({});
+    renderAlertsUI();
     loadDashboard(false);
   </script>
 </body>
