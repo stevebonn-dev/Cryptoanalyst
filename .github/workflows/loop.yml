@@ -5,10 +5,13 @@ on:
     - cron: '0 8,15,22 * * *' # Runs at 08:00, 15:00, and 22:00 CET daily
   workflow_dispatch: # Allows manual triggering from the GitHub Actions tab
 
+permissions:
+  contents: write
+
 jobs:
   run:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -29,3 +32,13 @@ jobs:
           python run.py
         env:
           PYTHONUNBUFFERED: '1'
+
+      - name: Commit and Push Updated JSON Files
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add watchlist.json data.json feedback_telemetry.json manual_inputs.json 2>/dev/null || true
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: update watchlist and crypto intelligence outputs [skip ci]"
+            git push
+          fi
