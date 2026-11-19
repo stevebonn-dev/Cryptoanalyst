@@ -10,7 +10,6 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
     body { background-color: #131722; color: #d1d4dc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    /* Remove TradingView attribution link/logo while keeping the dynamic chart intact */
     #tvChartContainer a[href*="tradingview"],
     #plChartContainer a[href*="tradingview"],
     .tv-lightweight-charts__attribution,
@@ -46,6 +45,7 @@
       <button data-tab="report" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">🏛️ Market Analyst Report</button>
       <button data-tab="xfeed" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">🐦 X Feed & Key Posts</button>
       <button data-tab="macro" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">📅 Macro & Fed Calendar</button>
+      <button data-tab="glossary" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">📖 Glossary & Acronyms</button>
       <button data-tab="backtest" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">Strategy Backtest & ROI</button>
       <button data-tab="manager" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">Asset Manager</button>
     </nav>
@@ -176,8 +176,8 @@
       <div class="bg-[#1e222d] border border-[#2a2e39] rounded-xl p-5 shadow-sm space-y-4">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-[#2a2e39] pb-3">
           <div>
-            <h2 class="text-sm font-extrabold text-white">💼 Sample Portfolio ($100,000 Model) & Recommendation Success Rate by Horizon</h2>
-            <p class="text-[11px] text-slate-400">Compares Short-Term (1–7d), Medium-Term (1–4w), and Long-Term (1–6m+) signal accuracy across core assets.</p>
+            <h2 class="text-sm font-extrabold text-white">💼 Sample Portfolio ($100,000 Model) &amp; Signal Win Rate by Horizon</h2>
+            <p class="text-[11px] text-slate-400">ST / MT / LT % = historical/modeled win rate that a short-term (1–7d), medium-term (1–4w), or long-term (1–6m+) signal plays out accurately. See <button type="button" onclick="switchTab('glossary')" class="text-amber-400 underline">Glossary</button> for details.</p>
           </div>
           <div class="flex items-center space-x-2 text-xs font-mono">
             <label for="horizonFilter" class="text-slate-400">Highlight Horizon:</label>
@@ -196,9 +196,9 @@
                 <th class="p-3">Asset</th>
                 <th class="p-3">Sample Alloc ($100k)</th>
                 <th class="p-3">Active Signal</th>
-                <th class="p-3">Short-Term (1–7d)</th>
-                <th class="p-3">Medium-Term (1–4w)</th>
-                <th class="p-3">Long-Term (1–6m+)</th>
+                <th class="p-3">Short-Term (1–7d) Win %</th>
+                <th class="p-3">Medium-Term (1–4w) Win %</th>
+                <th class="p-3">Long-Term (1–6m+) Win %</th>
               </tr>
             </thead>
             <tbody id="portfolio-table-body" class="divide-y divide-[#2a2e39] text-slate-300"></tbody>
@@ -206,8 +206,9 @@
         </div>
       </div>
 
-      <div class="flex justify-between items-center pt-1">
-        <h2 class="text-sm font-extrabold text-white">📊 Watchlist Matrix, Power Law, PVSRA & Live Signals</h2>
+      <div class="flex flex-wrap justify-between items-center gap-2 pt-1">
+        <h2 class="text-sm font-extrabold text-white">📊 Watchlist Matrix, Power Law, PVSRA &amp; Live Signals</h2>
+        <span class="text-[11px] font-mono text-slate-400">ST / MT / LT = signal accuracy % per horizon &bull; MVRV = Market Value / Realized Value</span>
       </div>
       <div id="assets-grid-container" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
     </section>
@@ -277,23 +278,24 @@
       </div>
     </section>
 
-    <!-- TAB 4: X FEED (LAST 24–48H POSTS + ADD NEW PEOPLE) -->
+    <!-- TAB 4: X FEED (PER PERSON, MOST RECENT ON TOP, UP TO 10 POSTS IN 24–48H + ADD NEW PEOPLE) -->
     <section id="xfeed" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
         <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-2">
           <div>
-            <h2 class="text-lg font-extrabold text-white">🐦 X Feed & Key Market Posts (Last 24–48 Hours)</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Tracked accounts: @seth_fin, @KobeissiLetter, @TedPillows, @CW8900, @aktionaer, @KillaXBT, @DrProfitCrypto — plus custom accounts you add.</p>
+            <h2 class="text-lg font-extrabold text-white">🐦 X Feed &amp; Key Market Posts (Grouped Per Person • Newest First)</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Lists up to the latest 10 posts per followed account within the last 24–48 hours, ordered newest-first (e.g., 5m ago on top). Add new people or posts below.</p>
           </div>
-          <span class="px-2.5 py-1 bg-sky-500/10 border border-sky-500/30 text-sky-400 text-[11px] font-bold rounded">Window: Last 24–48h</span>
+          <span class="px-2.5 py-1 bg-sky-500/10 border border-sky-500/30 text-sky-400 text-[11px] font-bold rounded">Newest First &bull; Max 10 / Person</span>
         </div>
 
         <!-- Add New X Person / Post Form -->
         <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-3 font-mono text-xs">
-          <div class="font-bold text-amber-400">+ Add New X Account & Recent Post (24–48h)</div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <input type="text" id="x-new-handle" placeholder="@Handle (e.g. @crypto_quant)" class="bg-[#1e222d] border border-[#2a2e39] rounded p-2 text-xs text-white font-mono" />
-            <input type="text" id="x-new-time" placeholder="Window (e.g. 14h ago / Yesterday)" class="bg-[#1e222d] border border-[#2a2e39] rounded p-2 text-xs text-white font-mono" />
+          <div class="font-bold text-amber-400">+ Add New X Account or Recent Post (Most Recent Appears on Top)</div>
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+            <input type="text" id="x-new-handle" placeholder="@Handle (e.g. @TedPillows)" class="bg-[#1e222d] border border-[#2a2e39] rounded p-2 text-xs text-white font-mono" />
+            <input type="number" id="x-new-minutes" min="1" max="2880" placeholder="Age in mins (e.g. 5 for 5m ago)" class="bg-[#1e222d] border border-[#2a2e39] rounded p-2 text-xs text-white font-mono" />
+            <input type="text" id="x-new-time" placeholder="Label (e.g. 5m ago / 2h ago)" class="bg-[#1e222d] border border-[#2a2e39] rounded p-2 text-xs text-white font-mono" />
             <input type="text" id="x-new-tag" placeholder="Topic (e.g. BTC / Macro / SFP)" class="bg-[#1e222d] border border-[#2a2e39] rounded p-2 text-xs text-white font-mono" />
           </div>
           <div class="flex flex-col sm:flex-row gap-3">
@@ -304,7 +306,7 @@
           </div>
         </div>
 
-        <div id="xfeed-posts-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono"></div>
+        <div id="xfeed-posts-container" class="space-y-4 text-xs font-mono"></div>
       </div>
     </section>
 
@@ -335,7 +337,52 @@
       </div>
     </section>
 
-    <!-- TAB 6: BACKTEST & ROI -->
+    <!-- TAB 6: GLOSSARY & ACRONYMS -->
+    <section id="glossary" class="tab-content space-y-6">
+      <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
+        <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-2">
+          <div>
+            <h2 class="text-lg font-extrabold text-white">📖 Acronyms, Metrics &amp; Signal Percentages Explained</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Clear definitions for MVRV / MVRV Band, PVSRA, SFP, Power Law, MWA, and ST / MT / LT win percentages.</p>
+          </div>
+          <span class="px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] font-bold rounded">Reference Guide</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1.5">
+            <div class="font-bold text-amber-400 text-sm">MVRV &amp; MVRV Band (Market Value to Realized Value)</div>
+            <p class="text-slate-300 leading-relaxed">Compares current <strong>Market Value</strong> (spot price &times; circulating supply) against <strong>Realized Value</strong> (each coin valued at the price when it last moved on-chain, reflecting aggregate cost basis). <strong>&lt; 1.2</strong> = undervalued/accumulation band; <strong>1.2–2.4</strong> = fair/neutral band; <strong>&gt; 2.4</strong> = overvalued/euphoria distribution zone.</p>
+          </div>
+
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1.5">
+            <div class="font-bold text-fuchsia-400 text-sm">PVSRA (Price, Volume, Support/Resistance Analysis)</div>
+            <p class="text-slate-300 leading-relaxed">Evaluates candlestick spread (high-low range), close position, and volume relative to a 20-bar average. High/climax volume (&ge;2.0&times; average) or rising volume (&ge;1.5&times; average) helps distinguish institutional absorption/stopping volume from climactic distribution or weak moves.</p>
+          </div>
+
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1.5">
+            <div class="font-bold text-amber-400 text-sm">Short-Term (ST), Medium-Term (MT) &amp; Long-Term (LT) %</div>
+            <p class="text-slate-300 leading-relaxed">Represents the <strong>signal win/accuracy rate for that time horizon</strong>: <strong>ST (1–7 days)</strong>, <strong>MT (1–4 weeks)</strong>, and <strong>LT (1–6 months+)</strong>. For example, an ST win rate of <strong>72%</strong> means signals on that short-term horizon have historically played out accurately ~72% of the time in model tracking—not a guaranteed outcome on any single trade.</p>
+          </div>
+
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1.5">
+            <div class="font-bold text-red-400 text-sm">SFP (Swing Failure Pattern)</div>
+            <p class="text-slate-300 leading-relaxed">A liquidity-sweep reversal setup where price briefly pierces a prior swing high or swing low (wick/sweep) to trigger stops/liquidity and then closes back inside the prior range, signaling a failed breakout and potential reversal.</p>
+          </div>
+
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1.5">
+            <div class="font-bold text-teal-400 text-sm">Power Law Model</div>
+            <p class="text-slate-300 leading-relaxed">A long-term logarithmic regression model for Bitcoin relative to days since genesis (Jan 3, 2009). Comparing spot price to the Power Law fair-value curve and lower/upper bands shows whether BTC is trading at a macro discount or overextended cycle premium.</p>
+          </div>
+
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1.5">
+            <div class="font-bold text-blue-400 text-sm">MWA (Moving Average: 50 / 100 / 200D / 200W) &amp; ROI / Corr</div>
+            <p class="text-slate-300 leading-relaxed"><strong>50 / 100 / 200D MA</strong> track short-to-medium trend baselines; <strong>200W MA</strong> acts as a long-term macro cycle anchor. <strong>ROI</strong> shows modeled strategy return; <strong>Correlation</strong> measures alignment with the benchmark/trend model.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 7: BACKTEST & ROI -->
     <section id="backtest" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-4">
         <h2 class="text-lg font-bold text-white">📈 Strategy Backtest & ROI Matrix</h2>
@@ -357,7 +404,7 @@
       </div>
     </section>
 
-    <!-- TAB 7: ASSET MANAGER -->
+    <!-- TAB 8: ASSET MANAGER -->
     <section id="manager" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-4">
         <h2 class="text-lg font-bold text-white">Universal Asset Onboarding</h2>
@@ -459,13 +506,14 @@
     };
 
     const defaultXPosts = [
-      { handle: '@KobeissiLetter', time: '28h ago (Nov 18)', tag: 'Macro & Leverage', post: 'US margin debt fell -$32B in October to $1.45T amid market volatility while crypto saw ~$2B in liquidations and spot ETF outflows with December Fed rate expectations in focus.' },
-      { handle: '@TedPillows', time: '20h ago (Nov 18)', tag: 'BTC & Funding', post: 'BTC funding on perps has reset near neutral after heavy leverage unwinds, with options pricing a wide near-term range while spot tests support.' },
-      { handle: '@DrProfitCrypto', time: '26h ago (Nov 18)', tag: 'Valuation & Liquidity', post: 'Focusing on major liquidity zones and long-term valuation bands rather than chasing emotional swings during high-rate macro pressure.' },
-      { handle: '@KillaXBT', time: '22h ago (Nov 18)', tag: 'SFP & Order Flow', post: 'Watching liquidity sweeps, spot absorption, and volume climax bars around key intraday levels before committing to directional swings.' },
-      { handle: '@seth_fin', time: '31h ago (Nov 18)', tag: 'MWA & Structure', post: 'Tracking whether BTC and majors can reclaim key moving average pivots and hold structural support floors without fresh breakdown volume.' },
-      { handle: '@CW8900', time: '36h ago (Nov 17)', tag: 'Cycle & Flows', post: 'Monitoring spot flow pressure, exchange liquidity, and cycle structure to separate tactical relief bounces from durable trend reversals.' },
-      { handle: '@aktionaer', time: '29h ago (Nov 18)', tag: 'Rates, AI & Crypto', post: 'Higher bond yields, AI/IPO capital shifts, and hawkish central bank expectations continue to weigh on risk assets and crypto equities.' }
+      { handle: '@TedPillows', ageMinutes: 5, time: '5m ago', tag: 'BTC & Funding', post: 'Latest check: BTC perp funding remains reset near neutral while spot tests support ahead of macro prints.' },
+      { handle: '@TedPillows', ageMinutes: 1200, time: '20h ago', tag: 'BTC & Liquidity', post: 'BTC funding on perps has reset near neutral after heavy leverage unwinds, with options pricing a wide near-term range while spot tests support.' },
+      { handle: '@KobeissiLetter', ageMinutes: 1680, time: '28h ago', tag: 'Macro & Leverage', post: 'US margin debt fell -$32B in October to $1.45T amid market volatility while crypto saw ~$2B in liquidations and spot ETF outflows with December Fed rate expectations in focus.' },
+      { handle: '@DrProfitCrypto', ageMinutes: 1560, time: '26h ago', tag: 'Valuation & Liquidity', post: 'Focusing on major liquidity zones and long-term valuation bands rather than chasing emotional swings during high-rate macro pressure.' },
+      { handle: '@KillaXBT', ageMinutes: 1320, time: '22h ago', tag: 'SFP & Order Flow', post: 'Watching liquidity sweeps, spot absorption, and volume climax bars around key intraday levels before committing to directional swings.' },
+      { handle: '@seth_fin', ageMinutes: 1860, time: '31h ago', tag: 'MWA & Structure', post: 'Tracking whether BTC and majors can reclaim key moving average pivots and hold structural support floors without fresh breakdown volume.' },
+      { handle: '@CW8900', ageMinutes: 2160, time: '36h ago', tag: 'Cycle & Flows', post: 'Monitoring spot flow pressure, exchange liquidity, and cycle structure to separate tactical relief bounces from durable trend reversals.' },
+      { handle: '@aktionaer', ageMinutes: 1740, time: '29h ago', tag: 'Rates, AI & Crypto', post: 'Higher bond yields, AI/IPO capital shifts, and hawkish central bank expectations continue to weigh on risk assets and crypto equities.' }
     ];
 
     const macroEvents = [
@@ -891,9 +939,9 @@
             <td class="p-3 font-bold text-amber-500">${t} (${a.name})</td>
             <td class="p-3 text-white">$${allocUsd} (${(a.weight * 100).toFixed(0)}%)</td>
             <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${rec.badgeClass}">${rec.action}</span></td>
-            <td class="p-3"><span class="${stCls}">${a.winST}</span></td>
-            <td class="p-3"><span class="${mtCls}">${a.winMT}</span></td>
-            <td class="p-3"><span class="${ltCls}">${a.winLT}</span></td>
+            <td class="p-3"><span class="${stCls}">${a.winST} win</span></td>
+            <td class="p-3"><span class="${mtCls}">${a.winMT} win</span></td>
+            <td class="p-3"><span class="${ltCls}">${a.winLT} win</span></td>
           </tr>`;
       }).join('');
     }
@@ -911,7 +959,7 @@
             <div class="grid grid-cols-2 gap-2 text-xs font-mono pt-1">
               <div>Spot: <strong class="text-white">$${a.price.toLocaleString(undefined, { maximumFractionDigits: 4 })}</strong></div>
               <div>MVRV: <strong class="text-blue-400">${a.mvrv}</strong></div>
-              <div>ST / MT / LT: <strong class="text-emerald-400">${a.winST}/${a.winMT}/${a.winLT}</strong></div>
+              <div>ST/MT/LT Win: <strong class="text-emerald-400">${a.winST}/${a.winMT}/${a.winLT}</strong></div>
               <div>ROI: <strong class="text-emerald-400">${a.roi}</strong></div>
             </div>
           </div>`;
@@ -943,39 +991,64 @@
     }
 
     function getXPosts() {
-      const saved = localStorage.getItem('cryptoanalyst_x_posts_v1');
+      const saved = localStorage.getItem('cryptoanalyst_x_posts_v2');
       return saved ? JSON.parse(saved) : defaultXPosts;
     }
 
     function saveXPosts(list) {
-      localStorage.setItem('cryptoanalyst_x_posts_v1', JSON.stringify(list));
+      localStorage.setItem('cryptoanalyst_x_posts_v2', JSON.stringify(list));
     }
 
     function renderXFeed() {
       const posts = getXPosts();
-      document.getElementById('xfeed-posts-container').innerHTML = posts.map(p => `
-        <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1.5">
-          <div class="flex justify-between items-center gap-2">
-            <span class="font-bold text-amber-400">${p.handle}</span>
-            <span class="text-[10px] text-slate-400">${p.time}</span>
-          </div>
-          <div class="text-[10px] text-cyan-400 font-bold uppercase">${p.tag}</div>
-          <p class="text-slate-300 text-[11px] leading-relaxed">${p.post}</p>
-        </div>
-      `).join('');
+      const grouped = {};
+      posts.forEach(p => {
+        if (!grouped[p.handle]) grouped[p.handle] = [];
+        grouped[p.handle].push(p);
+      });
+
+      const handles = Object.keys(grouped);
+      document.getElementById('xfeed-posts-container').innerHTML = handles.map(handle => {
+        const items = grouped[handle]
+          .slice()
+          .sort((a, b) => (a.ageMinutes ?? 9999) - (b.ageMinutes ?? 9999))
+          .slice(0, 10);
+
+        return `
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-3">
+            <div class="flex flex-wrap justify-between items-center gap-2 border-b border-[#2a2e39] pb-2">
+              <span class="font-extrabold text-amber-400 text-sm">${handle}</span>
+              <span class="text-[10px] text-slate-400">Latest ${items.length} / 10 posts (newest first)</span>
+            </div>
+            <div class="space-y-2.5">
+              ${items.map((p, idx) => `
+                <div class="p-3 rounded-lg bg-[#1e222d] border ${idx === 0 ? 'border-amber-500/40' : 'border-[#2a2e39]'} space-y-1">
+                  <div class="flex justify-between items-center gap-2">
+                    <span class="text-[10px] text-cyan-400 font-bold uppercase">${p.tag}${idx === 0 ? ' • LATEST' : ''}</span>
+                    <span class="text-[10px] text-slate-400">${p.time}</span>
+                  </div>
+                  <p class="text-slate-300 text-[11px] leading-relaxed">${p.post}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>`;
+      }).join('');
     }
 
     function addXFeedEntry() {
       let handle = document.getElementById('x-new-handle').value.trim();
-      const time = document.getElementById('x-new-time').value.trim() || 'Just now (24–48h window)';
+      const minsRaw = parseInt(document.getElementById('x-new-minutes').value, 10);
+      const ageMinutes = Number.isFinite(minsRaw) && minsRaw > 0 ? minsRaw : 10;
+      const time = document.getElementById('x-new-time').value.trim() || `${ageMinutes}m ago`;
       const tag = document.getElementById('x-new-tag').value.trim() || 'Market Commentary';
       const post = document.getElementById('x-new-post').value.trim();
       if (!handle || !post) return;
       if (!handle.startsWith('@')) handle = '@' + handle;
       const list = getXPosts();
-      list.unshift({ handle, time, tag, post });
+      list.unshift({ handle, ageMinutes, time, tag, post });
       saveXPosts(list);
       document.getElementById('x-new-handle').value = '';
+      document.getElementById('x-new-minutes').value = '';
       document.getElementById('x-new-time').value = '';
       document.getElementById('x-new-tag').value = '';
       document.getElementById('x-new-post').value = '';
