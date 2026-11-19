@@ -29,6 +29,69 @@ MACRO_EVENTS = [
     }
 ]
 
+CALENDAR_EVENTS: List[Dict[str, str]] = [
+    {
+        "date": "2026-06-12",
+        "end": "2026-06-12",
+        "title": "SpaceX IPO (SPCX) Macro Window",
+        "notes": "Tracked liquidity & proxy rotation regime (-30d / +28d)",
+    },
+    {
+        "date": "2026-12-08",
+        "end": "2026-12-09",
+        "title": "FOMC Meeting (Dec 2026)",
+        "notes": "Rate decision & Summary of Economic Projections",
+    },
+    {
+        "date": "2027-01-26",
+        "end": "2027-01-27",
+        "title": "FOMC Meeting (Jan 2027)",
+        "notes": "Scheduled FOMC policy meeting",
+    },
+    {
+        "date": "2027-03-16",
+        "end": "2027-03-17",
+        "title": "FOMC Meeting (Mar 2027)",
+        "notes": "Scheduled FOMC policy meeting",
+    },
+    {
+        "date": "2027-04-27",
+        "end": "2027-04-28",
+        "title": "FOMC Meeting (Apr 2027)",
+        "notes": "Scheduled FOMC policy meeting",
+    },
+    {
+        "date": "2027-06-08",
+        "end": "2027-06-09",
+        "title": "FOMC Meeting (Jun 2027)",
+        "notes": "Scheduled FOMC policy meeting",
+    },
+    {
+        "date": "2027-07-27",
+        "end": "2027-07-28",
+        "title": "FOMC Meeting (Jul 2027)",
+        "notes": "Scheduled FOMC policy meeting",
+    },
+    {
+        "date": "2027-09-14",
+        "end": "2027-09-15",
+        "title": "FOMC Meeting (Sep 2027)",
+        "notes": "Scheduled FOMC policy meeting",
+    },
+    {
+        "date": "2027-10-26",
+        "end": "2027-10-27",
+        "title": "FOMC Meeting (Oct 2027)",
+        "notes": "Scheduled FOMC policy meeting",
+    },
+    {
+        "date": "2027-11-16",
+        "end": "2027-11-17",
+        "title": "FOMC Meeting (Nov 2027)",
+        "notes": "Scheduled FOMC policy meeting",
+    },
+]
+
 
 def days_since_genesis(target_date: date) -> int:
     return max(1, (target_date - GENESIS_DATE).days)
@@ -84,7 +147,6 @@ def fetch_historical_btc_closes(start_date: date = date(2017, 8, 17)) -> Dict[st
         resp.raise_for_status()
         klines = resp.json()
 
-        # Paginate if more than 1000 daily candles exist
         while isinstance(klines, list) and klines:
             for row in klines:
                 dt_str = datetime.fromtimestamp(row[0] / 1000, tz=timezone.utc).date().isoformat()
@@ -118,7 +180,6 @@ def build_power_law_curve(
     cursor = date(start_year, 1, 1)
     end_date = date(end_year, 12, 31)
     points: List[Dict[str, Any]] = []
-
     sorted_hist_dates = sorted(btc_history.keys())
 
     def lookup_btc_price(d: date) -> Optional[float]:
@@ -127,7 +188,6 @@ def build_power_law_curve(
         iso = d.isoformat()
         if iso in btc_history:
             return btc_history[iso]
-        # Nearest prior available close within 7 days
         for offset in range(1, 8):
             prev_iso = (d - timedelta(days=offset)).isoformat()
             if prev_iso in btc_history:
@@ -151,7 +211,6 @@ def build_power_law_curve(
         )
         cursor += timedelta(days=step_days)
 
-    # Ensure exact current date is represented
     today_iso = as_of_date.isoformat()
     if not any(p["date"] == today_iso for p in points):
         metrics = compute_power_law_metrics(as_of_date)
@@ -308,7 +367,7 @@ def send_telegram_alert(text: str) -> None:
     token = (os.getenv("TELEGRAM_BOT_TOKEN") or "").strip()
     chat_id = (os.getenv("TELEGRAM_CHAT_ID") or "").strip()
     if not token or not chat_id:
-        print("Telegram secrets not configured; skipping Telegram send.")
+        print("Telegram secrets not set; skipping external Telegram send (using on-page alerts).")
         return
 
     url = f"https://api.telegram.org/bot{token}/sendMessage"
@@ -329,7 +388,11 @@ def main() -> None:
     macro_state = evaluate_macro_event_regime(today)
     btc_history = fetch_historical_btc_closes()
 
-    latest_hist_price = btc_history[max(btc_history.keys())] if btc_history else float(prev_state.get("btc_price", 92000.0))
+    latest_hist_price = (
+        btc_history[max(btc_history.keys())]
+        if btc_history
+        else float(prev_state.get("btc_price", 92000.0))
+    )
     btc_price = latest_hist_price
 
     pl_today = compute_power_law_metrics(today)
@@ -369,6 +432,17 @@ def main() -> None:
         power_law_zone=power_law_zone,
     )
 
+    on_page_alerts: List[Dict[str, str]] = [
+        {"message": item, "timestamp": now_utc.isoformat()} for item in transitions
+    ]
+    if elec_floor_breached:
+        on_page_alerts.append(
+            {
+                "message": f"BTC (${btc_price:,.0f}) is below electrical cost floor (${elec_cost_floor:,.0f}).",
+                "timestamp": now_utc.isoformat(),
+            }
+        )
+
     dashboard_payload = {
         "updated_at_utc": now_utc.isoformat(),
         "macro_regime": macro_state,
@@ -393,6 +467,8 @@ def main() -> None:
         },
         "matrix": matrix,
         "active_transitions": transitions,
+        "alerts": on_page_alerts,
+        "calendar_events": CALENDAR_EVENTS,
     }
     DASHBOARD_PATH.write_text(json.dumps(dashboard_payload, indent=2), encoding="utf-8")
 
@@ -426,4 +502,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
