@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cryptoanalyst — Power Law, Alerts & FOMC Calendar</title>
+  <title>Cryptoanalyst — Power Law, Asset Matrix, X Feed & Alerts</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -26,14 +26,14 @@
       color: var(--text);
       padding: 20px;
     }
-    .wrap { max-width: 1120px; margin: 0 auto; }
+    .wrap { max-width: 1160px; margin: 0 auto; }
     .topbar {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
     .sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
     .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
@@ -63,7 +63,6 @@
       margin-bottom: 16px;
     }
     .tab-btn {
-      position: relative;
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -71,22 +70,21 @@
       font-weight: 600;
     }
 
-    /* Visible flare animation when unread/active alerts exist */
     @keyframes alertFlare {
       0%, 100% {
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.75), 0 0 14px rgba(245, 158, 11, 0.55);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.75), 0 0 14px rgba(245, 158, 11, 0.6);
         border-color: #f59e0b;
-        background: #2a1719;
+        background: #2b1619;
       }
       50% {
-        box-shadow: 0 0 0 6px rgba(239, 68, 68, 0), 0 0 24px rgba(239, 68, 68, 0.9);
+        box-shadow: 0 0 0 6px rgba(239, 68, 68, 0), 0 0 24px rgba(239, 68, 68, 0.95);
         border-color: #ef4444;
-        background: #3b171b;
+        background: #3f161b;
       }
     }
     .tab-btn.flare {
-      animation: alertFlare 1.4s infinite;
-      color: #fff;
+      animation: alertFlare 1.35s infinite;
+      color: #ffffff;
     }
     .badge {
       background: var(--red);
@@ -99,7 +97,7 @@
 
     .kpis {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
       gap: 12px;
       margin-bottom: 16px;
     }
@@ -114,8 +112,8 @@
     .val { font-size: 21px; font-weight: 700; margin-top: 6px; }
 
     .banner-box {
-      border: 1px solid rgba(245, 158, 11, 0.5);
-      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.55);
+      background: rgba(245, 158, 11, 0.09);
       border-radius: 12px;
       padding: 14px 16px;
       margin-bottom: 16px;
@@ -140,15 +138,35 @@
       border-radius: 6px;
       flex-shrink: 0;
     }
-    .close-btn:hover { color: #fff; border-color: var(--red); background: rgba(239, 68, 68, 0.2); }
+    .close-btn:hover { color: #fff; border-color: var(--red); background: rgba(239, 68, 68, 0.22); }
 
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
-    .chart-box { position: relative; height: 430px; width: 100%; }
+    .chart-box { position: relative; height: 440px; width: 100%; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
+    .asset-card {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+    }
+    .post-card {
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
 
     table { width: 100%; border-collapse: collapse; font-size: 14px; }
     th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
     th { color: var(--muted); font-size: 12px; text-transform: uppercase; }
+
     .pill {
       display: inline-block;
       padding: 3px 8px;
@@ -156,9 +174,13 @@
       font-size: 11px;
       font-weight: 700;
     }
-    .pill-next { background: rgba(56, 189, 248, 0.18); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.4); }
-    .pill-upcoming { background: rgba(34, 197, 94, 0.16); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.35); }
+    .pill-high { background: rgba(34, 197, 94, 0.18); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.4); }
+    .pill-med { background: rgba(245, 158, 11, 0.18); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .pill-low { background: rgba(239, 68, 68, 0.18); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .pill-next { background: rgba(56, 189, 248, 0.2); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.45); }
+    .pill-upcoming { background: rgba(34, 197, 94, 0.16); color: #86efac; }
     .pill-past { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+
     .err-box {
       background: rgba(239, 68, 68, 0.12);
       border: 1px solid rgba(239, 68, 68, 0.45);
@@ -174,7 +196,7 @@
   <div class="wrap">
     <div class="topbar">
       <div>
-        <h2 style="margin:0;">Cryptoanalyst Dashboard</h2>
+        <h2 style="margin:0;">Cryptoanalyst Intelligence Dashboard</h2>
         <div id="statusLine" class="sub">Loading ./dashboard_data.json...</div>
       </div>
       <div class="actions">
@@ -186,31 +208,37 @@
 
     <div id="errBox" class="err-box"></div>
 
-    <!-- Top persistent banner shown whenever unclosed alerts exist -->
     <div id="topAlertBanner" class="banner-box" style="display:none;">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-        <strong>Active Unread Alerts (stay until closed)</strong>
+        <strong>Active Alerts (stay displayed until closed)</strong>
         <button onclick="switchTab('alerts')" style="padding:5px 10px;font-size:12px;">Open Alerts Tab</button>
       </div>
       <div id="topAlertList"></div>
     </div>
 
     <div class="tabs">
-      <button id="tab-chart" class="tab-btn active" onclick="switchTab('chart')">Power Law Chart</button>
+      <button id="tab-chart" class="tab-btn active" onclick="switchTab('chart')">Power Law &amp; BTC History</button>
+      <button id="tab-matrix" class="tab-btn" onclick="switchTab('matrix')">Asset Recommendations</button>
+      <button id="tab-xfeed" class="tab-btn" onclick="switchTab('xfeed')">X / Macro Posts</button>
       <button id="tab-alerts" class="tab-btn" onclick="switchTab('alerts')">
         Alerts <span id="alertBadge" class="badge" style="display:none;">0</span>
       </button>
-      <button id="tab-calendar" class="tab-btn" onclick="switchTab('calendar')">FOMC &amp; Macro Calendar</button>
+      <button id="tab-calendar" class="tab-btn" onclick="switchTab('calendar')">FOMC &amp; Calendar</button>
     </div>
 
     <div class="kpis">
+      <div class="card" style="margin-bottom:0;">
+        <div class="label">Current BTC Price</div>
+        <div id="kpiBtc" class="val">—</div>
+        <div id="kpiBtcSource" class="sub">—</div>
+      </div>
       <div class="card" style="margin-bottom:0;">
         <div class="label">Power Law Trend</div>
         <div id="kpiTrend" class="val">—</div>
         <div id="kpiDays" class="sub">—</div>
       </div>
       <div class="card" style="margin-bottom:0;">
-        <div class="label">BTC Price vs Trend</div>
+        <div class="label">BTC vs PL Trend</div>
         <div id="kpiMult" class="val">—</div>
         <div id="kpiZone" class="sub">—</div>
       </div>
@@ -226,7 +254,7 @@
       </div>
     </div>
 
-    <!-- TAB 1: POWER LAW CHART -->
+    <!-- TAB 1: POWER LAW CHART + BTC PRICE HISTORY -->
     <div id="panel-chart" class="tab-panel active">
       <div class="card">
         <div class="chart-box">
@@ -235,13 +263,36 @@
       </div>
     </div>
 
-    <!-- TAB 2: PERSISTENT ALERTS -->
+    <!-- TAB 2: ASSET RECOMMENDATIONS / CONVICTION MATRIX -->
+    <div id="panel-matrix" class="tab-panel">
+      <div class="card">
+        <h3 style="margin:0 0 6px 0;">Asset Conviction &amp; Recommendations</h3>
+        <div class="sub" style="margin-bottom:14px;">Scores and tiers adjusted for current macro regime, electrical cost floor, and MVRV positioning.</div>
+        <div id="matrixGrid" class="grid-2"></div>
+      </div>
+    </div>
+
+    <!-- TAB 3: X / SOCIAL & MACRO POSTS -->
+    <div id="panel-xfeed" class="tab-panel">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;">
+          <div>
+            <h3 style="margin:0;">X &amp; Macro Notes</h3>
+            <div class="sub">Reloads latest items from <code>dashboard_data.json</code> whenever you refresh or click Refresh Data.</div>
+          </div>
+          <button onclick="loadDashboard(true)">Reload Feed</button>
+        </div>
+        <div id="xFeedList"></div>
+      </div>
+    </div>
+
+    <!-- TAB 4: PERSISTENT ALERTS -->
     <div id="panel-alerts" class="tab-panel">
       <div class="card">
         <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;">
           <div>
-            <h3 style="margin:0;">On-Page Alerts</h3>
-            <div class="sub">Alerts stay displayed across page refreshes until you click <strong>Close</strong>. No external chat service required.</div>
+            <h3 style="margin:0;">Persistent On-Page Alerts</h3>
+            <div class="sub">Alerts stay displayed across page refreshes until you click <strong>Close</strong>.</div>
           </div>
           <div style="display:flex;gap:8px;">
             <button onclick="addTestAlert()">Add Test Alert</button>
@@ -252,11 +303,11 @@
       </div>
     </div>
 
-    <!-- TAB 3: FOMC & MACRO CALENDAR -->
+    <!-- TAB 5: FOMC & MACRO CALENDAR -->
     <div id="panel-calendar" class="tab-panel">
       <div class="card">
-        <h3 style="margin:0 0 6px 0;">FOMC &amp; Key Macro Schedule</h3>
-        <div class="sub" style="margin-bottom:14px;">Federal Reserve FOMC policy meetings (statement typically 2:00 PM ET / 20:00 CET on day 2) and tracked macro windows.</div>
+        <h3 style="margin:0 0 6px 0;">FOMC &amp; Key Macro Calendar</h3>
+        <div class="sub" style="margin-bottom:14px;">Federal Reserve FOMC meeting dates and tracked macro events.</div>
         <table>
           <thead>
             <tr>
@@ -273,8 +324,8 @@
   </div>
 
   <script>
-    const STORAGE_ACTIVE_KEY = "cryptoanalyst_active_alerts_v1";
-    const STORAGE_DISMISSED_KEY = "cryptoanalyst_dismissed_alerts_v1";
+    const STORAGE_ACTIVE_KEY = "cryptoanalyst_active_alerts_v2";
+    const STORAGE_DISMISSED_KEY = "cryptoanalyst_dismissed_alerts_v2";
 
     const DEFAULT_CALENDAR_EVENTS = [
       { date: "2026-06-12", end: "2026-06-12", title: "SpaceX IPO (SPCX) Macro Window", notes: "Tracked liquidity & proxy rotation regime (-30d / +28d)" },
@@ -292,9 +343,8 @@
     let chartInstance = null;
     let currentData = null;
     let scaleType = "logarithmic";
-    let activeTab = "chart";
 
-    function readJsonStorage(key, fallback) {
+    function readJson(key, fallback) {
       try {
         const raw = localStorage.getItem(key);
         return raw ? JSON.parse(raw) : fallback;
@@ -303,21 +353,18 @@
       }
     }
 
-    function writeJsonStorage(key, val) {
+    function writeJson(key, val) {
       try {
         localStorage.setItem(key, JSON.stringify(val));
       } catch (_) {}
     }
 
     function switchTab(tabName) {
-      activeTab = tabName;
-      document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
-      document.querySelectorAll(".tab-panel").forEach(panel => panel.classList.remove("active"));
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
       document.getElementById("tab-" + tabName).classList.add("active");
       document.getElementById("panel-" + tabName).classList.add("active");
-      if (tabName === "chart" && currentData) {
-        renderPowerLawChart(currentData);
-      }
+      if (tabName === "chart" && currentData) renderPowerLawChart(currentData);
     }
 
     function setScale(type) {
@@ -328,64 +375,63 @@
     }
 
     function syncAlertsFromData(data) {
-      const dismissed = new Set(readJsonStorage(STORAGE_DISMISSED_KEY, []));
-      let stored = readJsonStorage(STORAGE_ACTIVE_KEY, []);
-      const byId = new Map(stored.map(item => [item.id, item]));
+      const dismissed = new Set(readJson(STORAGE_DISMISSED_KEY, []));
+      const existing = readJson(STORAGE_ACTIVE_KEY, []);
+      const byId = new Map(existing.map(item => [item.id, item]));
 
-      const incomingTexts = [];
-      if (Array.isArray(data.active_transitions)) {
-        data.active_transitions.forEach(t => incomingTexts.push(typeof t === "string" ? t : JSON.stringify(t)));
+      const incoming = [];
+      if (Array.isArray(data?.active_transitions)) {
+        data.active_transitions.forEach(t => incoming.push(typeof t === "string" ? t : JSON.stringify(t)));
       }
-      if (Array.isArray(data.alerts)) {
-        data.alerts.forEach(a => incomingTexts.push(typeof a === "string" ? a : (a.message || JSON.stringify(a))));
+      if (Array.isArray(data?.alerts)) {
+        data.alerts.forEach(a => incoming.push(typeof a === "string" ? a : (a.message || JSON.stringify(a))));
       }
-      if (data.elec_floor_breached) {
-        incomingTexts.push("BTC is currently below the electrical cost floor.");
+      if (data?.elec_floor_breached) {
+        incoming.push("BTC is below the electrical cost floor.");
       }
 
-      const stamp = data.updated_at_utc || new Date().toISOString();
-      incomingTexts.forEach(msg => {
-        const id = "alert::" + stamp.slice(0, 10) + "::" + msg;
+      const stamp = data?.updated_at_utc || new Date().toISOString();
+      incoming.forEach(msg => {
+        const id = "sys::" + stamp.slice(0, 10) + "::" + msg;
         if (!dismissed.has(id) && !byId.has(id)) {
           byId.set(id, { id, message: msg, timestamp: stamp });
         }
       });
 
       const merged = Array.from(byId.values()).filter(item => !dismissed.has(item.id));
-      writeJsonStorage(STORAGE_ACTIVE_KEY, merged);
+      writeJson(STORAGE_ACTIVE_KEY, merged);
       renderAlertsUI();
     }
 
     function dismissAlert(id) {
-      const dismissed = new Set(readJsonStorage(STORAGE_DISMISSED_KEY, []));
+      const dismissed = new Set(readJson(STORAGE_DISMISSED_KEY, []));
       dismissed.add(id);
-      writeJsonStorage(STORAGE_DISMISSED_KEY, Array.from(dismissed));
-
-      const remaining = readJsonStorage(STORAGE_ACTIVE_KEY, []).filter(item => item.id !== id);
-      writeJsonStorage(STORAGE_ACTIVE_KEY, remaining);
+      writeJson(STORAGE_DISMISSED_KEY, Array.from(dismissed));
+      const remaining = readJson(STORAGE_ACTIVE_KEY, []).filter(item => item.id !== id);
+      writeJson(STORAGE_ACTIVE_KEY, remaining);
       renderAlertsUI();
     }
 
     function restoreDismissedAlerts() {
-      writeJsonStorage(STORAGE_DISMISSED_KEY, []);
+      writeJson(STORAGE_DISMISSED_KEY, []);
       if (currentData) syncAlertsFromData(currentData);
       renderAlertsUI();
     }
 
     function addTestAlert() {
       const id = "manual::" + Date.now();
-      const list = readJsonStorage(STORAGE_ACTIVE_KEY, []);
+      const list = readJson(STORAGE_ACTIVE_KEY, []);
       list.unshift({
         id,
-        message: "Manual check alert — stays visible across refreshes until closed.",
+        message: "Test alert — stays shown across refreshes until you click Close.",
         timestamp: new Date().toISOString()
       });
-      writeJsonStorage(STORAGE_ACTIVE_KEY, list);
+      writeJson(STORAGE_ACTIVE_KEY, list);
       renderAlertsUI();
     }
 
     function renderAlertsUI() {
-      const alerts = readJsonStorage(STORAGE_ACTIVE_KEY, []);
+      const alerts = readJson(STORAGE_ACTIVE_KEY, []);
       const count = alerts.length;
       const tabBtn = document.getElementById("tab-alerts");
       const badge = document.getElementById("alertBadge");
@@ -404,10 +450,8 @@
         topBanner.style.display = "none";
       }
 
-      const buildCardsHtml = (items) => {
-        if (!items.length) {
-          return '<div class="sub" style="padding:12px 0;">No active alerts right now.</div>';
-        }
+      const renderCards = (items) => {
+        if (!items.length) return '<div class="sub" style="padding:10px 0;">No active alerts.</div>';
         return items.map(item => `
           <div class="alert-item">
             <div>
@@ -419,66 +463,105 @@
         `).join("");
       };
 
-      topList.innerHTML = buildCardsHtml(alerts.slice(0, 3));
-      panelList.innerHTML = buildCardsHtml(alerts);
+      topList.innerHTML = renderCards(alerts.slice(0, 3));
+      panelList.innerHTML = renderCards(alerts);
     }
 
-    function buildFallbackCurve(data) {
-      const genesis = new Date("2009-01-03T00:00:00Z");
-      const logA = data?.power_law?.params?.log_a ?? -16.493;
-      const beta = data?.power_law?.params?.beta ?? 5.688;
-      const band = data?.power_law?.params?.band_log10 ?? 0.35;
-      const spot = Number(data?.btc_price ?? data?.power_law?.current?.btc_price ?? 0) || null;
-
-      const points = [];
-      const start = new Date("2017-01-01T00:00:00Z");
-      const end = new Date("2030-12-31T00:00:00Z");
-      const now = new Date();
-
-      for (let d = new Date(start); d <= end; d.setUTCDate(d.getUTCDate() + 21)) {
-        const t = Math.max(1, Math.round((d - genesis) / 86400000));
-        const trend = Math.pow(10, logA + beta * Math.log10(t));
-        points.push({
-          date: d.toISOString().slice(0, 10),
-          trend: Number(trend.toFixed(2)),
-          support: Number((trend * Math.pow(10, -band)).toFixed(2)),
-          resistance: Number((trend * Math.pow(10, band)).toFixed(2)),
-          btc_price: d <= now ? spot : null
+    function extractHistorySeries(data) {
+      // Supports multiple possible shapes from dashboard_data.json
+      const map = new Map();
+      if (Array.isArray(data?.btc_history)) {
+        data.btc_history.forEach(row => {
+          if (row && row.date && typeof row.price === "number") map.set(row.date, row.price);
+        });
+      } else if (data?.btc_history && typeof data.btc_history === "object") {
+        Object.entries(data.btc_history).forEach(([d, p]) => {
+          if (typeof p === "number") map.set(d, p);
         });
       }
-      return points;
+      if (Array.isArray(data?.power_law?.curve)) {
+        data.power_law.curve.forEach(p => {
+          if (p && p.date && typeof p.btc_price === "number" && !map.has(p.date)) {
+            map.set(p.date, p.btc_price);
+          }
+        });
+      }
+      return map;
+    }
+
+    function buildCurveWithHistory(data) {
+      const genesis = new Date("2009-01-03T00:00:00Z");
+      const logA = Number(data?.power_law?.params?.log_a ?? -16.493);
+      const beta = Number(data?.power_law?.params?.beta ?? 5.688);
+      const band = Number(data?.power_law?.params?.band_log10 ?? 0.35);
+      const histMap = extractHistorySeries(data);
+      const spot = Number(data?.btc_price ?? data?.power_law?.current?.btc_price ?? 0) || null;
+      const todayIso = new Date().toISOString().slice(0, 10);
+
+      let baseCurve = Array.isArray(data?.power_law?.curve) && data.power_law.curve.length > 0
+        ? data.power_law.curve.slice()
+        : null;
+
+      if (!baseCurve) {
+        baseCurve = [];
+        const start = new Date("2017-01-01T00:00:00Z");
+        const end = new Date("2030-12-31T00:00:00Z");
+        for (let d = new Date(start); d <= end; d.setUTCDate(d.getUTCDate() + 14)) {
+          const t = Math.max(1, Math.round((d - genesis) / 86400000));
+          const trend = Math.pow(10, logA + beta * Math.log10(t));
+          baseCurve.push({
+            date: d.toISOString().slice(0, 10),
+            trend: Number(trend.toFixed(2)),
+            support: Number((trend * Math.pow(10, -band)).toFixed(2)),
+            resistance: Number((trend * Math.pow(10, band)).toFixed(2))
+          });
+        }
+      }
+
+      const sortedHistDates = Array.from(histMap.keys()).sort();
+
+      return baseCurve.map(pt => {
+        let price = typeof pt.btc_price === "number" ? pt.btc_price : (histMap.get(pt.date) ?? null);
+        if (price === null && pt.date <= todayIso && sortedHistDates.length > 0) {
+          // Nearest prior historical close
+          for (let i = sortedHistDates.length - 1; i >= 0; i--) {
+            if (sortedHistDates[i] <= pt.date) {
+              price = histMap.get(sortedHistDates[i]);
+              break;
+            }
+          }
+          if (price === null && spot) price = spot;
+        }
+        return { ...pt, btc_price: price };
+      });
     }
 
     function renderPowerLawChart(data) {
       if (typeof Chart === "undefined") {
-        showError("Chart.js failed to load from CDN. Check network/ad-blocker settings.");
+        showError("Chart.js failed to load.");
         return;
       }
-      const rawCurve = Array.isArray(data?.power_law?.curve) && data.power_law.curve.length > 0
-        ? data.power_law.curve
-        : buildFallbackCurve(data);
-
-      const canvas = document.getElementById("powerLawChart");
-      if (!canvas) return;
-      const ctx = canvas.getContext("2d");
+      const curve = buildCurveWithHistory(data);
+      const ctx = document.getElementById("powerLawChart").getContext("2d");
       if (chartInstance) chartInstance.destroy();
 
       chartInstance = new Chart(ctx, {
         type: "line",
         data: {
-          labels: rawCurve.map(p => p.date),
+          labels: curve.map(p => p.date),
           datasets: [
             {
-              label: "BTC Price",
-              data: rawCurve.map(p => (typeof p.btc_price === "number" ? p.btc_price : null)),
+              label: "BTC Price History",
+              data: curve.map(p => (typeof p.btc_price === "number" ? p.btc_price : null)),
               borderColor: "#f59e0b",
-              borderWidth: 2.2,
+              backgroundColor: "rgba(245, 158, 11, 0.12)",
+              borderWidth: 2.3,
               pointRadius: 0,
               spanGaps: false
             },
             {
               label: "Resistance (+Band)",
-              data: rawCurve.map(p => p.resistance),
+              data: curve.map(p => p.resistance),
               borderColor: "#ef4444",
               borderDash: [5, 5],
               borderWidth: 1.5,
@@ -486,14 +569,14 @@
             },
             {
               label: "Power Law Trend",
-              data: rawCurve.map(p => p.trend),
+              data: curve.map(p => p.trend),
               borderColor: "#38bdf8",
               borderWidth: 2.5,
               pointRadius: 0
             },
             {
               label: "Support (-Band)",
-              data: rawCurve.map(p => p.support),
+              data: curve.map(p => p.support),
               borderColor: "#22c55e",
               borderDash: [5, 5],
               borderWidth: 1.5,
@@ -526,24 +609,76 @@
       });
     }
 
+    function renderMatrix(data) {
+      const grid = document.getElementById("matrixGrid");
+      const matrix = data?.matrix || data?.recommendations || {};
+      const entries = Array.isArray(matrix)
+        ? matrix.map(item => [item.ticker || item.asset || "ASSET", item])
+        : Object.entries(matrix);
+
+      if (!entries.length) {
+        grid.innerHTML = '<div class="sub">No asset matrix entries in dashboard_data.json yet.</div>';
+        return;
+      }
+
+      grid.innerHTML = entries.map(([ticker, info]) => {
+        const tier = String(info?.tier || info?.recommendation || "MEDIUM").toUpperCase();
+        const score = info?.score ?? info?.conviction ?? "—";
+        const notes = Array.isArray(info?.notes) ? info.notes.join(" · ") : (info?.notes || info?.reason || "Standard regime baseline");
+        let pillClass = "pill-med";
+        if (tier.includes("HIGH") || tier.includes("BUY") || tier.includes("OVERWEIGHT")) pillClass = "pill-high";
+        else if (tier.includes("LOW") || tier.includes("AVOID") || tier.includes("UNDERWEIGHT")) pillClass = "pill-low";
+
+        return `
+          <div class="asset-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <strong style="font-size:16px;">${escapeHtml(ticker)}</strong>
+              <span class="pill ${pillClass}">${escapeHtml(tier)}</span>
+            </div>
+            <div style="margin-top:8px;font-size:14px;">Score: <strong>${escapeHtml(String(score))}</strong></div>
+            <div class="sub" style="margin-top:6px;">${escapeHtml(notes)}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderXFeed(data) {
+      const container = document.getElementById("xFeedList");
+      const posts = data?.x_posts || data?.feed_items || data?.posts || [];
+      if (!Array.isArray(posts) || !posts.length) {
+        container.innerHTML = '<div class="sub">No X/macro posts in <code>dashboard_data.json</code> yet. Add an <code>x_posts</code> array in <code>run.py</code> to display items here.</div>';
+        return;
+      }
+
+      container.innerHTML = posts.map(p => {
+        const author = p.author || p.handle || "@macro";
+        const text = p.text || p.content || p.message || "";
+        const time = p.timestamp || p.date || "";
+        return `
+          <div class="post-card">
+            <div style="display:flex;justify-content:space-between;gap:10px;">
+              <strong>${escapeHtml(author)}</strong>
+              <span class="sub">${escapeHtml(time)}</span>
+            </div>
+            <div style="margin-top:8px;line-height:1.45;">${escapeHtml(text)}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
     function renderCalendar(data) {
       const extra = Array.isArray(data?.calendar_events) ? data.calendar_events : [];
       const combined = [...DEFAULT_CALENDAR_EVENTS, ...extra];
       const todayStr = new Date().toISOString().slice(0, 10);
-
-      // Find the next upcoming event start date
       const upcomingStarts = combined.map(e => e.date).filter(d => d && d >= todayStr).sort();
       const nextDate = upcomingStarts[0] || null;
 
-      const tbody = document.getElementById("calendarBody");
-      tbody.innerHTML = combined.map(ev => {
+      document.getElementById("calendarBody").innerHTML = combined.map(ev => {
         const endDate = ev.end || ev.date;
         let statusHtml = '<span class="pill pill-past">Completed</span>';
-        if (ev.date === nextDate) {
-          statusHtml = '<span class="pill pill-next">Next Up</span>';
-        } else if (endDate >= todayStr) {
-          statusHtml = '<span class="pill pill-upcoming">Upcoming</span>';
-        }
+        if (ev.date === nextDate) statusHtml = '<span class="pill pill-next">Next Up</span>';
+        else if (endDate >= todayStr) statusHtml = '<span class="pill pill-upcoming">Upcoming</span>';
+
         const dateLabel = ev.end && ev.end !== ev.date ? `${ev.date} to ${ev.end}` : ev.date;
         return `
           <tr>
@@ -560,14 +695,16 @@
       const pl = data?.power_law?.current || {};
       const btc = Number(data?.btc_price ?? pl.btc_price ?? 0);
       const trend = Number(pl.trend ?? 0);
-      const mult = trend > 0 ? (btc / trend) : Number(pl.multiple_to_trend ?? 0);
+      const mult = trend > 0 && btc > 0 ? (btc / trend) : Number(pl.multiple_to_trend ?? 0);
 
-      document.getElementById("kpiTrend").textContent = trend ? "$" + trend.toLocaleString() : "—";
+      document.getElementById("kpiBtc").textContent = btc ? "$" + btc.toLocaleString(undefined, { maximumFractionDigits: 0 }) : "—";
+      document.getElementById("kpiBtcSource").textContent = data?.btc_price_source || "Latest daily close / spot";
+      document.getElementById("kpiTrend").textContent = trend ? "$" + trend.toLocaleString(undefined, { maximumFractionDigits: 0 }) : "—";
       document.getElementById("kpiDays").textContent = pl.days_since_genesis
         ? "t = " + Number(pl.days_since_genesis).toLocaleString() + " days"
-        : "Power Law corridor";
+        : "Genesis Power Law";
       document.getElementById("kpiMult").textContent = mult ? mult.toFixed(2) + "x" : "—";
-      document.getElementById("kpiZone").textContent = (pl.zone || "CORRIDOR") + (btc ? ` ($${btc.toLocaleString()})` : "");
+      document.getElementById("kpiZone").textContent = pl.zone || "CORRIDOR";
       document.getElementById("kpiBands").textContent = (pl.support && pl.resistance)
         ? `$${Number(pl.support).toLocaleString()} – $${Number(pl.resistance).toLocaleString()}`
         : "—";
@@ -601,35 +738,37 @@
 
     async function loadDashboard(manualClick = false) {
       clearError();
-      const cacheBuster = "cb=" + Date.now();
+      const cb = "cb=" + Date.now();
       document.getElementById("statusLine").textContent = manualClick
-        ? "Fetching fresh ./dashboard_data.json..."
+        ? "Refreshing ./dashboard_data.json..."
         : "Loading ./dashboard_data.json...";
 
       try {
-        const res = await fetch(`./dashboard_data.json?${cacheBuster}`, {
+        const res = await fetch(`./dashboard_data.json?${cb}`, {
           cache: "no-store",
           headers: { "Cache-Control": "no-cache" }
         });
         if (!res.ok) throw new Error("HTTP " + res.status);
         const data = await res.json();
         currentData = data;
+
         document.getElementById("statusLine").textContent =
-          "Data timestamp (UTC): " + (data.updated_at_utc || "unknown") + " | Checked: " + new Date().toLocaleTimeString();
+          "Data UTC: " + (data.updated_at_utc || "unknown") + " | Refreshed: " + new Date().toLocaleTimeString();
 
         renderKpis(data);
         renderPowerLawChart(data);
+        renderMatrix(data);
+        renderXFeed(data);
         syncAlertsFromData(data);
         renderCalendar(data);
       } catch (err) {
-        document.getElementById("statusLine").textContent = "Could not load ./dashboard_data.json (" + err.message + ")";
-        showError("Error loading ./dashboard_data.json: " + err.message + ". Using fallback calendar and saved alerts.");
+        document.getElementById("statusLine").textContent = "Failed to load ./dashboard_data.json (" + err.message + ")";
+        showError("Could not load ./dashboard_data.json: " + err.message);
         renderCalendar({});
         renderAlertsUI();
       }
     }
 
-    // Initial boot
     renderAlertsUI();
     renderCalendar({});
     loadDashboard(false);
