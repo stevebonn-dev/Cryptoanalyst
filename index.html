@@ -1,3 +1,8 @@
+Added the STH Value Zone band and live status readout to the Short-Term Holder MVRV and SOPR Indicators tab and main chart overlay so it recalculates and updates automatically on every refresh or live price sync.
+What Was Added
+ * Dynamic STH Value Zone Bounds & Status (updateSthValueZone): Computes the live upper and lower bounds of the Short-Term Holder value zone relative to the STH Cost Basis / MVRV-STH band structure, reports whether BTC is currently Inside Value Zone, Below Lower Value Band (Discount/Support), or Above Upper Value Band (Overextended), and shows exact dollar levels and percentage distances.
+ * Chart Value Zone Lines & Overlay: Plots the Value Zone Upper, STH Cost Basis, and Value Zone Lower bands in the 📉 STH MVRV & SOPR chart and keeps the main chart's 📉 STH Bands overlay in sync whenever loadChartData() or refreshAllTerminalData() runs.
+Complete index.html Ready to Copy
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -230,15 +235,15 @@
       <div id="assets-grid-container" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
     </section>
 
-    <!-- TAB 2: SHORT-TERM HOLDER MVRV & SOPR INDICATORS (SCREENSHOT SUITE) -->
+    <!-- TAB 2: SHORT-TERM HOLDER MVRV & SOPR INDICATORS (SCREENSHOT SUITE + VALUE ZONE) -->
     <section id="sthmodel" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
         <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-2">
           <div>
             <h2 class="text-lg font-extrabold text-white">📉 Short-Term Holder MVRV and SOPR Indicators</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Price [USD] vs. STH Cost Basis, STH-SOPR / MVRV-STH Oscillator &amp; Standard Deviation Bands (+2.0sd to -1.5sd)</p>
+            <p class="text-xs text-slate-400 mt-0.5">Price [USD] vs. STH Cost Basis, STH Value Zone &amp; Standard Deviation Bands (+2.0sd to -1.5sd) — Auto-Updated on Refresh</p>
           </div>
-          <span class="px-2.5 py-1 bg-sky-500/10 border border-sky-500/30 text-sky-300 text-xs font-bold rounded">STH On-Chain Suite</span>
+          <span id="sthLastUpdatedBadge" class="px-2.5 py-1 bg-sky-500/10 border border-sky-500/30 text-sky-300 text-xs font-bold rounded">Value Zone Synced</span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs font-mono">
@@ -250,24 +255,28 @@
             <span class="text-slate-400 block uppercase font-bold">STH Cost Basis</span>
             <strong class="text-sky-300 text-lg" id="sthCostVal">$76,150</strong>
           </div>
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
-            <span class="text-slate-400 block uppercase font-bold">MVRV-STH / SOPR Zone</span>
-            <strong class="text-amber-400 text-sm" id="sthZoneVal">Below STH Cost (-1.0sd to -1.5sd)</strong>
+          <div class="p-4 bg-[#131722] rounded-xl border border-amber-500/30 space-y-1">
+            <span class="text-amber-300 block uppercase font-bold">STH Value Zone Band</span>
+            <strong class="text-amber-400 text-sm" id="sthValueZoneBand">$59,397 – $94,426</strong>
+            <div class="text-[10px] text-slate-400" id="sthValueZoneState">Checking position...</div>
           </div>
           <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
-            <span class="text-slate-400 block uppercase font-bold">STH Profit / Stress Bias</span>
+            <span class="text-slate-400 block uppercase font-bold">MVRV-STH / SOPR Bias</span>
             <strong class="text-orange-300 text-sm" id="sthBiasVal">Underwater STHs • Overhead Supply</strong>
           </div>
         </div>
 
+        <!-- Live Value Zone Breakdown Strip -->
+        <div id="sthValueZoneDetails" class="p-3.5 bg-[#131722] rounded-xl border border-[#2a2e39] text-xs font-mono text-slate-300"></div>
+
         <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-          <span class="text-slate-300 font-bold">BTC Price [USD] &amp; STH Cost / Deviation Bands</span>
+          <span class="text-slate-300 font-bold">BTC Price [USD], STH Value Zone &amp; Deviation Bands</span>
           <div class="flex flex-wrap gap-2 text-[11px]">
-            <button id="sth-btn-sd" onclick="toggleSthBands()" class="px-2.5 py-1 rounded border border-amber-500 bg-amber-500/20 text-amber-300 font-bold">● +2.0sd / -1.5sd Bands</button>
+            <button id="sth-btn-sd" onclick="toggleSthBands()" class="px-2.5 py-1 rounded border border-amber-500 bg-amber-500/20 text-amber-300 font-bold">● Value Zone &amp; SD Bands</button>
             <span class="text-white font-bold px-2 py-1">● Price</span>
             <span class="text-sky-300 font-bold px-2 py-1">● STH Cost Basis</span>
-            <span class="text-orange-300 font-bold px-2 py-1">● +1.0sd / +2.0sd</span>
-            <span class="text-blue-300 font-bold px-2 py-1">● -1.0sd / -1.5sd</span>
+            <span class="text-orange-300 font-bold px-2 py-1">● Upper Value Zone (+2.0sd)</span>
+            <span class="text-blue-300 font-bold px-2 py-1">● Lower Value Zone (-1.5sd)</span>
           </div>
         </div>
 
@@ -333,7 +342,7 @@
 
         <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] text-xs font-mono space-y-1">
           <div class="font-bold text-amber-400">Active Algorithmic &amp; Liquidation Context</div>
-          <p class="text-slate-300 text-[11px]">Composite decision engine weights MVRV valuation (&lt;1.2 bottom signal, 1.2–2.4 neutral/accumulation, &gt;2.4 euphoria), STH Cost Basis / MVRV-STH &amp; SOPR deviation bands, Power Law fair-value deviation (BTC), 50/100/200D/200W MWA trend alignment, SFP liquidity sweeps, PVSRA 20-bar volume spread confirmation, and larger liquidation clusters.</p>
+          <p class="text-slate-300 text-[11px]">Composite decision engine weights MVRV valuation (&lt;1.2 bottom signal, 1.2–2.4 neutral/accumulation, &gt;2.4 euphoria), STH Cost Basis / Value Zone &amp; SOPR deviation bands, Power Law fair-value deviation (BTC), 50/100/200D/200W MWA trend alignment, SFP liquidity sweeps, PVSRA 20-bar volume spread confirmation, and larger liquidation clusters.</p>
         </div>
 
         <div id="full-analyst-report-container" class="space-y-4 text-xs font-mono"></div>
@@ -409,15 +418,15 @@
         <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-2">
           <div>
             <h2 class="text-lg font-extrabold text-white">📖 Acronyms, Metrics &amp; Signal Percentages Explained</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Clear definitions for STH MVRV &amp; SOPR, MVRV Band, PVSRA, SFP, Liquidation Zones, Power Law, MWA, and ST / MT / LT win percentages.</p>
+            <p class="text-xs text-slate-400 mt-0.5">Clear definitions for STH MVRV, Value Zone &amp; SOPR, MVRV Band, PVSRA, SFP, Liquidation Zones, Power Law, MWA, and ST / MT / LT win percentages.</p>
           </div>
           <span class="px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] font-bold rounded">Reference Guide</span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
           <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1.5">
-            <div class="font-bold text-sky-300 text-sm">STH MVRV, STH Cost Basis &amp; STH-SOPR Bands</div>
-            <p class="text-slate-300 leading-relaxed">Tracks coins moved within the last 155 days (Short-Term Holders). <strong>STH Cost Basis</strong> shows average recent buyer entry; <strong>MVRV-STH</strong> and <strong>STH-SOPR</strong> measure whether recent coins are spent/held in profit or loss, with standard deviation bands (<code>+2.0sd</code> to <code>-1.5sd</code>) marking overextension vs. capitulation/support[span_1](start_span)[span_1](end_span).</p>
+            <div class="font-bold text-sky-300 text-sm">STH MVRV, Value Zone &amp; STH-SOPR Bands</div>
+            <p class="text-slate-300 leading-relaxed">Tracks coins moved within the last 155 days (Short-Term Holders). <strong>STH Cost Basis</strong> shows average recent buyer entry; the <strong>Value Zone</strong> highlights the dynamic upper/lower band corridor around STH valuation and standard deviations (<code>+2.0sd</code> to <code>-1.5sd</code>) alongside <strong>STH-SOPR</strong> profit/loss regimes.</p>
           </div>
 
           <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1.5">
@@ -951,6 +960,28 @@
       );
     }
 
+    function getSthValueZone(btcSpot, sthBase) {
+      const upperBand = Math.round(sthBase * 1.24);
+      const lowerBand = Math.round(sthBase * 0.78);
+      const distLowerPct = (((lowerBand - btcSpot) / btcSpot) * 100).toFixed(1);
+      const distUpperPct = (((upperBand - btcSpot) / btcSpot) * 100).toFixed(1);
+
+      let zoneStatus = 'Inside STH Value Zone';
+      let zoneNote = `Price sits inside the STH valuation corridor ($${lowerBand.toLocaleString()} – $${upperBand.toLocaleString()}).`;
+
+      if (btcSpot < lowerBand) {
+        zoneStatus = 'Below Lower Value Band (Discount / Sweep)';
+        zoneNote = `Price is ${Math.abs(distLowerPct)}% below the lower STH value band ($${lowerBand.toLocaleString()}); ${distUpperPct}% below upper band ($${upperBand.toLocaleString()}).`;
+      } else if (btcSpot > upperBand) {
+        zoneStatus = 'Above Upper Value Band (Overextended)';
+        zoneNote = `Price is +${(((btcSpot - upperBand) / upperBand) * 100).toFixed(1)}% above the upper STH value band ($${upperBand.toLocaleString()}).`;
+      } else {
+        zoneNote = `Inside STH value band ($${lowerBand.toLocaleString()} – $${upperBand.toLocaleString()}): ${distLowerPct}% to lower band, +${distUpperPct}% to upper band.`;
+      }
+
+      return { upperBand, lowerBand, zoneStatus, zoneNote };
+    }
+
     function renderSthOverlayOnMainChart(ticker) {
       if (!candleSeries || typeof LightweightCharts === 'undefined') return;
       sthOverlayLines.forEach(line => {
@@ -960,12 +991,11 @@
 
       if (!visibilityState.sth || ticker !== 'BTC') return;
       const sthBase = assetsStore.BTC.sthCostBasis || 76150;
+      const vz = getSthValueZone(assetsStore.BTC.price, sthBase);
       const lines = [
-        { price: Number((sthBase * 1.24).toFixed(0)), color: '#fb923c', style: LightweightCharts.LineStyle.Dashed, title: '+2.0sd STH' },
-        { price: Number((sthBase * 1.12).toFixed(0)), color: '#fdba74', style: LightweightCharts.LineStyle.Dotted, title: '+1.0sd STH' },
+        { price: vz.upperBand, color: '#fb923c', style: LightweightCharts.LineStyle.Dashed, title: 'STH Value Upper (+2.0sd)' },
         { price: sthBase, color: '#38bdf8', style: LightweightCharts.LineStyle.Solid, title: 'STH Cost Basis' },
-        { price: Number((sthBase * 0.88).toFixed(0)), color: '#93c5fd', style: LightweightCharts.LineStyle.Dotted, title: '-1.0sd STH' },
-        { price: Number((sthBase * 0.78).toFixed(0)), color: '#60a5fa', style: LightweightCharts.LineStyle.Dashed, title: '-1.5sd STH' }
+        { price: vz.lowerBand, color: '#60a5fa', style: LightweightCharts.LineStyle.Dashed, title: 'STH Value Lower (-1.5sd)' }
       ];
 
       sthOverlayLines = lines.map(l =>
@@ -996,10 +1026,10 @@
 
       sthPriceSeries = sthChart.addLineSeries({ color: '#ffffff', lineWidth: 2, title: 'Price [USD]', priceLineVisible: false });
       sthCostSeries = sthChart.addLineSeries({ color: '#38bdf8', lineWidth: 2.5, title: 'STH Cost Basis', priceLineVisible: false });
-      sthPlus2Series = sthChart.addLineSeries({ color: '#fb923c', lineWidth: 1.5, lineStyle: LightweightCharts.LineStyle.Dashed, title: '+2.0sd', priceLineVisible: false });
+      sthPlus2Series = sthChart.addLineSeries({ color: '#fb923c', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dashed, title: 'Value Zone Upper (+2.0sd)', priceLineVisible: false });
       sthPlus1Series = sthChart.addLineSeries({ color: '#fdba74', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted, title: '+1.0sd', priceLineVisible: false });
       sthMinus1Series = sthChart.addLineSeries({ color: '#93c5fd', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted, title: '-1.0sd', priceLineVisible: false });
-      sthMinus15Series = sthChart.addLineSeries({ color: '#60a5fa', lineWidth: 1.5, lineStyle: LightweightCharts.LineStyle.Dashed, title: '-1.5sd', priceLineVisible: false });
+      sthMinus15Series = sthChart.addLineSeries({ color: '#60a5fa', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dashed, title: 'Value Zone Lower (-1.5sd)', priceLineVisible: false });
     }
 
     function toggleSthBands() {
@@ -1013,11 +1043,17 @@
       if (!sthChart) initSthChart();
       const sthBase = assetsStore.BTC.sthCostBasis || 76150;
       const diffPct = (((btcSpot - sthBase) / sthBase) * 100).toFixed(1);
+      const vz = getSthValueZone(btcSpot, sthBase);
+      const stamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
       document.getElementById('sthSpotVal').innerText = `$${btcSpot.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
       document.getElementById('sthCostVal').innerText = `$${sthBase.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
-      document.getElementById('sthZoneVal').innerText = btcSpot >= sthBase ? `Above STH Cost (+${diffPct}%)` : `Below STH Cost (${diffPct}%)`;
+      document.getElementById('sthValueZoneBand').innerText = `$${vz.lowerBand.toLocaleString()} – $${vz.upperBand.toLocaleString()}`;
+      document.getElementById('sthValueZoneState').innerText = vz.zoneStatus;
       document.getElementById('sthBiasVal').innerText = btcSpot >= sthBase ? 'STHs in Net Profit • Support Active' : 'STHs Underwater • Overhead Supply';
+      document.getElementById('sthValueZoneDetails').innerHTML = `<strong class="text-amber-400">Updated Value Zone (${stamp}):</strong> ${vz.zoneNote}`;
+      const badge = document.getElementById('sthLastUpdatedBadge');
+      if (badge) badge.innerText = `Value Zone Synced • ${stamp}`;
 
       const seriesNodes = [
         ['2024-10-01', 63200, 61500],
@@ -1479,7 +1515,8 @@
       if (!container) return;
       container.innerHTML = Object.keys(assetsStore).map((t, idx) => {
         const a = assetsStore[t], rec = computeRecommendation(a);
-        const extraPl = t === 'BTC' ? ` • Power Law: ${getPowerLawMetrics(a.price).pctDiff.toFixed(1)}% vs Fair • STH Cost: $${(a.sthCostBasis || 76150).toLocaleString()}` : '';
+        const vz = t === 'BTC' ? getSthValueZone(a.price, a.sthCostBasis || 76150) : null;
+        const extraPl = t === 'BTC' ? ` • Power Law: ${getPowerLawMetrics(a.price).pctDiff.toFixed(1)}% vs Fair • STH Cost: $${(a.sthCostBasis || 76150).toLocaleString()} • Value Zone: $${vz.lowerBand.toLocaleString()}–$${vz.upperBand.toLocaleString()}` : '';
         return `
           <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-2">
             <div class="flex flex-wrap justify-between items-center gap-2">
