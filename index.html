@@ -103,6 +103,32 @@
           </div>
         </div>
 
+        <!-- Custom Horizontal & Diagonal Drawing Toolbar -->
+        <div class="p-3 rounded-lg bg-[#131722] border border-[#2a2e39] space-y-2 text-[11px] font-mono">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex flex-wrap items-center gap-1.5">
+              <span class="text-amber-400 font-bold mr-1">✏️ Draw Tool:</span>
+              <button id="tool-none" onclick="setDrawTool('none')" class="px-2.5 py-1 rounded border border-slate-500 bg-slate-500/25 text-white font-bold">✋ Normal</button>
+              <button id="tool-horiz" onclick="setDrawTool('horiz')" class="px-2.5 py-1 rounded border border-amber-500/50 bg-[#1e222d] text-amber-300 hover:bg-amber-500/20 font-bold">➖ Horiz Line (Click Chart)</button>
+              <button id="tool-diag" onclick="setDrawTool('diag')" class="px-2.5 py-1 rounded border border-cyan-500/50 bg-[#1e222d] text-cyan-300 hover:bg-cyan-500/20 font-bold">📐 Diag Line (2 Clicks)</button>
+              <input type="color" id="customLineColor" value="#facc15" title="Line Color" class="w-7 h-6 rounded bg-[#1e222d] border border-[#2a2e39] cursor-pointer" />
+            </div>
+
+            <div class="flex flex-wrap items-center gap-1.5">
+              <input type="number" step="any" id="manualHorizPrice" placeholder="Price e.g. 64500" class="w-32 bg-[#1e222d] border border-[#2a2e39] rounded px-2 py-1 text-white" />
+              <input type="text" id="manualHorizLabel" placeholder="Label (optional)" class="w-32 bg-[#1e222d] border border-[#2a2e39] rounded px-2 py-1 text-white" />
+              <button onclick="addManualHorizontalLine()" class="px-2.5 py-1 rounded bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold">+ Add Horiz</button>
+              <button onclick="clearAssetCustomLines()" class="px-2.5 py-1 rounded bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-300 font-bold">🗑 Clear All</button>
+            </div>
+          </div>
+
+          <div id="drawToolHint" class="text-[10px] text-slate-400">
+            Tip: Select <strong>➖ Horiz Line</strong> and click on the chart (or enter a price above), or select <strong>📐 Diag Line</strong> and click start + end points. Lines auto-save per asset.
+          </div>
+
+          <div id="customLinesList" class="flex flex-wrap gap-2 pt-1"></div>
+        </div>
+
         <div class="relative w-full h-[520px] bg-[#131722] rounded-lg border border-[#2a2e39] overflow-hidden">
           <div id="tvFloatingLegend" class="absolute top-3 left-3 z-20 bg-[#1e222d]/90 backdrop-blur-md border border-[#2a2e39] px-3 py-2 rounded-lg font-mono text-xs pointer-events-none shadow-lg space-y-1">
             <div class="flex items-center space-x-2">
@@ -131,12 +157,12 @@
         <div id="chartDecisionStrip" class="grid grid-cols-1 md:grid-cols-6 gap-3 pt-1 text-xs font-mono"></div>
       </div>
 
-      <!-- BTC Multi-Touch Resistance & Support Zones -->
+      <!-- BTC Multi-Touch Resistance, Support & Larger Liquidation Zones (Auto-Synced) -->
       <div id="multiTouchLevelsCard" class="bg-[#1e222d] border border-[#2a2e39] rounded-xl p-4 shadow-sm space-y-3 font-mono text-xs">
         <div class="flex flex-wrap justify-between items-center gap-2 border-b border-[#2a2e39] pb-2">
           <div>
             <h3 class="text-sm font-extrabold text-white">🎯 BTC Multi-Touch Resistance, Support &amp; Larger Liquidation Zones</h3>
-            <p class="text-[11px] text-slate-400">Includes multi-touch Widerstand/Unterstützung zones and larger long/short liquidation pockets</p>
+            <p id="btcLevelsMeta" class="text-[11px] text-slate-400">Syncing live BTC spot &amp; distance to zones...</p>
           </div>
           <div class="flex items-center gap-2">
             <button onclick="applyScreenshotLevelsToChart()" class="px-2.5 py-1 rounded bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-[11px]">
@@ -148,28 +174,7 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-[11px]">
-          <div class="p-3 rounded-lg bg-red-500/5 border border-red-500/30 space-y-1.5">
-            <div class="font-bold text-red-400 uppercase">Resistance Zones (Widerstand)</div>
-            <div>&bull; <strong>74,050 &ndash; 76,264 $</strong> <span class="text-slate-400">(5&times; tested)</span></div>
-            <div>&bull; <strong>70,983 &ndash; 72,026 $</strong> <span class="text-slate-400">(2&times; tested)</span></div>
-            <div>&bull; <strong>64,700 &ndash; 67,531 $</strong> <span class="text-slate-400">(7&times; tested)</span></div>
-          </div>
-
-          <div class="p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/30 space-y-1.5">
-            <div class="font-bold text-emerald-400 uppercase">Support Zones (Unterst&uuml;tzung)</div>
-            <div>&bull; <strong>62,062 &ndash; 62,818 $</strong> <span class="text-slate-400">(3&times; tested &bull; Immediate)</span></div>
-            <div>&bull; <strong>57,800 &ndash; 59,131 $</strong> <span class="text-slate-400">(3&times; tested &bull; Deeper Floor)</span></div>
-            <div class="text-amber-300">&bull; Reference Spot: <strong>63,762 $</strong></div>
-          </div>
-
-          <div class="p-3 rounded-lg bg-orange-500/5 border border-orange-500/30 space-y-1.5">
-            <div class="font-bold text-orange-400 uppercase">💥 Larger Liquidation Zones</div>
-            <div>&bull; <strong>Short Liq Cluster:</strong> <strong>66,650 &ndash; 67,530 $</strong></div>
-            <div>&bull; <strong>Long Liq Cluster 1:</strong> <strong>59,500 &ndash; 62,200 $</strong></div>
-            <div>&bull; <strong>Long Liq Cluster 2:</strong> <strong>57,800 &ndash; 59,130 $</strong></div>
-          </div>
-        </div>
+        <div id="btcLevelsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-[11px]"></div>
       </div>
 
       <!-- State Transitions & Engine Telemetry Strip -->
@@ -216,7 +221,7 @@
 
       <div class="flex flex-wrap justify-between items-center gap-2 pt-1">
         <h2 class="text-sm font-extrabold text-white">📊 Watchlist Matrix, Power Law, PVSRA &amp; Live Signals</h2>
-        <span class="text-[11px] font-mono text-slate-400">ST / MT / LT = signal accuracy % per horizon &bull; MVRV = Market Value / Realized Value</span>
+        <span id="watchlistSyncLabel" class="text-[11px] font-mono text-slate-400">Auto-updating on load &amp; refresh</span>
       </div>
       <div id="assets-grid-container" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
     </section>
@@ -292,15 +297,15 @@
         <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-2">
           <div>
             <h2 class="text-lg font-extrabold text-white">🐦 X Feed &amp; Key Market Posts (Grouped Per Person &bull; Newest First)</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Add any X handle (e.g., <code class="text-amber-400">@seliseli_46</code>) and its latest posts (up to 10 per person in 24–48h, sorted with newest / smallest age on top).</p>
+            <p class="text-xs text-slate-400 mt-0.5">Add any X handle (e.g., <code class="text-amber-400">@seliseli_46</code>) and its latest posts (newest on top). Note: static HTML runs locally in your browser and logs/refreshes posts you enter or sync via refresh.</p>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex flex-wrap items-center gap-2">
             <span id="xFeedLastRefreshed" class="text-[10px] font-mono text-slate-400">Synced just now</span>
             <button onclick="refreshXFeedState()" class="px-2.5 py-1 bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 text-[11px] font-bold rounded">🔄 Refresh X Feed</button>
+            <button onclick="resetDefaultXFeed()" class="px-2.5 py-1 bg-[#131722] hover:bg-[#2a2e39] border border-[#2a2e39] text-slate-300 text-[11px] font-bold rounded">↺ Reset Defaults</button>
           </div>
         </div>
 
-        <!-- Add New X Person / Post Form -->
         <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-3 font-mono text-xs">
           <div class="font-bold text-amber-400">+ Add New X Account or Recent Post (Most Recent Appears on Top)</div>
           <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
@@ -310,7 +315,7 @@
             <input type="text" id="x-new-tag" placeholder="Topic (e.g. BTC / Liquidations / SFP)" class="bg-[#1e222d] border border-[#2a2e39] rounded p-2 text-xs text-white font-mono" />
           </div>
           <div class="flex flex-col sm:flex-row gap-3">
-            <input type="text" id="x-new-post" placeholder="Paste or enter the post from this user (or leave blank to register the user with a pending sync note)..." class="flex-grow bg-[#1e222d] border border-[#2a2e39] rounded p-2 text-xs text-white font-mono" />
+            <input type="text" id="x-new-post" placeholder="Paste or enter the post from this user (or leave blank to create a fresh entry for this account)..." class="flex-grow bg-[#1e222d] border border-[#2a2e39] rounded p-2 text-xs text-white font-mono" />
             <button onclick="addXFeedEntry()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-xs rounded shadow transition whitespace-nowrap">
               + Add User / Post
             </button>
@@ -581,6 +586,174 @@
     let seriesMap = { ma50: null, ma100: null, ma200d: null, ma200w: null, plTrend: null, buyZoneLine: null, sellZoneLine: null, energyLine: null };
     let visibilityState = { ma50: true, ma100: true, ma200d: true, ma200w: true, zones: true, liq: true, energy: true, sfp: true, pvsra: true, pl: true };
 
+    // Custom Persistent Horizontal & Diagonal Lines State
+    const CUSTOM_LINES_KEY = 'cryptoanalyst_custom_lines_v1';
+    let activeDrawTool = 'none'; // 'none' | 'horiz' | 'diag'
+    let pendingDiagPoint = null;
+    let renderedCustomHorizLines = [];
+    let renderedCustomDiagSeries = [];
+
+    function loadAllCustomLines() {
+      try {
+        const raw = localStorage.getItem(CUSTOM_LINES_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch (_) {
+        return {};
+      }
+    }
+
+    function saveAllCustomLines(map) {
+      localStorage.setItem(CUSTOM_LINES_KEY, JSON.stringify(map));
+    }
+
+    function getAssetCustomLines(ticker) {
+      const all = loadAllCustomLines();
+      return Array.isArray(all[ticker]) ? all[ticker] : [];
+    }
+
+    function setAssetCustomLines(ticker, list) {
+      const all = loadAllCustomLines();
+      all[ticker] = list;
+      saveAllCustomLines(all);
+    }
+
+    function setDrawTool(tool) {
+      activeDrawTool = tool;
+      pendingDiagPoint = null;
+
+      const noneBtn = document.getElementById('tool-none');
+      const horizBtn = document.getElementById('tool-horiz');
+      const diagBtn = document.getElementById('tool-diag');
+      const hint = document.getElementById('drawToolHint');
+
+      noneBtn.className = tool === 'none'
+        ? 'px-2.5 py-1 rounded border border-slate-400 bg-slate-500/30 text-white font-bold'
+        : 'px-2.5 py-1 rounded border border-[#2a2e39] bg-[#1e222d] text-slate-400 font-bold';
+      horizBtn.className = tool === 'horiz'
+        ? 'px-2.5 py-1 rounded border border-amber-400 bg-amber-500/25 text-amber-300 font-bold'
+        : 'px-2.5 py-1 rounded border border-amber-500/40 bg-[#1e222d] text-amber-300 font-bold';
+      diagBtn.className = tool === 'diag'
+        ? 'px-2.5 py-1 rounded border border-cyan-400 bg-cyan-500/25 text-cyan-300 font-bold'
+        : 'px-2.5 py-1 rounded border border-cyan-500/40 bg-[#1e222d] text-cyan-300 font-bold';
+
+      if (tool === 'horiz') {
+        hint.innerHTML = 'Active: <strong>Horizontal Line</strong> — click anywhere on the chart to place a persistent horizontal line at that price.';
+      } else if (tool === 'diag') {
+        hint.innerHTML = 'Active: <strong>Diagonal Line</strong> — click <strong>Point 1 (start)</strong>, then click <strong>Point 2 (end)</strong> on the chart.';
+      } else {
+        hint.innerHTML = 'Tip: Select <strong>➖ Horiz Line</strong> and click on the chart (or enter a price above), or select <strong>📐 Diag Line</strong> and click start + end points. Lines auto-save per asset.';
+      }
+    }
+
+    function renderCustomLinesOnChart(ticker) {
+      if (!candleSeries || !tvChart) return;
+
+      renderedCustomHorizLines.forEach(pl => {
+        try { candleSeries.removePriceLine(pl); } catch (_) {}
+      });
+      renderedCustomHorizLines = [];
+
+      renderedCustomDiagSeries.forEach(s => {
+        try { tvChart.removeSeries(s); } catch (_) {}
+      });
+      renderedCustomDiagSeries = [];
+
+      const lines = getAssetCustomLines(ticker);
+      lines.forEach(item => {
+        if (item.type === 'horiz') {
+          const pl = candleSeries.createPriceLine({
+            price: Number(item.price),
+            color: item.color || '#facc15',
+            lineWidth: 2,
+            lineStyle: LightweightCharts.LineStyle.Solid,
+            axisLabelVisible: true,
+            title: item.label || `H: $${Number(item.price).toLocaleString(undefined, { maximumFractionDigits: 4 })}`
+          });
+          renderedCustomHorizLines.push(pl);
+        } else if (item.type === 'diag' && item.p1 && item.p2) {
+          const pts = [item.p1, item.p2].slice().sort((a, b) => Number(a.time) - Number(b.time));
+          if (pts[0].time !== pts[1].time) {
+            const lineSeries = tvChart.addLineSeries({
+              color: item.color || '#22d3ee',
+              lineWidth: 2.5,
+              lineStyle: LightweightCharts.LineStyle.Solid,
+              priceLineVisible: false,
+              lastValueVisible: false,
+              crosshairMarkerVisible: false
+            });
+            lineSeries.setData([
+              { time: Number(pts[0].time), value: Number(pts[0].price) },
+              { time: Number(pts[1].time), value: Number(pts[1].price) }
+            ]);
+            renderedCustomDiagSeries.push(lineSeries);
+          }
+        }
+      });
+
+      renderCustomLinesList(ticker);
+    }
+
+    function renderCustomLinesList(ticker) {
+      const box = document.getElementById('customLinesList');
+      if (!box) return;
+      const lines = getAssetCustomLines(ticker);
+      if (!lines.length) {
+        box.innerHTML = `<span class="text-[10px] text-slate-500">No custom lines saved for ${ticker} yet.</span>`;
+        return;
+      }
+
+      box.innerHTML = lines.map(item => {
+        const desc = item.type === 'horiz'
+          ? `➖ ${item.label || 'Horiz'} @ $${Number(item.price).toLocaleString(undefined, { maximumFractionDigits: 4 })}`
+          : `📐 Diag: $${Number(item.p1.price).toLocaleString(undefined, { maximumFractionDigits: 4 })} → $${Number(item.p2.price).toLocaleString(undefined, { maximumFractionDigits: 4 })}`;
+        return `
+          <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#1e222d] border border-[#2a2e39] text-[10px] text-slate-200">
+            <span class="w-2 h-2 rounded-full inline-block" style="background:${item.color || '#facc15'}"></span>
+            <span>${desc}</span>
+            <button onclick="removeCustomLine('${ticker}', '${item.id}')" title="Remove line" class="text-red-400 hover:text-red-300 font-bold ml-1">✕</button>
+          </span>
+        `;
+      }).join('');
+    }
+
+    function addHorizontalLineToAsset(ticker, price, label, color) {
+      if (!Number.isFinite(price) || price <= 0) return;
+      const lines = getAssetCustomLines(ticker);
+      lines.push({
+        id: 'line_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        type: 'horiz',
+        price,
+        label: label || `Level $${price.toLocaleString(undefined, { maximumFractionDigits: 4 })}`,
+        color: color || '#facc15'
+      });
+      setAssetCustomLines(ticker, lines);
+      renderCustomLinesOnChart(ticker);
+    }
+
+    function addManualHorizontalLine() {
+      const ticker = document.getElementById('topAssetSelect').value;
+      const price = parseFloat(document.getElementById('manualHorizPrice').value);
+      const label = document.getElementById('manualHorizLabel').value.trim();
+      const color = document.getElementById('customLineColor').value;
+      if (!Number.isFinite(price) || price <= 0) return;
+      addHorizontalLineToAsset(ticker, price, label, color);
+      document.getElementById('manualHorizPrice').value = '';
+      document.getElementById('manualHorizLabel').value = '';
+    }
+
+    function removeCustomLine(ticker, id) {
+      const filtered = getAssetCustomLines(ticker).filter(x => x.id !== id);
+      setAssetCustomLines(ticker, filtered);
+      renderCustomLinesOnChart(ticker);
+    }
+
+    function clearAssetCustomLines() {
+      const ticker = document.getElementById('topAssetSelect').value;
+      setAssetCustomLines(ticker, []);
+      pendingDiagPoint = null;
+      renderCustomLinesOnChart(ticker);
+    }
+
     function calcPowerLawValue(unixSec) {
       const genesisSec = Date.UTC(2009, 0, 3) / 1000;
       const days = Math.max(1, (unixSec - genesisSec) / 86400);
@@ -615,6 +788,46 @@
       seriesMap.ma200d = tvChart.addLineSeries({ color: '#ec4899', lineWidth: 2, title: '200D MA', priceLineVisible: false });
       seriesMap.ma200w = tvChart.addLineSeries({ color: '#a855f7', lineWidth: 2.5, lineStyle: LightweightCharts.LineStyle.Dashed, title: '200W MA', priceLineVisible: false });
       seriesMap.plTrend = tvChart.addLineSeries({ color: '#14b8a6', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dotted, title: 'Power Law Fair', priceLineVisible: false });
+
+      tvChart.subscribeClick((param) => {
+        if (activeDrawTool === 'none' || !param || !param.point || !candleSeries) return;
+        const price = candleSeries.coordinateToPrice(param.point.y);
+        if (!Number.isFinite(price) || price <= 0) return;
+
+        const ticker = document.getElementById('topAssetSelect').value;
+        const color = document.getElementById('customLineColor').value;
+        const hint = document.getElementById('drawToolHint');
+
+        if (activeDrawTool === 'horiz') {
+          addHorizontalLineToAsset(ticker, Number(price.toFixed(6)), '', color);
+          setDrawTool('none');
+        } else if (activeDrawTool === 'diag') {
+          const clickedTime = typeof param.time === 'number'
+            ? param.time
+            : Math.floor(Date.now() / 1000);
+
+          if (!pendingDiagPoint) {
+            pendingDiagPoint = { time: clickedTime, price: Number(price.toFixed(6)) };
+            hint.innerHTML = `Point 1 set at <strong>$${pendingDiagPoint.price.toLocaleString(undefined, { maximumFractionDigits: 4 })}</strong> — now click <strong>Point 2 (end)</strong> on the chart.`;
+          } else {
+            const p2 = { time: clickedTime, price: Number(price.toFixed(6)) };
+            if (p2.time !== pendingDiagPoint.time) {
+              const lines = getAssetCustomLines(ticker);
+              lines.push({
+                id: 'line_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                type: 'diag',
+                p1: pendingDiagPoint,
+                p2,
+                color: color || '#22d3ee'
+              });
+              setAssetCustomLines(ticker, lines);
+              renderCustomLinesOnChart(ticker);
+            }
+            pendingDiagPoint = null;
+            setDrawTool('none');
+          }
+        }
+      });
 
       window.addEventListener('resize', () => {
         if (tvChart && container) tvChart.applyOptions({ width: container.clientWidth, height: container.clientHeight });
@@ -673,6 +886,45 @@
           title: d.title
         })
       );
+    }
+
+    function updateBTCLevelsCard() {
+      const btc = assetsStore.BTC;
+      const spot = btc.price;
+      const distSupportPct = (((62062 - spot) / spot) * 100).toFixed(2);
+      const distResistPct = (((64700 - spot) / spot) * 100).toFixed(2);
+      const stamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      const metaEl = document.getElementById('btcLevelsMeta');
+      if (metaEl) {
+        metaEl.innerHTML = `BTC Spot: <strong class="text-amber-400">$${spot.toLocaleString(undefined, { maximumFractionDigits: 2 })}</strong> &bull; S1 Support ($62,062): <strong class="text-emerald-400">${distSupportPct}%</strong> &bull; R1 Resistance ($64,700): <strong class="text-red-400">+${Math.abs(distResistPct)}%</strong> &bull; Updated: <span class="text-slate-300">${stamp}</span>`;
+      }
+
+      const gridEl = document.getElementById('btcLevelsGrid');
+      if (gridEl) {
+        gridEl.innerHTML = `
+          <div class="p-3 rounded-lg bg-red-500/5 border border-red-500/30 space-y-1.5">
+            <div class="font-bold text-red-400 uppercase">Resistance Zones (Widerstand)</div>
+            <div>&bull; <strong>74,050 &ndash; 76,264 $</strong> <span class="text-slate-400">(5&times; tested)</span></div>
+            <div>&bull; <strong>70,983 &ndash; 72,026 $</strong> <span class="text-slate-400">(2&times; tested)</span></div>
+            <div>&bull; <strong>64,700 &ndash; 67,531 $</strong> <span class="text-slate-400">(7&times; tested)</span></div>
+          </div>
+
+          <div class="p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/30 space-y-1.5">
+            <div class="font-bold text-emerald-400 uppercase">Support Zones (Unterst&uuml;tzung)</div>
+            <div>&bull; <strong>62,062 &ndash; 62,818 $</strong> <span class="text-slate-400">(3&times; tested &bull; Immediate)</span></div>
+            <div>&bull; <strong>57,800 &ndash; 59,131 $</strong> <span class="text-slate-400">(3&times; tested &bull; Deeper Floor)</span></div>
+            <div class="text-amber-300">&bull; Live Spot: <strong>$${spot.toLocaleString(undefined, { maximumFractionDigits: 2 })}</strong></div>
+          </div>
+
+          <div class="p-3 rounded-lg bg-orange-500/5 border border-orange-500/30 space-y-1.5">
+            <div class="font-bold text-orange-400 uppercase">💥 Larger Liquidation Zones</div>
+            <div>&bull; <strong>Short Liq Cluster:</strong> <strong>$${btc.liqShortLow.toLocaleString()} &ndash; $${btc.liqShortHigh.toLocaleString()}</strong></div>
+            <div>&bull; <strong>Long Liq Cluster 1:</strong> <strong>$${btc.liqLongLow.toLocaleString()} &ndash; $${btc.liqLongHigh.toLocaleString()}</strong></div>
+            <div>&bull; <strong>Long Liq Cluster 2:</strong> <strong>57,800 &ndash; 59,130 $</strong></div>
+          </div>
+        `;
+      }
     }
 
     function initPowerLawChart() {
@@ -770,11 +1022,11 @@
         const raw = [];
         const nowSec = Math.floor(Date.now() / 1000);
         const stepSec = interval === '15m' ? 900 : interval === '1h' ? 3600 : interval === '4h' ? 14400 : interval === '1d' ? 86400 : 604800;
-        let price = assetsStore[ticker].price * 0.95;
+        let price = assetsStore[ticker].price * 0.98;
         for (let i = 200; i >= 0; i--) {
           const t = (nowSec - (i * stepSec)) * 1000;
           const open = price;
-          const close = Math.max(assetsStore[ticker].price * 0.2, price + (Math.random() - 0.48) * (assetsStore[ticker].price * 0.012));
+          const close = Math.max(assetsStore[ticker].price * 0.2, price + (Math.random() - 0.48) * (assetsStore[ticker].price * 0.008));
           raw.push([t, open.toString(), Math.max(open, close).toString(), Math.min(open, close).toString(), close.toString(), (Math.random() * 5e6 + 1e6).toString()]);
           price = close;
         }
@@ -870,6 +1122,21 @@
       }
     }
 
+    async function syncAllAssetPrices(activeTicker) {
+      const tickers = Object.keys(assetsStore);
+      await Promise.all(tickers.map(async (t) => {
+        if (t === activeTicker) return;
+        try {
+          const res = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${t}USDT`, { cache: 'no-store' });
+          if (res.ok) {
+            const j = await res.json();
+            const px = parseFloat(j.price);
+            if (Number.isFinite(px) && px > 0) assetsStore[t].price = px;
+          }
+        } catch (_) {}
+      }));
+    }
+
     async function loadChartData() {
       const ticker = document.getElementById('topAssetSelect').value;
       const asset = assetsStore[ticker];
@@ -907,12 +1174,16 @@
 
         renderPriceLines(asset);
         renderLiquidationLines(asset);
+        renderCustomLinesOnChart(ticker);
         applyVisibilityStates();
         tvChart.timeScale().fitContent();
       }
 
+      await syncAllAssetPrices(ticker);
       renderPowerLawHistoryChart(assetsStore.BTC.price);
       await loadStateTelemetry();
+      updateBTCLevelsCard();
+
       const rec = computeRecommendation(asset);
       const hudSig = document.getElementById('hudSignal');
       hudSig.className = `text-[10px] px-2 py-0.5 rounded font-bold border ${rec.badgeClass}`;
@@ -931,7 +1202,11 @@
         <div class="p-2.5 rounded bg-teal-500/5 border border-teal-500/30"><span class="text-teal-400 font-bold block">📐 PL / ROI</span><strong class="text-teal-300 text-xs">${ticker === 'BTC' ? getPowerLawMetrics(asset.price).pctDiff.toFixed(1) + '% vs PL' : asset.roi}</strong></div>
       `;
 
-      document.getElementById('liveFeedBadge').innerText = `Feed: Live (${ticker} • ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`;
+      const stamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      document.getElementById('liveFeedBadge').innerText = `Feed: Live (${ticker} • ${stamp})`;
+      const wlLabel = document.getElementById('watchlistSyncLabel');
+      if (wlLabel) wlLabel.textContent = `Signals & Prices Synced: ${stamp}`;
+
       renderPortfolioTable();
       renderDashboardGrid();
       renderAnalystReportAllAssets();
@@ -1059,12 +1334,12 @@
     }
 
     function getXPosts() {
-      const saved = localStorage.getItem('cryptoanalyst_x_posts_v3');
+      const saved = localStorage.getItem('cryptoanalyst_x_posts_v4');
       return saved ? JSON.parse(saved) : defaultXPosts;
     }
 
     function saveXPosts(list) {
-      localStorage.setItem('cryptoanalyst_x_posts_v3', JSON.stringify(list));
+      localStorage.setItem('cryptoanalyst_x_posts_v4', JSON.stringify(list));
     }
 
     function renderXFeed() {
@@ -1118,7 +1393,7 @@
       const time = document.getElementById('x-new-time').value.trim() || `${ageMinutes}m ago`;
       const tag = document.getElementById('x-new-tag').value.trim() || 'Tracked Account';
       const rawPost = document.getElementById('x-new-post').value.trim();
-      const post = rawPost || `Account ${handle} added to watchlist. Static HTML cannot auto-scrape live X tweets directly—paste or log ${handle}'s latest 24–48h post here anytime.`;
+      const post = rawPost || `Added ${handle} to feed (${time}). Static HTML does not scrape live X tweets directly—paste ${handle}'s latest post text above anytime to append it.`;
 
       const list = getXPosts();
       list.unshift({ handle, ageMinutes, time, tag, post });
@@ -1130,16 +1405,32 @@
       document.getElementById('x-new-tag').value = '';
       document.getElementById('x-new-post').value = '';
 
-      statusEl.textContent = `Saved entry for ${handle} (${time}) — sorted newest-first.`;
+      statusEl.textContent = `Added ${handle} (${time}) — newest post sorted to top.`;
       statusEl.className = 'text-[11px] text-emerald-400 block';
       renderXFeed();
     }
 
     function refreshXFeedState() {
-      renderXFeed();
+      const list = getXPosts();
       const stamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       const badge = document.getElementById('xFeedLastRefreshed');
-      if (badge) badge.textContent = `Refreshed at ${stamp} (local feed sorted newest-first)`;
+      if (badge) badge.textContent = `Refreshed at ${stamp} (${list.length} entries • newest first)`;
+      const statusEl = document.getElementById('xFeedStatusMsg');
+      if (statusEl) {
+        statusEl.textContent = `X feed re-sorted & synced at ${stamp} (note: static HTML cannot pull external X posts automatically without an X API/proxy).`;
+        statusEl.className = 'text-[11px] text-sky-400 block';
+      }
+      renderXFeed();
+    }
+
+    function resetDefaultXFeed() {
+      localStorage.removeItem('cryptoanalyst_x_posts_v4');
+      renderXFeed();
+      const statusEl = document.getElementById('xFeedStatusMsg');
+      if (statusEl) {
+        statusEl.textContent = 'Restored default X feed entries.';
+        statusEl.className = 'text-[11px] text-amber-400 block';
+      }
     }
 
     function renderMacroCalendar() {
@@ -1198,6 +1489,7 @@
         b.classList.toggle('text-slate-400', !active);
       });
       document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === tabId));
+      if (tabId === 'dashboard') updateBTCLevelsCard();
       if (tabId === 'powerlaw') renderPowerLawHistoryChart(assetsStore.BTC.price);
       if (tabId === 'report') renderAnalystReportAllAssets();
       if (tabId === 'xfeed') renderXFeed();
@@ -1207,9 +1499,12 @@
     document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', () => switchTab(b.getAttribute('data-tab'))));
     initTradingViewChart();
     initPowerLawChart();
+    updateBTCLevelsCard();
     renderXFeed();
     renderMacroCalendar();
     loadChartData();
   </script>
 </body>
 </html>
+
+For past notes and workflow history, you can also check your 📊 Crypto analytics notebook.
