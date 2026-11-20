@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CryptoAnalyst - Institutional Pro Terminal, Power Law, PVSRA & Portfolio Lab</title>
+  <title>CryptoAnalyst - Institutional Pro Terminal, Power Law, STH MVRV/SOPR & PVSRA</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
   <style>
@@ -12,9 +12,11 @@
     body { background-color: #131722; color: #d1d4dc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     #tvChartContainer a[href*="tradingview"],
     #plChartContainer a[href*="tradingview"],
+    #sthChartContainer a[href*="tradingview"],
     .tv-lightweight-charts__attribution,
     #tvChartContainer table tr td:first-child a,
-    #plChartContainer table tr td:first-child a {
+    #plChartContainer table tr td:first-child a,
+    #sthChartContainer table tr td:first-child a {
       display: none !important;
       opacity: 0 !important;
       pointer-events: none !important;
@@ -28,7 +30,7 @@
     <div class="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between flex-wrap gap-2">
       <div class="flex items-center space-x-3">
         <span class="text-xl">📈</span>
-        <h1 class="font-bold text-sm tracking-wide text-white">CryptoAnalyst // Institutional Terminal, Power Law & PVSRA</h1>
+        <h1 class="font-bold text-sm tracking-wide text-white">CryptoAnalyst // Institutional Terminal, Power Law, STH MVRV/SOPR & PVSRA</h1>
         <span id="liveFeedBadge" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
           Feed: Syncing Binance, State & Power Law...
         </span>
@@ -41,6 +43,7 @@
     <!-- Navigation Tabs -->
     <nav class="max-w-7xl mx-auto px-4 flex space-x-2 border-t border-[#2a2e39] pt-2 pb-2 overflow-x-auto text-xs font-semibold">
       <button data-tab="dashboard" class="nav-btn px-4 py-1.5 rounded bg-amber-500 text-slate-900 font-bold transition">Pro Charting, PVSRA & Portfolio</button>
+      <button data-tab="sthmodel" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">📉 STH MVRV & SOPR</button>
       <button data-tab="powerlaw" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">📐 Power Law Model</button>
       <button data-tab="report" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">🏛️ Market Analyst Report</button>
       <button data-tab="xfeed" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">🐦 X Feed & Key Posts</button>
@@ -95,6 +98,7 @@
             <button id="btn-ma200w" onclick="toggleSeries('ma200w')" class="px-2.5 py-1 rounded border border-purple-500 bg-purple-500/20 text-purple-300 font-bold transition">● 200W MA</button>
             <button id="btn-zones" onclick="toggleSeries('zones')" class="px-2.5 py-1 rounded border border-emerald-500 bg-emerald-500/20 text-emerald-300 font-bold transition">● Buy/Sell Zones</button>
             <button id="btn-liq" onclick="toggleSeries('liq')" class="px-2.5 py-1 rounded border border-orange-500 bg-orange-500/20 text-orange-300 font-bold transition">💥 Liq Zones</button>
+            <button id="btn-sth" onclick="toggleSeries('sth')" class="px-2.5 py-1 rounded border border-sky-500 bg-sky-500/20 text-sky-300 font-bold transition">📉 STH Bands</button>
             <button id="btn-energy" onclick="toggleSeries('energy')" class="px-2.5 py-1 rounded border border-cyan-500 bg-cyan-500/20 text-cyan-300 font-bold transition">⚡ Energy Floor</button>
             <button id="btn-sfp" onclick="toggleSeries('sfp')" class="px-2.5 py-1 rounded border border-red-500 bg-red-500/20 text-red-300 font-bold transition">🎯 SFP Trap</button>
             <button id="btn-pvsra" onclick="toggleSeries('pvsra')" class="px-2.5 py-1 rounded border border-fuchsia-500 bg-fuchsia-500/30 text-fuchsia-300 font-bold transition">🔮 PVSRA Climax</button>
@@ -226,7 +230,52 @@
       <div id="assets-grid-container" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
     </section>
 
-    <!-- TAB 2: POWER LAW MODEL -->
+    <!-- TAB 2: SHORT-TERM HOLDER MVRV & SOPR INDICATORS (SCREENSHOT SUITE) -->
+    <section id="sthmodel" class="tab-content space-y-6">
+      <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
+        <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-2">
+          <div>
+            <h2 class="text-lg font-extrabold text-white">📉 Short-Term Holder MVRV and SOPR Indicators</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Price [USD] vs. STH Cost Basis, STH-SOPR / MVRV-STH Oscillator &amp; Standard Deviation Bands (+2.0sd to -1.5sd)</p>
+          </div>
+          <span class="px-2.5 py-1 bg-sky-500/10 border border-sky-500/30 text-sky-300 text-xs font-bold rounded">STH On-Chain Suite</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs font-mono">
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
+            <span class="text-slate-400 block uppercase font-bold">BTC Spot</span>
+            <strong class="text-white text-lg" id="sthSpotVal">$63,635</strong>
+          </div>
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
+            <span class="text-slate-400 block uppercase font-bold">STH Cost Basis</span>
+            <strong class="text-sky-300 text-lg" id="sthCostVal">$76,150</strong>
+          </div>
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
+            <span class="text-slate-400 block uppercase font-bold">MVRV-STH / SOPR Zone</span>
+            <strong class="text-amber-400 text-sm" id="sthZoneVal">Below STH Cost (-1.0sd to -1.5sd)</strong>
+          </div>
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
+            <span class="text-slate-400 block uppercase font-bold">STH Profit / Stress Bias</span>
+            <strong class="text-orange-300 text-sm" id="sthBiasVal">Underwater STHs • Overhead Supply</strong>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+          <span class="text-slate-300 font-bold">BTC Price [USD] &amp; STH Cost / Deviation Bands</span>
+          <div class="flex flex-wrap gap-2 text-[11px]">
+            <button id="sth-btn-sd" onclick="toggleSthBands()" class="px-2.5 py-1 rounded border border-amber-500 bg-amber-500/20 text-amber-300 font-bold">● +2.0sd / -1.5sd Bands</button>
+            <span class="text-white font-bold px-2 py-1">● Price</span>
+            <span class="text-sky-300 font-bold px-2 py-1">● STH Cost Basis</span>
+            <span class="text-orange-300 font-bold px-2 py-1">● +1.0sd / +2.0sd</span>
+            <span class="text-blue-300 font-bold px-2 py-1">● -1.0sd / -1.5sd</span>
+          </div>
+        </div>
+
+        <div id="sthChartContainer" class="w-full h-[420px] bg-[#131722] rounded-lg border border-[#2a2e39] overflow-hidden"></div>
+      </div>
+    </section>
+
+    <!-- TAB 3: POWER LAW MODEL -->
     <section id="powerlaw" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
         <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-2">
@@ -271,7 +320,7 @@
       </div>
     </section>
 
-    <!-- TAB 3: MARKET ANALYST REPORT (ALL ASSETS + LIQUIDATION ZONES) -->
+    <!-- TAB 4: MARKET ANALYST REPORT (ALL ASSETS + LIQUIDATION ZONES) -->
     <section id="report" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
         <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-2">
@@ -284,14 +333,14 @@
 
         <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] text-xs font-mono space-y-1">
           <div class="font-bold text-amber-400">Active Algorithmic &amp; Liquidation Context</div>
-          <p class="text-slate-300 text-[11px]">Composite decision engine weights MVRV valuation (&lt;1.2 bottom signal, 1.2–2.4 neutral/accumulation, &gt;2.4 euphoria), Power Law fair-value deviation (BTC), 50/100/200D/200W MWA trend alignment, SFP liquidity sweeps, PVSRA 20-bar volume spread confirmation, and larger liquidation clusters (long-liquidation sweeps below vs. short-squeeze pockets above).</p>
+          <p class="text-slate-300 text-[11px]">Composite decision engine weights MVRV valuation (&lt;1.2 bottom signal, 1.2–2.4 neutral/accumulation, &gt;2.4 euphoria), STH Cost Basis / MVRV-STH &amp; SOPR deviation bands, Power Law fair-value deviation (BTC), 50/100/200D/200W MWA trend alignment, SFP liquidity sweeps, PVSRA 20-bar volume spread confirmation, and larger liquidation clusters.</p>
         </div>
 
         <div id="full-analyst-report-container" class="space-y-4 text-xs font-mono"></div>
       </div>
     </section>
 
-    <!-- TAB 4: X FEED (PER PERSON, MOST RECENT ON TOP, ADD NEW USERS & REFRESH) -->
+    <!-- TAB 5: X FEED (PER PERSON, MOST RECENT ON TOP, ADD NEW USERS & REFRESH) -->
     <section id="xfeed" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
         <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-2">
@@ -327,7 +376,7 @@
       </div>
     </section>
 
-    <!-- TAB 5: MACRO & FED CALENDAR -->
+    <!-- TAB 6: MACRO & FED CALENDAR -->
     <section id="macro" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
         <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-2">
@@ -354,18 +403,23 @@
       </div>
     </section>
 
-    <!-- TAB 6: GLOSSARY & ACRONYMS -->
+    <!-- TAB 7: GLOSSARY & ACRONYMS -->
     <section id="glossary" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
         <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-2">
           <div>
             <h2 class="text-lg font-extrabold text-white">📖 Acronyms, Metrics &amp; Signal Percentages Explained</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Clear definitions for MVRV / MVRV Band, PVSRA, SFP, Liquidation Zones, Power Law, MWA, and ST / MT / LT win percentages.</p>
+            <p class="text-xs text-slate-400 mt-0.5">Clear definitions for STH MVRV &amp; SOPR, MVRV Band, PVSRA, SFP, Liquidation Zones, Power Law, MWA, and ST / MT / LT win percentages.</p>
           </div>
           <span class="px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] font-bold rounded">Reference Guide</span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1.5">
+            <div class="font-bold text-sky-300 text-sm">STH MVRV, STH Cost Basis &amp; STH-SOPR Bands</div>
+            <p class="text-slate-300 leading-relaxed">Tracks coins moved within the last 155 days (Short-Term Holders). <strong>STH Cost Basis</strong> shows average recent buyer entry; <strong>MVRV-STH</strong> and <strong>STH-SOPR</strong> measure whether recent coins are spent/held in profit or loss, with standard deviation bands (<code>+2.0sd</code> to <code>-1.5sd</code>) marking overextension vs. capitulation/support[span_1](start_span)[span_1](end_span).</p>
+          </div>
+
           <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1.5">
             <div class="font-bold text-amber-400 text-sm">MVRV &amp; MVRV Band (Market Value to Realized Value)</div>
             <p class="text-slate-300 leading-relaxed">Compares current <strong>Market Value</strong> (spot price &times; circulating supply) against <strong>Realized Value</strong> (each coin valued at the price when it last moved on-chain, reflecting aggregate cost basis). <strong>&lt; 1.2</strong> = undervalued/accumulation band; <strong>1.2–2.4</strong> = fair/neutral band; <strong>&gt; 2.4</strong> = overvalued/euphoria distribution zone.</p>
@@ -387,11 +441,6 @@
           </div>
 
           <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1.5">
-            <div class="font-bold text-red-400 text-sm">SFP (Swing Failure Pattern)</div>
-            <p class="text-slate-300 leading-relaxed">A liquidity-sweep reversal setup where price briefly pierces a prior swing high or swing low to trigger stops/liquidity and then closes back inside the prior range, signaling a failed breakout and potential reversal.</p>
-          </div>
-
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1.5">
             <div class="font-bold text-teal-400 text-sm">Power Law &amp; MWA (50 / 100 / 200D / 200W)</div>
             <p class="text-slate-300 leading-relaxed">Bitcoin's Power Law curve models long-term logarithmic fair value since Jan 3, 2009. <strong>50 / 100 / 200D MA</strong> and <strong>200W MA</strong> provide short-, medium-, and macro-cycle moving average context.</p>
           </div>
@@ -399,7 +448,7 @@
       </div>
     </section>
 
-    <!-- TAB 7: BACKTEST & ROI -->
+    <!-- TAB 8: BACKTEST & ROI -->
     <section id="backtest" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-4">
         <h2 class="text-lg font-bold text-white">📈 Strategy Backtest & ROI Matrix</h2>
@@ -421,7 +470,7 @@
       </div>
     </section>
 
-    <!-- TAB 8: ASSET MANAGER -->
+    <!-- TAB 9: ASSET MANAGER -->
     <section id="manager" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-4">
         <h2 class="text-lg font-bold text-white">Universal Asset Onboarding</h2>
@@ -440,14 +489,14 @@
   <script>
     const assetsStore = {
       BTC: {
-        name: 'Bitcoin', price: 63635.16, mvrv: 1.15, electrical_cost: 54500, buyZone: 60150, sellZone: 76000,
+        name: 'Bitcoin', price: 63635.16, mvrv: 1.15, sthCostBasis: 76150, electrical_cost: 54500, buyZone: 60150, sellZone: 76000,
         liqLongLow: 59500, liqLongHigh: 62200, liqShortLow: 66650, liqShortHigh: 67530,
         liqSummary: 'Long liqs $59.5k–$62.2k & $57.8k–$59.1k; Short squeeze cluster $66.65k–$67.53k',
         weight: 0.40, winST: '72%', winMT: '84%', winLT: '93%', winProb: '74%', accuracy: '99.49%',
-        roi: '+39.8%', correlation: '98.7%', strategy: 'Power Law + PVSRA + Liq Sweep',
+        roi: '+39.8%', correlation: '98.7%', strategy: 'Power Law + STH MVRV/SOPR + PVSRA',
         pvsraStatus: 'Institutional Absorption', pvsraScore: 1, weekly200Base: 41000,
         outlookST: 'Watch $59.5k–$62.2k long liquidation pocket for sweeps/absorption; short squeeze liquidity sits near $66.65k–$67.53k.',
-        outlookMT: 'Reclaiming 50/100/200 MWA levels and stabilizing ETF/rate flows required for range expansion.',
+        outlookMT: 'Reclaiming STH cost basis and 50/100/200 MWA levels required for sustained upside expansion.',
         outlookLT: 'Deep Power Law discount and MVRV < 1.2 favor multi-month core accumulation.'
       },
       ETH: {
@@ -581,14 +630,24 @@
     let plFairSeries = null;
     let plLowSeries = null;
     let plHighSeries = null;
+
+    let sthChart = null;
+    let sthPriceSeries = null;
+    let sthCostSeries = null;
+    let sthPlus2Series = null;
+    let sthPlus1Series = null;
+    let sthMinus1Series = null;
+    let sthMinus15Series = null;
+    let sthBandsVisible = true;
+    let sthOverlayLines = [];
+
     let screenshotPriceLines = [];
     let liqPriceLines = [];
     let seriesMap = { ma50: null, ma100: null, ma200d: null, ma200w: null, plTrend: null, buyZoneLine: null, sellZoneLine: null, energyLine: null };
-    let visibilityState = { ma50: true, ma100: true, ma200d: true, ma200w: true, zones: true, liq: true, energy: true, sfp: true, pvsra: true, pl: true };
+    let visibilityState = { ma50: true, ma100: true, ma200d: true, ma200w: true, zones: true, liq: true, sth: true, energy: true, sfp: true, pvsra: true, pl: true };
 
-    // Custom Persistent Horizontal & Diagonal Lines State
     const CUSTOM_LINES_KEY = 'cryptoanalyst_custom_lines_v1';
-    let activeDrawTool = 'none'; // 'none' | 'horiz' | 'diag'
+    let activeDrawTool = 'none';
     let pendingDiagPoint = null;
     let renderedCustomHorizLines = [];
     let renderedCustomDiagSeries = [];
@@ -835,6 +894,10 @@
           const plBox = document.getElementById('plChartContainer');
           plChart.applyOptions({ width: plBox.clientWidth, height: plBox.clientHeight });
         }
+        if (sthChart && document.getElementById('sthChartContainer')) {
+          const sthBox = document.getElementById('sthChartContainer');
+          sthChart.applyOptions({ width: sthBox.clientWidth, height: sthBox.clientHeight });
+        }
       });
     }
 
@@ -886,6 +949,107 @@
           title: d.title
         })
       );
+    }
+
+    function renderSthOverlayOnMainChart(ticker) {
+      if (!candleSeries || typeof LightweightCharts === 'undefined') return;
+      sthOverlayLines.forEach(line => {
+        try { candleSeries.removePriceLine(line); } catch (_) {}
+      });
+      sthOverlayLines = [];
+
+      if (!visibilityState.sth || ticker !== 'BTC') return;
+      const sthBase = assetsStore.BTC.sthCostBasis || 76150;
+      const lines = [
+        { price: Number((sthBase * 1.24).toFixed(0)), color: '#fb923c', style: LightweightCharts.LineStyle.Dashed, title: '+2.0sd STH' },
+        { price: Number((sthBase * 1.12).toFixed(0)), color: '#fdba74', style: LightweightCharts.LineStyle.Dotted, title: '+1.0sd STH' },
+        { price: sthBase, color: '#38bdf8', style: LightweightCharts.LineStyle.Solid, title: 'STH Cost Basis' },
+        { price: Number((sthBase * 0.88).toFixed(0)), color: '#93c5fd', style: LightweightCharts.LineStyle.Dotted, title: '-1.0sd STH' },
+        { price: Number((sthBase * 0.78).toFixed(0)), color: '#60a5fa', style: LightweightCharts.LineStyle.Dashed, title: '-1.5sd STH' }
+      ];
+
+      sthOverlayLines = lines.map(l =>
+        candleSeries.createPriceLine({
+          price: l.price,
+          color: l.color,
+          lineWidth: 1.5,
+          lineStyle: l.style,
+          axisLabelVisible: true,
+          title: l.title
+        })
+      );
+    }
+
+    function initSthChart() {
+      const container = document.getElementById('sthChartContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      sthChart = LightweightCharts.createChart(container, {
+        width: container.clientWidth || 900,
+        height: container.clientHeight || 420,
+        layout: { background: { type: 'solid', color: '#131722' }, textColor: '#d1d4dc', attributionLogo: false },
+        grid: { vertLines: { color: '#1e222d' }, horzLines: { color: '#1e222d' } },
+        rightPriceScale: { mode: LightweightCharts.PriceScaleMode.Logarithmic, borderColor: '#2a2e39' },
+        timeScale: { borderColor: '#2a2e39', timeVisible: false },
+      });
+
+      sthPriceSeries = sthChart.addLineSeries({ color: '#ffffff', lineWidth: 2, title: 'Price [USD]', priceLineVisible: false });
+      sthCostSeries = sthChart.addLineSeries({ color: '#38bdf8', lineWidth: 2.5, title: 'STH Cost Basis', priceLineVisible: false });
+      sthPlus2Series = sthChart.addLineSeries({ color: '#fb923c', lineWidth: 1.5, lineStyle: LightweightCharts.LineStyle.Dashed, title: '+2.0sd', priceLineVisible: false });
+      sthPlus1Series = sthChart.addLineSeries({ color: '#fdba74', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted, title: '+1.0sd', priceLineVisible: false });
+      sthMinus1Series = sthChart.addLineSeries({ color: '#93c5fd', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted, title: '-1.0sd', priceLineVisible: false });
+      sthMinus15Series = sthChart.addLineSeries({ color: '#60a5fa', lineWidth: 1.5, lineStyle: LightweightCharts.LineStyle.Dashed, title: '-1.5sd', priceLineVisible: false });
+    }
+
+    function toggleSthBands() {
+      sthBandsVisible = !sthBandsVisible;
+      const btn = document.getElementById('sth-btn-sd');
+      if (btn) btn.classList.toggle('opacity-40', !sthBandsVisible);
+      renderSthIndicatorChart(assetsStore.BTC.price);
+    }
+
+    function renderSthIndicatorChart(btcSpot) {
+      if (!sthChart) initSthChart();
+      const sthBase = assetsStore.BTC.sthCostBasis || 76150;
+      const diffPct = (((btcSpot - sthBase) / sthBase) * 100).toFixed(1);
+
+      document.getElementById('sthSpotVal').innerText = `$${btcSpot.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+      document.getElementById('sthCostVal').innerText = `$${sthBase.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+      document.getElementById('sthZoneVal').innerText = btcSpot >= sthBase ? `Above STH Cost (+${diffPct}%)` : `Below STH Cost (${diffPct}%)`;
+      document.getElementById('sthBiasVal').innerText = btcSpot >= sthBase ? 'STHs in Net Profit • Support Active' : 'STHs Underwater • Overhead Supply';
+
+      const seriesNodes = [
+        ['2024-10-01', 63200, 61500],
+        ['2024-12-17', 106100, 74500],
+        ['2025-04-07', 76200, 89500],
+        ['2025-07-14', 118500, 96000],
+        ['2025-10-06', 124650, 108500],
+        ['2026-02-05', 70400, 94200],
+        ['2026-06-15', 66800, 83500],
+        ['2026-10-10', 61200, 78400],
+        ['2026-11-20', btcSpot, sthBase]
+      ];
+
+      const pPts = [], cPts = [], p2Pts = [], p1Pts = [], m1Pts = [], m15Pts = [];
+      seriesNodes.forEach(([d, px, cost]) => {
+        pPts.push({ time: d, value: px });
+        cPts.push({ time: d, value: cost });
+        if (sthBandsVisible) {
+          p2Pts.push({ time: d, value: Number((cost * 1.24).toFixed(0)) });
+          p1Pts.push({ time: d, value: Number((cost * 1.12).toFixed(0)) });
+          m1Pts.push({ time: d, value: Number((cost * 0.88).toFixed(0)) });
+          m15Pts.push({ time: d, value: Number((cost * 0.78).toFixed(0)) });
+        }
+      });
+
+      sthPriceSeries.setData(pPts);
+      sthCostSeries.setData(cPts);
+      sthPlus2Series.setData(p2Pts);
+      sthPlus1Series.setData(p1Pts);
+      sthMinus1Series.setData(m1Pts);
+      sthMinus15Series.setData(m15Pts);
+      sthChart.timeScale().fitContent();
     }
 
     function updateBTCLevelsCard() {
@@ -1174,6 +1338,7 @@
 
         renderPriceLines(asset);
         renderLiquidationLines(asset);
+        renderSthOverlayOnMainChart(ticker);
         renderCustomLinesOnChart(ticker);
         applyVisibilityStates();
         tvChart.timeScale().fitContent();
@@ -1181,6 +1346,7 @@
 
       await syncAllAssetPrices(ticker);
       renderPowerLawHistoryChart(assetsStore.BTC.price);
+      renderSthIndicatorChart(assetsStore.BTC.price);
       await loadStateTelemetry();
       updateBTCLevelsCard();
 
@@ -1236,9 +1402,11 @@
       visibilityState[key] = !visibilityState[key];
       const btn = document.getElementById(`btn-${key}`);
       btn.classList.toggle('opacity-40', !visibilityState[key]);
-      const curAsset = assetsStore[document.getElementById('topAssetSelect').value];
+      const ticker = document.getElementById('topAssetSelect').value;
+      const curAsset = assetsStore[ticker];
       if (key === 'zones' || key === 'energy') renderPriceLines(curAsset);
       else if (key === 'liq') renderLiquidationLines(curAsset);
+      else if (key === 'sth') renderSthOverlayOnMainChart(ticker);
       else if (key === 'sfp' || key === 'pvsra') loadChartData();
       else applyVisibilityStates();
     }
@@ -1311,7 +1479,7 @@
       if (!container) return;
       container.innerHTML = Object.keys(assetsStore).map((t, idx) => {
         const a = assetsStore[t], rec = computeRecommendation(a);
-        const extraPl = t === 'BTC' ? ` • Power Law: ${getPowerLawMetrics(a.price).pctDiff.toFixed(1)}% vs Fair` : '';
+        const extraPl = t === 'BTC' ? ` • Power Law: ${getPowerLawMetrics(a.price).pctDiff.toFixed(1)}% vs Fair • STH Cost: $${(a.sthCostBasis || 76150).toLocaleString()}` : '';
         return `
           <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-2">
             <div class="flex flex-wrap justify-between items-center gap-2">
@@ -1490,6 +1658,7 @@
       });
       document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === tabId));
       if (tabId === 'dashboard') updateBTCLevelsCard();
+      if (tabId === 'sthmodel') renderSthIndicatorChart(assetsStore.BTC.price);
       if (tabId === 'powerlaw') renderPowerLawHistoryChart(assetsStore.BTC.price);
       if (tabId === 'report') renderAnalystReportAllAssets();
       if (tabId === 'xfeed') renderXFeed();
@@ -1498,6 +1667,7 @@
 
     document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', () => switchTab(b.getAttribute('data-tab'))));
     initTradingViewChart();
+    initSthChart();
     initPowerLawChart();
     updateBTCLevelsCard();
     renderXFeed();
@@ -1506,5 +1676,3 @@
   </script>
 </body>
 </html>
-
-For past notes and workflow history, you can also check your 📊 Crypto analytics notebook.
