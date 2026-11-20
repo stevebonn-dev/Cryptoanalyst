@@ -1,8 +1,3 @@
-Added the STH Value Zone band and live status readout to the Short-Term Holder MVRV and SOPR Indicators tab and main chart overlay so it recalculates and updates automatically on every refresh or live price sync.
-What Was Added
- * Dynamic STH Value Zone Bounds & Status (updateSthValueZone): Computes the live upper and lower bounds of the Short-Term Holder value zone relative to the STH Cost Basis / MVRV-STH band structure, reports whether BTC is currently Inside Value Zone, Below Lower Value Band (Discount/Support), or Above Upper Value Band (Overextended), and shows exact dollar levels and percentage distances.
- * Chart Value Zone Lines & Overlay: Plots the Value Zone Upper, STH Cost Basis, and Value Zone Lower bands in the 📉 STH MVRV & SOPR chart and keeps the main chart's 📉 STH Bands overlay in sync whenever loadChartData() or refreshAllTerminalData() runs.
-Complete index.html Ready to Copy
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
