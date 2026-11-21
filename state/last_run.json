@@ -1,61 +1,15 @@
 {
-  "updated_at": "2026-11-20T15:25:10.083692+00:00",
-  "regime": "ACCUMULATION_DISCOUNT",
-  "mvrv_band": "UNDERVALUED_BOTTOM",
-  "elec_floor_breached": false,
-  "btc_spot": 63635.16,
-  "electrical_cost_floor": 54500.0,
-  "asset_tiers": {
-    "BTC": "HIGH_CONVICTION_ACCUMULATE",
-    "ETH": "CORE_HOLD",
-    "SOL": "CORE_HOLD",
-    "XRP": "CORE_HOLD",
-    "ONDO": "CORE_HOLD",
-    "SUI": "CORE_HOLD",
-    "SEI": "CORE_HOLD",
-    "HBAR": "CORE_HOLD",
-    "HYPE": "CORE_HOLD"
-  },
-  "transitions": [
-    "Regime shift: NORMAL -> ACCUMULATION_DISCOUNT",
-    "MVRV band transition: NEUTRAL -> UNDERVALUED_BOTTOM",
-    "BTC conviction tier: MEDIUM -> HIGH_CONVICTION_ACCUMULATE",
-    "ETH conviction tier: MEDIUM -> CORE_HOLD",
-    "SOL conviction tier: MEDIUM -> CORE_HOLD",
-    "XRP conviction tier: MEDIUM -> CORE_HOLD",
-    "HYPE conviction tier: MEDIUM -> CORE_HOLD"
+  "lastRunAt": "2026-11-21T09:35:44.370568+00:00",
+  "assets": [
+    "BTC",
+    "ETH",
+    "SOL",
+    "XRP",
+    "ONDO",
+    "SUI",
+    "SEI",
+    "HBAR",
+    "HYPE"
   ],
-  "alerts": [
-    "Regime shift: NORMAL -> ACCUMULATION_DISCOUNT",
-    "MVRV band transition: NEUTRAL -> UNDERVALUED_BOTTOM",
-    "BTC conviction tier: MEDIUM -> HIGH_CONVICTION_ACCUMULATE",
-    "ETH conviction tier: MEDIUM -> CORE_HOLD",
-    "SOL conviction tier: MEDIUM -> CORE_HOLD",
-    "XRP conviction tier: MEDIUM -> CORE_HOLD",
-    "HYPE conviction tier: MEDIUM -> CORE_HOLD",
-    "[BTC] MVRV is 1.15 (< 1.2): Historical Market Bottom / Strong Buy Signal",
-    "BTC Spot ($63,635.16) testing STH Cost Basis ($76,150.00)"
-  ],
-  "latest_feedback": {
-    "timestamp": "2026-11-20T15:25:10.083668+00:00",
-    "ticker": "BTC",
-    "timeframe": "24h",
-    "mvrv_ratio": 1.15,
-    "valuation_status": "Significantly Undervalued (Historical Market Bottom / Strong Buy)",
-    "error_pct": 0.57,
-    "accuracy_score": 99.43,
-    "dynamic_adjustment": 0.0005,
-    "alerts_triggered": [
-      {
-        "level": "CRITICAL_OPPORTUNITY",
-        "indicator": "MVRV Ratio",
-        "message": "[BTC] MVRV is 1.15 (< 1.2): Historical Market Bottom / Strong Buy Signal"
-      },
-      {
-        "level": "WARNING_SUPPORT",
-        "indicator": "STH Cost Basis",
-        "message": "BTC Spot ($63,635.16) testing STH Cost Basis ($76,150.00)"
-      }
-    ]
-  }
+  "history": []
 }

@@ -1,0 +1,15 @@
+{
+  "sourceName": "ThirdPartySignalIndex",
+  "updatedAt": "2026-11-21T09:35:44.370382+00:00",
+  "defaultPrior": {
+    "score": 55,
+    "source": "DefaultBaseline"
+  },
+  "feeds": {
+    "@seliseli_46": {
+      "score": 72,
+      "source": "ThirdPartySignalIndex",
+      "verifiedCalls": 10
+    }
+  }
+}
