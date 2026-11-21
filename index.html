@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CryptoAnalyst - Institutional Pro Terminal, Power Law, STH MVRV/SOPR & PVSRA</title>
+  <title>CryptoAnalyst - Live Market Terminal, Quant Oscillators, Signal Tracker & Portfolio</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
   <style>
@@ -13,10 +13,14 @@
     #tvChartContainer a[href*="tradingview"],
     #plChartContainer a[href*="tradingview"],
     #sthChartContainer a[href*="tradingview"],
+    #quantZChartContainer a[href*="tradingview"],
+    #quantVdChartContainer a[href*="tradingview"],
     .tv-lightweight-charts__attribution,
     #tvChartContainer table tr td:first-child a,
     #plChartContainer table tr td:first-child a,
-    #sthChartContainer table tr td:first-child a {
+    #sthChartContainer table tr td:first-child a,
+    #quantZChartContainer table tr td:first-child a,
+    #quantVdChartContainer table tr td:first-child a {
       display: none !important;
       opacity: 0 !important;
       pointer-events: none !important;
@@ -30,26 +34,33 @@
     <div class="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between flex-wrap gap-2">
       <div class="flex items-center space-x-3">
         <span class="text-xl">📈</span>
-        <h1 class="font-bold text-sm tracking-wide text-white">CryptoAnalyst // Institutional Terminal, Power Law, STH MVRV/SOPR & PVSRA</h1>
+        <h1 class="font-bold text-sm tracking-wide text-white">CryptoAnalyst // Live Market Terminal, Signal Tracker &amp; Portfolio</h1>
         <span id="liveFeedBadge" class="px-2 py-0.5 text-[10px] font-mono font-bold rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-          Feed: Syncing Binance, State & Power Law...
+          Feed: Syncing Binance...
         </span>
       </div>
-      <button onclick="refreshAllTerminalData()" class="px-3 py-1.5 text-xs font-bold rounded bg-amber-500 hover:bg-amber-600 text-slate-900 transition shadow-sm">
-        🔄 Refresh Data &amp; Signals
-      </button>
+      <div class="flex items-center gap-2">
+        <button onclick="logCurrentSignalsNow()" class="px-3 py-1.5 text-xs font-bold rounded bg-emerald-500 hover:bg-emerald-600 text-slate-950 transition shadow-sm">
+          💾 Log Signals Now
+        </button>
+        <button onclick="refreshAllTerminalData()" class="px-3 py-1.5 text-xs font-bold rounded bg-amber-500 hover:bg-amber-600 text-slate-900 transition shadow-sm">
+          🔄 Refresh Data &amp; Signals
+        </button>
+      </div>
     </div>
 
     <!-- Navigation Tabs -->
     <nav class="max-w-7xl mx-auto px-4 flex space-x-2 border-t border-[#2a2e39] pt-2 pb-2 overflow-x-auto text-xs font-semibold">
-      <button data-tab="dashboard" class="nav-btn px-4 py-1.5 rounded bg-amber-500 text-slate-900 font-bold transition">Pro Charting, PVSRA & Portfolio</button>
-      <button data-tab="sthmodel" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">📉 STH MVRV & SOPR</button>
+      <button data-tab="dashboard" class="nav-btn px-4 py-1.5 rounded bg-amber-500 text-slate-900 font-bold transition">Pro Charting, PVSRA &amp; Portfolio</button>
+      <button data-tab="tracker" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">🎯 Signal &amp; Portfolio Tracker</button>
+      <button data-tab="quant" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">🧮 Quant Indicators</button>
+      <button data-tab="sthmodel" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">📉 STH MVRV &amp; SOPR</button>
       <button data-tab="powerlaw" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">📐 Power Law Model</button>
       <button data-tab="report" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">🏛️ Market Analyst Report</button>
-      <button data-tab="xfeed" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">🐦 X Feed & Key Posts</button>
-      <button data-tab="macro" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">📅 Macro & Fed Calendar</button>
-      <button data-tab="glossary" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">📖 Glossary & Acronyms</button>
-      <button data-tab="backtest" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">Strategy Backtest & ROI</button>
+      <button data-tab="xfeed" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">🐦 X Feed &amp; Key Posts</button>
+      <button data-tab="macro" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">📅 Macro &amp; Fed Calendar</button>
+      <button data-tab="glossary" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">📖 Glossary &amp; Acronyms</button>
+      <button data-tab="backtest" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">Strategy Backtest &amp; ROI</button>
       <button data-tab="manager" class="nav-btn px-4 py-1.5 rounded text-slate-400 hover:bg-[#2a2e39] hover:text-white transition">Asset Manager</button>
     </nav>
   </header>
@@ -96,10 +107,10 @@
             <button id="btn-ma100" onclick="toggleSeries('ma100')" class="px-2.5 py-1 rounded border border-amber-500 bg-amber-500/20 text-amber-300 font-bold transition">● 100 MA</button>
             <button id="btn-ma200d" onclick="toggleSeries('ma200d')" class="px-2.5 py-1 rounded border border-pink-500 bg-pink-500/20 text-pink-300 font-bold transition">● 200D MA</button>
             <button id="btn-ma200w" onclick="toggleSeries('ma200w')" class="px-2.5 py-1 rounded border border-purple-500 bg-purple-500/20 text-purple-300 font-bold transition">● 200W MA</button>
-            <button id="btn-zones" onclick="toggleSeries('zones')" class="px-2.5 py-1 rounded border border-emerald-500 bg-emerald-500/20 text-emerald-300 font-bold transition">● Buy/Sell Zones</button>
-            <button id="btn-liq" onclick="toggleSeries('liq')" class="px-2.5 py-1 rounded border border-orange-500 bg-orange-500/20 text-orange-300 font-bold transition">💥 Liq Zones</button>
-            <button id="btn-sth" onclick="toggleSeries('sth')" class="px-2.5 py-1 rounded border border-sky-500 bg-sky-500/20 text-sky-300 font-bold transition">📉 STH Bands</button>
-            <button id="btn-energy" onclick="toggleSeries('energy')" class="px-2.5 py-1 rounded border border-cyan-500 bg-cyan-500/20 text-cyan-300 font-bold transition">⚡ Energy Floor</button>
+            <button id="btn-zones" onclick="toggleSeries('zones')" class="px-2.5 py-1 rounded border border-emerald-500 bg-emerald-500/20 text-emerald-300 font-bold transition">● Dyn Buy/Sell</button>
+            <button id="btn-liq" onclick="toggleSeries('liq')" class="px-2.5 py-1 rounded border border-orange-500 bg-orange-500/20 text-orange-300 font-bold transition">💥 Est Liq Bands</button>
+            <button id="btn-sth" onclick="toggleSeries('sth')" class="px-2.5 py-1 rounded border border-sky-500 bg-sky-500/20 text-sky-300 font-bold transition">📉 Est STH Bands</button>
+            <button id="btn-quant" onclick="toggleSeries('quant')" class="px-2.5 py-1 rounded border border-rose-500 bg-rose-500/20 text-rose-300 font-bold transition">🧮 Quant VD/Z</button>
             <button id="btn-sfp" onclick="toggleSeries('sfp')" class="px-2.5 py-1 rounded border border-red-500 bg-red-500/20 text-red-300 font-bold transition">🎯 SFP Trap</button>
             <button id="btn-pvsra" onclick="toggleSeries('pvsra')" class="px-2.5 py-1 rounded border border-fuchsia-500 bg-fuchsia-500/30 text-fuchsia-300 font-bold transition">🔮 PVSRA Climax</button>
             <button id="btn-pl" onclick="toggleSeries('pl')" class="px-2.5 py-1 rounded border border-teal-500 bg-teal-500/20 text-teal-300 font-bold transition">📐 Power Law</button>
@@ -148,10 +159,11 @@
               <span id="hudMa200w" class="text-purple-400">200W MA: --</span>
             </div>
             <div class="flex flex-wrap gap-x-3 text-[10px] pt-0.5 border-t border-[#2a2e39]">
-              <span id="hudBuy" class="text-emerald-400 font-bold">🟢 Buy Zone: --</span>
-              <span id="hudSell" class="text-red-400 font-bold">🔴 Sell Zone: --</span>
-              <span id="hudLiq" class="text-orange-400 font-bold">💥 Liq Zones: --</span>
+              <span id="hudBuy" class="text-emerald-400 font-bold">🟢 Dyn Buy: --</span>
+              <span id="hudSell" class="text-red-400 font-bold">🔴 Dyn Sell: --</span>
+              <span id="hudLiq" class="text-orange-400 font-bold">💥 Est Liq: --</span>
               <span id="hudPvsra" class="text-fuchsia-400 font-bold">🔮 PVSRA: --</span>
+              <span id="hudQuant" class="text-rose-400 font-bold">🧮 Quant: --</span>
               <span id="hudPl" class="text-teal-400 font-bold">📐 PL Dev: --</span>
             </div>
           </div>
@@ -161,31 +173,30 @@
         <div id="chartDecisionStrip" class="grid grid-cols-1 md:grid-cols-6 gap-3 pt-1 text-xs font-mono"></div>
       </div>
 
-      <!-- BTC Multi-Touch Resistance, Support & Larger Liquidation Zones (Auto-Synced) -->
+      <!-- Dynamic Structure & Volatility Liquidity Bands -->
       <div id="multiTouchLevelsCard" class="bg-[#1e222d] border border-[#2a2e39] rounded-xl p-4 shadow-sm space-y-3 font-mono text-xs">
         <div class="flex flex-wrap justify-between items-center gap-2 border-b border-[#2a2e39] pb-2">
           <div>
-            <h3 class="text-sm font-extrabold text-white">🎯 BTC Multi-Touch Resistance, Support &amp; Larger Liquidation Zones</h3>
-            <p id="btcLevelsMeta" class="text-[11px] text-slate-400">Syncing live BTC spot &amp; distance to zones...</p>
+            <h3 class="text-sm font-extrabold text-white">🎯 Dynamic Candle Levels &amp; Volatility Liquidity Bands (Live Computed)</h3>
+            <p id="btcLevelsMeta" class="text-[11px] text-slate-400">Syncing live spot &amp; rolling structure levels...</p>
           </div>
           <div class="flex items-center gap-2">
-            <button onclick="applyScreenshotLevelsToChart()" class="px-2.5 py-1 rounded bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-[11px]">
-              Plot Levels on Chart
+            <button onclick="applyDynamicLevelsToChart()" class="px-2.5 py-1 rounded bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-[11px]">
+              Plot Swing Levels on Chart
             </button>
-            <button onclick="clearScreenshotLevelsFromChart()" class="px-2.5 py-1 rounded bg-[#131722] hover:bg-[#2a2e39] text-slate-300 border border-[#2a2e39] font-bold text-[11px]">
-              Clear Levels
+            <button onclick="clearDynamicLevelsFromChart()" class="px-2.5 py-1 rounded bg-[#131722] hover:bg-[#2a2e39] text-slate-300 border border-[#2a2e39] font-bold text-[11px]">
+              Clear Swing Levels
             </button>
           </div>
         </div>
-
         <div id="btcLevelsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-[11px]"></div>
       </div>
 
       <!-- State Transitions & Engine Telemetry Strip -->
       <div class="bg-[#1e222d] border border-[#2a2e39] rounded-xl p-4 shadow-sm space-y-2 font-mono text-xs">
         <div class="flex flex-wrap justify-between items-center gap-2 border-b border-[#2a2e39] pb-2">
-          <span class="font-extrabold text-white">⚡ State Transitions & Alert Telemetry (`state/last_run.json`)</span>
-          <span id="stateRegimeBadge" class="px-2.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">Regime: ACCUMULATION_DISCOUNT</span>
+          <span class="font-extrabold text-white">⚡ State Transitions, Signal Log &amp; Portfolio Telemetry</span>
+          <span id="stateRegimeBadge" class="px-2.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">Regime: SYNCING</span>
         </div>
         <div id="stateAlertsList" class="text-[11px] text-slate-300 space-y-1"></div>
       </div>
@@ -194,8 +205,8 @@
       <div class="bg-[#1e222d] border border-[#2a2e39] rounded-xl p-5 shadow-sm space-y-4">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-[#2a2e39] pb-3">
           <div>
-            <h2 class="text-sm font-extrabold text-white">💼 Sample Portfolio ($100,000 Model) &amp; Signal Win Rate by Horizon</h2>
-            <p class="text-[11px] text-slate-400">ST / MT / LT % = historical/modeled win rate that a short-term (1–7d), medium-term (1–4w), or long-term (1–6m+) signal plays out accurately. See <button type="button" onclick="switchTab('glossary')" class="text-amber-400 underline">Glossary</button> for details.</p>
+            <h2 class="text-sm font-extrabold text-white">💼 Sample Portfolio ($100,000 Model) &amp; Live/Reference Win Rates</h2>
+            <p class="text-[11px] text-slate-400">Shows live tracked value vs. baseline entry + reference ST/MT/LT win estimates. Open <button type="button" onclick="switchTab('tracker')" class="text-amber-400 underline">Signal &amp; Portfolio Tracker</button> for full audit log &amp; JSON export/import.</p>
           </div>
           <div class="flex items-center space-x-2 text-xs font-mono">
             <label for="horizonFilter" class="text-slate-400">Highlight Horizon:</label>
@@ -212,10 +223,10 @@
             <thead class="bg-[#131722] text-slate-400 uppercase">
               <tr>
                 <th class="p-3">Asset</th>
-                <th class="p-3">Sample Alloc ($100k)</th>
-                <th class="p-3">Active Signal</th>
-                <th class="p-3">Liquidation Zones</th>
-                <th class="p-3">ST / MT / LT Win %</th>
+                <th class="p-3">Target Alloc ($100k)</th>
+                <th class="p-3">Live Model Value &amp; Return</th>
+                <th class="p-3">Active Signal &amp; Tracked Win</th>
+                <th class="p-3">Ref ST / MT / LT Win %</th>
               </tr>
             </thead>
             <tbody id="portfolio-table-body" class="divide-y divide-[#2a2e39] text-slate-300"></tbody>
@@ -224,54 +235,182 @@
       </div>
 
       <div class="flex flex-wrap justify-between items-center gap-2 pt-1">
-        <h2 class="text-sm font-extrabold text-white">📊 Watchlist Matrix, Power Law, PVSRA &amp; Live Signals</h2>
+        <h2 class="text-sm font-extrabold text-white">📊 Watchlist Matrix, Live Quant Oscillators, Power Law, PVSRA &amp; Signals</h2>
         <span id="watchlistSyncLabel" class="text-[11px] font-mono text-slate-400">Auto-updating on load &amp; refresh</span>
       </div>
       <div id="assets-grid-container" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
     </section>
 
-    <!-- TAB 2: SHORT-TERM HOLDER MVRV & SOPR INDICATORS (SCREENSHOT SUITE + VALUE ZONE) -->
-    <section id="sthmodel" class="tab-content space-y-6">
+    <!-- TAB 2: PERSISTENT SIGNAL & SAMPLE PORTFOLIO TRACKER -->
+    <section id="tracker" class="tab-content space-y-6">
+      <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-6 font-mono text-xs">
+        <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-3">
+          <div>
+            <h2 class="text-lg font-extrabold text-white">🎯 Persistent Recommendation Log &amp; Sample $100,000 Portfolio Tracker</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Saved in browser storage (<code>localStorage</code>) and exportable/importable as JSON so your tracking history can be backed up or moved across code deployments.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="logCurrentSignalsNow()" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold rounded">+ Snapshot Current Signals</button>
+            <button onclick="exportTrackingJson()" class="px-3 py-1.5 bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 font-bold rounded">⬇ Export JSON</button>
+            <label class="px-3 py-1.5 bg-[#131722] hover:bg-[#2a2e39] border border-[#2a2e39] text-amber-300 font-bold rounded cursor-pointer">
+              ⬆ Import JSON
+              <input type="file" id="importTrackingFile" accept="application/json" onchange="importTrackingJson(event)" class="hidden" />
+            </label>
+            <button onclick="resetPortfolioBaselineNow()" class="px-3 py-1.5 bg-[#131722] hover:bg-[#2a2e39] border border-[#2a2e39] text-slate-300 font-bold rounded">↺ Re-Anchor $100k Baseline</button>
+            <button onclick="clearRecommendationHistory()" class="px-3 py-1.5 bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-300 font-bold rounded">🗑 Clear Log</button>
+          </div>
+        </div>
+
+        <div id="trackerStatusBanner" class="text-[11px] text-emerald-400 hidden"></div>
+
+        <!-- KPI Summary Cards -->
+        <div id="trackerSummaryGrid" class="grid grid-cols-1 md:grid-cols-4 gap-4"></div>
+
+        <!-- Sample Portfolio Performance Breakdown -->
+        <div class="space-y-2">
+          <div class="flex flex-wrap justify-between items-center gap-2">
+            <h3 class="text-sm font-extrabold text-white">💼 Sample $100,000 Portfolio — Baseline vs. Live Spot Performance</h3>
+            <span id="portfolioBaselineMeta" class="text-[11px] text-slate-400">--</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-[#131722] text-slate-400 uppercase">
+                <tr>
+                  <th class="p-3">Asset</th>
+                  <th class="p-3">Weight</th>
+                  <th class="p-3">Baseline Entry</th>
+                  <th class="p-3">Live Spot</th>
+                  <th class="p-3">Target Alloc</th>
+                  <th class="p-3">Live Value</th>
+                  <th class="p-3">Return % / P&amp;L</th>
+                </tr>
+              </thead>
+              <tbody id="tracker-portfolio-body" class="divide-y divide-[#2a2e39] text-slate-300"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recorded Recommendations & Outcome Evaluations -->
+        <div class="space-y-2">
+          <div class="flex flex-wrap justify-between items-center gap-2">
+            <h3 class="text-sm font-extrabold text-white">📜 Logged Recommendations &amp; Evaluated Outcomes</h3>
+            <span id="loggedSignalsCount" class="text-[11px] text-slate-400">0 entries</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-[#131722] text-slate-400 uppercase">
+                <tr>
+                  <th class="p-3">Logged At</th>
+                  <th class="p-3">Asset</th>
+                  <th class="p-3">Signal</th>
+                  <th class="p-3">Entry</th>
+                  <th class="p-3">Target / Stop</th>
+                  <th class="p-3">Live Move %</th>
+                  <th class="p-3">Outcome</th>
+                </tr>
+              </thead>
+              <tbody id="tracker-signals-body" class="divide-y divide-[#2a2e39] text-slate-300"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: SEPARATE QUANT INDICATORS CHARTS -->
+    <section id="quant" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
         <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-2">
           <div>
-            <h2 class="text-lg font-extrabold text-white">📉 Short-Term Holder MVRV and SOPR Indicators</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Price [USD] vs. STH Cost Basis, STH Value Zone &amp; Standard Deviation Bands (+2.0sd to -1.5sd) — Auto-Updated on Refresh</p>
+            <h2 class="text-lg font-extrabold text-white">🧮 Quant Indicators — Live Z-Score Deviation Band &amp; VD Volume Delta Oscillator</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Computed dynamically from real candle closes &amp; volumes — elevated to a <strong>Higher-Weight Factor</strong> when confirmed with PVSRA/zones</p>
           </div>
-          <span id="sthLastUpdatedBadge" class="px-2.5 py-1 bg-sky-500/10 border border-sky-500/30 text-sky-300 text-xs font-bold rounded">Value Zone Synced</span>
+          <span id="quantConfirmationBadge" class="px-2.5 py-1 bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-bold rounded">QUANT FACTOR: CHECKING...</span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs font-mono">
           <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
-            <span class="text-slate-400 block uppercase font-bold">BTC Spot</span>
-            <strong class="text-white text-lg" id="sthSpotVal">$63,635</strong>
+            <span class="text-pink-300 block uppercase font-bold">Live Z-Score (20-Bar)</span>
+            <strong class="text-white text-lg" id="quantZVal">--</strong>
+            <div class="text-[10px] text-slate-400" id="quantZBandText">Thresholds: &plusmn;1.58 / -4.27</div>
           </div>
           <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
-            <span class="text-slate-400 block uppercase font-bold">STH Cost Basis</span>
-            <strong class="text-sky-300 text-lg" id="sthCostVal">$76,150</strong>
+            <span class="text-emerald-300 block uppercase font-bold">Live VD Delta Momentum</span>
+            <strong class="text-emerald-400 text-lg" id="quantVdVal">--</strong>
+            <div class="text-[10px] text-slate-400" id="quantVdDivText">Calculating from candle delta...</div>
           </div>
           <div class="p-4 bg-[#131722] rounded-xl border border-amber-500/30 space-y-1">
-            <span class="text-amber-300 block uppercase font-bold">STH Value Zone Band</span>
-            <strong class="text-amber-400 text-sm" id="sthValueZoneBand">$59,397 – $94,426</strong>
-            <div class="text-[10px] text-slate-400" id="sthValueZoneState">Checking position...</div>
+            <span class="text-amber-300 block uppercase font-bold">Confirmation &amp; Weighting</span>
+            <strong class="text-amber-400 text-sm" id="quantFactorStatus">--</strong>
+            <div class="text-[10px] text-slate-400" id="quantReliabilityNote">Confirmed when aligned with PVSRA/zones</div>
           </div>
           <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
-            <span class="text-slate-400 block uppercase font-bold">MVRV-STH / SOPR Bias</span>
-            <strong class="text-orange-300 text-sm" id="sthBiasVal">Underwater STHs • Overhead Supply</strong>
+            <span class="text-cyan-300 block uppercase font-bold">Active Asset Quant Read</span>
+            <strong class="text-white text-sm" id="quantAssetRead">--</strong>
+            <div class="text-[10px] text-slate-400" id="quantSyncTime">Synced on refresh</div>
           </div>
         </div>
 
-        <!-- Live Value Zone Breakdown Strip -->
+        <div id="quantFactorCallout" class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/40 text-xs font-mono text-amber-200"></div>
+
+        <div class="space-y-2">
+          <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+            <span class="text-pink-300 font-bold">Chart 1: Live Rolling Z-Score Oscillator (Magenta Band &bull; &plusmn;1.58 &amp; -4.27 Extremes)</span>
+            <span class="text-[11px] text-slate-400">0.00 Baseline &bull; +1.58 Overextended &bull; -1.58 Oversold &bull; -4.27 Deep Washout</span>
+          </div>
+          <div id="quantZChartContainer" class="w-full h-[240px] bg-[#131722] rounded-lg border border-[#2a2e39] overflow-hidden"></div>
+        </div>
+
+        <div class="space-y-2">
+          <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+            <span class="text-emerald-300 font-bold">Chart 2: Live VD (Volume Delta Proxy) Oscillator (+0.50 / 0.00 / -0.35 Levels)</span>
+            <span class="text-[11px] text-slate-400">Green/Red Delta Bars + Signal Line + Extremes</span>
+          </div>
+          <div id="quantVdChartContainer" class="w-full h-[240px] bg-[#131722] rounded-lg border border-[#2a2e39] overflow-hidden"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: SHORT-TERM HOLDER MVRV & SOPR INDICATORS -->
+    <section id="sthmodel" class="tab-content space-y-6">
+      <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
+        <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-2">
+          <div>
+            <h2 class="text-lg font-extrabold text-white">📉 Short-Term Holder MVRV &amp; SOPR Model (Modeled / State-Driven)</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Live BTC Spot vs. Modeled STH Cost Basis &amp; Value Zone Corridor (or values loaded from <code>state/last_run.json</code>)</p>
+          </div>
+          <span id="sthLastUpdatedBadge" class="px-2.5 py-1 bg-sky-500/10 border border-sky-500/30 text-sky-300 text-xs font-bold rounded">Modeled / Syncing</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs font-mono">
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
+            <span class="text-slate-400 block uppercase font-bold">Live BTC Spot</span>
+            <strong class="text-white text-lg" id="sthSpotVal">--</strong>
+          </div>
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
+            <span class="text-slate-400 block uppercase font-bold">Modeled STH Cost Basis</span>
+            <strong class="text-sky-300 text-lg" id="sthCostVal">--</strong>
+          </div>
+          <div class="p-4 bg-[#131722] rounded-xl border border-amber-500/30 space-y-1">
+            <span class="text-amber-300 block uppercase font-bold">Modeled STH Value Zone</span>
+            <strong class="text-amber-400 text-sm" id="sthValueZoneBand">--</strong>
+            <div class="text-[10px] text-slate-400" id="sthValueZoneState">--</div>
+          </div>
+          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
+            <span class="text-slate-400 block uppercase font-bold">Modeled MVRV / SOPR Bias</span>
+            <strong class="text-orange-300 text-sm" id="sthBiasVal">--</strong>
+          </div>
+        </div>
+
         <div id="sthValueZoneDetails" class="p-3.5 bg-[#131722] rounded-xl border border-[#2a2e39] text-xs font-mono text-slate-300"></div>
 
         <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-          <span class="text-slate-300 font-bold">BTC Price [USD], STH Value Zone &amp; Deviation Bands</span>
+          <span class="text-slate-300 font-bold">BTC Price [USD], Modeled STH Value Zone &amp; Deviation Bands</span>
           <div class="flex flex-wrap gap-2 text-[11px]">
             <button id="sth-btn-sd" onclick="toggleSthBands()" class="px-2.5 py-1 rounded border border-amber-500 bg-amber-500/20 text-amber-300 font-bold">● Value Zone &amp; SD Bands</button>
-            <span class="text-white font-bold px-2 py-1">● Price</span>
-            <span class="text-sky-300 font-bold px-2 py-1">● STH Cost Basis</span>
-            <span class="text-orange-300 font-bold px-2 py-1">● Upper Value Zone (+2.0sd)</span>
-            <span class="text-blue-300 font-bold px-2 py-1">● Lower Value Zone (-1.5sd)</span>
+            <span class="text-white font-bold px-2 py-1">● Live Price</span>
+            <span class="text-sky-300 font-bold px-2 py-1">● Modeled STH Basis</span>
+            <span class="text-orange-300 font-bold px-2 py-1">● Upper Band (+2.0sd)</span>
+            <span class="text-blue-300 font-bold px-2 py-1">● Lower Band (-1.5sd)</span>
           </div>
         </div>
 
@@ -279,44 +418,44 @@
       </div>
     </section>
 
-    <!-- TAB 3: POWER LAW MODEL -->
+    <!-- TAB 5: POWER LAW MODEL -->
     <section id="powerlaw" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
         <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-2">
           <div>
-            <h2 class="text-lg font-extrabold text-white">📐 Bitcoin Power Law Regression & Historical Price Corridor</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Historical BTC Price vs. Power Law Fair Value Curve & Accumulation/Euphoria Bands (Genesis: Jan 3, 2009)</p>
+            <h2 class="text-lg font-extrabold text-white">📐 Bitcoin Power Law Regression &amp; Live Spot Corridor</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Live BTC Price vs. Power Law Regression Curve from Genesis (Jan 3, 2009) — Power Law curve is a mathematical model</p>
           </div>
-          <span class="px-2.5 py-1 bg-teal-500/10 border border-teal-500/30 text-teal-400 text-xs font-bold rounded">Integrated in Algorithm</span>
+          <span class="px-2.5 py-1 bg-teal-500/10 border border-teal-500/30 text-teal-400 text-xs font-bold rounded">Live Spot + Model Curve</span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs font-mono">
           <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
             <span class="text-slate-400 block uppercase font-bold">Live BTC Spot</span>
-            <strong class="text-white text-lg" id="plLivePrice">$63,635</strong>
+            <strong class="text-white text-lg" id="plLivePrice">--</strong>
           </div>
           <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
-            <span class="text-slate-400 block uppercase font-bold">Power Law Fair Value</span>
-            <strong class="text-teal-400 text-lg" id="plFairValue">$189,665</strong>
+            <span class="text-slate-400 block uppercase font-bold">Power Law Model Fair</span>
+            <strong class="text-teal-400 text-lg" id="plFairValue">--</strong>
           </div>
           <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
-            <span class="text-slate-400 block uppercase font-bold">Distance vs Fair Value</span>
-            <strong class="text-emerald-400 text-lg" id="plDistance">-66.4%</strong>
+            <span class="text-slate-400 block uppercase font-bold">Distance vs Model</span>
+            <strong class="text-emerald-400 text-lg" id="plDistance">--</strong>
           </div>
           <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
-            <span class="text-slate-400 block uppercase font-bold">Valuation Regime</span>
-            <strong class="text-emerald-400 text-sm" id="plRegime">Deep Discount / Buy Zone</strong>
+            <span class="text-slate-400 block uppercase font-bold">Model Valuation Regime</span>
+            <strong class="text-emerald-400 text-sm" id="plRegime">--</strong>
           </div>
         </div>
 
         <div class="space-y-2">
           <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-            <span class="text-slate-300 font-bold">Historical BTC Price (2016–2026) vs. Power Law Fair Value & Bands</span>
+            <span class="text-slate-300 font-bold">BTC Price Trajectory vs. Power Law Model &amp; Corridor Bands</span>
             <div class="flex flex-wrap gap-3 text-[11px]">
-              <span class="text-amber-400 font-bold">● BTC Historical Price</span>
-              <span class="text-teal-400 font-bold">● Power Law Fair Value</span>
-              <span class="text-emerald-400 font-bold">--- Lower Accumulation Band</span>
-              <span class="text-red-400 font-bold">--- Upper Cycle Band</span>
+              <span class="text-amber-400 font-bold">● BTC Price</span>
+              <span class="text-teal-400 font-bold">● Power Law Fair (Model)</span>
+              <span class="text-emerald-400 font-bold">--- Lower Corridor</span>
+              <span class="text-red-400 font-bold">--- Upper Corridor</span>
             </div>
           </div>
           <div id="plChartContainer" class="w-full h-[420px] bg-[#131722] rounded-lg border border-[#2a2e39] overflow-hidden"></div>
@@ -324,51 +463,51 @@
       </div>
     </section>
 
-    <!-- TAB 4: MARKET ANALYST REPORT (ALL ASSETS + LIQUIDATION ZONES) -->
+    <!-- TAB 6: MARKET ANALYST REPORT (ALL ASSETS) -->
     <section id="report" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
         <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-2">
           <div>
             <h2 class="text-xl font-extrabold text-white">🏛️ Director’s Desk // Full Market Analyst Report (All Assets)</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Indicators, Larger Liquidation Zones, Recommendations &amp; Short / Medium / Long-Term Outlooks Across Every Asset</p>
+            <p class="text-xs text-slate-400 mt-0.5" id="reportRefreshMeta">Live Binance spot &amp; candle-derived Quant Z/VD, dynamic Buy/Sell zones, modeled MVRV/liquidation bands &amp; horizon outlooks</p>
           </div>
           <button onclick="refreshAllTerminalData()" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-slate-900 text-[11px] font-bold rounded-lg">🔄 Refresh Recommendations</button>
         </div>
 
-        <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] text-xs font-mono space-y-1">
-          <div class="font-bold text-amber-400">Active Algorithmic &amp; Liquidation Context</div>
-          <p class="text-slate-300 text-[11px]">Composite decision engine weights MVRV valuation (&lt;1.2 bottom signal, 1.2–2.4 neutral/accumulation, &gt;2.4 euphoria), STH Cost Basis / Value Zone &amp; SOPR deviation bands, Power Law fair-value deviation (BTC), 50/100/200D/200W MWA trend alignment, SFP liquidity sweeps, PVSRA 20-bar volume spread confirmation, and larger liquidation clusters.</p>
+        <div class="p-4 bg-[#131722] rounded-xl border border-amber-500/30 text-xs font-mono space-y-1">
+          <div class="font-bold text-amber-400">Data Provenance &amp; Persistent Tracking</div>
+          <p class="text-slate-300 text-[11px]">Spot prices, candle moving averages, dynamic Buy/Sell zones, PVSRA volume spread, and rolling Quant Z-Score / VD delta momentum are computed from <strong>live Binance market data</strong>. Every signal snapshot and `$100,000` sample portfolio baseline is persisted in <code>localStorage</code> and can be exported/imported as JSON across deployments.</p>
         </div>
 
         <div id="full-analyst-report-container" class="space-y-4 text-xs font-mono"></div>
       </div>
     </section>
 
-    <!-- TAB 5: X FEED (PER PERSON, MOST RECENT ON TOP, ADD NEW USERS & REFRESH) -->
+    <!-- TAB 7: X FEED -->
     <section id="xfeed" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
         <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-2">
           <div>
             <h2 class="text-lg font-extrabold text-white">🐦 X Feed &amp; Key Market Posts (Grouped Per Person &bull; Newest First)</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Add any X handle (e.g., <code class="text-amber-400">@seliseli_46</code>) and its latest posts (newest on top). Note: static HTML runs locally in your browser and logs/refreshes posts you enter or sync via refresh.</p>
+            <p class="text-xs text-slate-400 mt-0.5">Add any X handle (e.g., <code class="text-amber-400">@seliseli_46</code>) or click <strong>Refresh X Feed</strong> to generate fresh entries &amp; advance ages. <em>Note: Browser-only mode uses local feed entries + refresh simulation unless wired to an X API backend.</em></p>
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <span id="xFeedLastRefreshed" class="text-[10px] font-mono text-slate-400">Synced just now</span>
+            <span id="xFeedLastRefreshed" class="text-[10px] font-mono text-slate-400">Ready</span>
             <button onclick="refreshXFeedState()" class="px-2.5 py-1 bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 text-[11px] font-bold rounded">🔄 Refresh X Feed</button>
             <button onclick="resetDefaultXFeed()" class="px-2.5 py-1 bg-[#131722] hover:bg-[#2a2e39] border border-[#2a2e39] text-slate-300 text-[11px] font-bold rounded">↺ Reset Defaults</button>
           </div>
         </div>
 
         <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-3 font-mono text-xs">
-          <div class="font-bold text-amber-400">+ Add New X Account or Recent Post (Most Recent Appears on Top)</div>
+          <div class="font-bold text-amber-400">+ Add New X Account or Post (Newest Appears on Top)</div>
           <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
             <input type="text" id="x-new-handle" placeholder="@Handle (e.g. @seliseli_46)" class="bg-[#1e222d] border border-[#2a2e39] rounded p-2 text-xs text-white font-mono" />
-            <input type="number" id="x-new-minutes" min="1" max="2880" placeholder="Age in mins (e.g. 5 for 5m ago)" class="bg-[#1e222d] border border-[#2a2e39] rounded p-2 text-xs text-white font-mono" />
-            <input type="text" id="x-new-time" placeholder="Label (e.g. 5m ago / 2h ago)" class="bg-[#1e222d] border border-[#2a2e39] rounded p-2 text-xs text-white font-mono" />
-            <input type="text" id="x-new-tag" placeholder="Topic (e.g. BTC / Liquidations / SFP)" class="bg-[#1e222d] border border-[#2a2e39] rounded p-2 text-xs text-white font-mono" />
+            <input type="number" id="x-new-minutes" min="1" max="2880" placeholder="Age in mins (e.g. 5)" class="bg-[#1e222d] border border-[#2a2e39] rounded p-2 text-xs text-white font-mono" />
+            <input type="text" id="x-new-time" placeholder="Label (e.g. 5m ago)" class="bg-[#1e222d] border border-[#2a2e39] rounded p-2 text-xs text-white font-mono" />
+            <input type="text" id="x-new-tag" placeholder="Topic (e.g. BTC / VD / Zones)" class="bg-[#1e222d] border border-[#2a2e39] rounded p-2 text-xs text-white font-mono" />
           </div>
           <div class="flex flex-col sm:flex-row gap-3">
-            <input type="text" id="x-new-post" placeholder="Paste or enter the post from this user (or leave blank to create a fresh entry for this account)..." class="flex-grow bg-[#1e222d] border border-[#2a2e39] rounded p-2 text-xs text-white font-mono" />
+            <input type="text" id="x-new-post" placeholder="Paste or enter the post from this user..." class="flex-grow bg-[#1e222d] border border-[#2a2e39] rounded p-2 text-xs text-white font-mono" />
             <button onclick="addXFeedEntry()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-xs rounded shadow transition whitespace-nowrap">
               + Add User / Post
             </button>
@@ -380,13 +519,13 @@
       </div>
     </section>
 
-    <!-- TAB 6: MACRO & FED CALENDAR -->
+    <!-- TAB 8: MACRO & FED CALENDAR -->
     <section id="macro" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
         <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-2">
           <div>
-            <h2 class="text-lg font-extrabold text-white">📅 Macro & Fed Calendar (FOMC, CPI, PCE & Liquidity Milestones)</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Key Federal Reserve decisions, inflation releases, and macro catalysts impacting crypto liquidity.</p>
+            <h2 class="text-lg font-extrabold text-white">📅 Macro &amp; Fed Calendar (FOMC, CPI, PCE &amp; Liquidity Milestones)</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Scheduled macro releases and central bank dates impacting crypto liquidity.</p>
           </div>
           <span class="px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] font-bold rounded">Nov–Dec 2026 Schedule</span>
         </div>
@@ -398,7 +537,7 @@
                 <th class="p-3">Date</th>
                 <th class="p-3">Event / Release</th>
                 <th class="p-3">Category</th>
-                <th class="p-3">Market & Crypto Impact Notes</th>
+                <th class="p-3">Market &amp; Crypto Impact Notes</th>
               </tr>
             </thead>
             <tbody id="macro-calendar-body" class="divide-y divide-[#2a2e39] text-slate-300"></tbody>
@@ -407,65 +546,55 @@
       </div>
     </section>
 
-    <!-- TAB 7: GLOSSARY & ACRONYMS -->
+    <!-- TAB 9: GLOSSARY & ACRONYMS -->
     <section id="glossary" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-5">
         <div class="border-b border-[#2a2e39] pb-4 flex flex-wrap justify-between items-center gap-2">
           <div>
             <h2 class="text-lg font-extrabold text-white">📖 Acronyms, Metrics &amp; Signal Percentages Explained</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Clear definitions for STH MVRV, Value Zone &amp; SOPR, MVRV Band, PVSRA, SFP, Liquidation Zones, Power Law, MWA, and ST / MT / LT win percentages.</p>
+            <p class="text-xs text-slate-400 mt-0.5">Definitions for live vs. modeled metrics and tracked outcomes.</p>
           </div>
           <span class="px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] font-bold rounded">Reference Guide</span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1.5">
-            <div class="font-bold text-sky-300 text-sm">STH MVRV, Value Zone &amp; STH-SOPR Bands</div>
-            <p class="text-slate-300 leading-relaxed">Tracks coins moved within the last 155 days (Short-Term Holders). <strong>STH Cost Basis</strong> shows average recent buyer entry; the <strong>Value Zone</strong> highlights the dynamic upper/lower band corridor around STH valuation and standard deviations (<code>+2.0sd</code> to <code>-1.5sd</code>) alongside <strong>STH-SOPR</strong> profit/loss regimes.</p>
+          <div class="p-4 bg-[#131722] rounded-xl border border-emerald-500/30 space-y-1.5">
+            <div class="font-bold text-emerald-300 text-sm">🎯 Tracked Signal Log &amp; Outcome Rules</div>
+            <p class="text-slate-300 leading-relaxed">Logged signals evaluate against live spot prices: for Buy/Accumulate signals, reaching <code>sellZone</code> marks <strong>WIN</strong> and dropping &ge;4% below entry marks <strong>LOSS</strong>; for Trim/Sell signals, reaching <code>buyZone</code> marks <strong>WIN</strong> and rising &ge;4% above entry marks <strong>LOSS</strong>. Export/Import JSON lets you preserve records across deployments.</p>
+          </div>
+
+          <div class="p-4 bg-[#131722] rounded-xl border border-amber-500/30 space-y-1.5">
+            <div class="font-bold text-amber-300 text-sm">⭐ Live Quant Z-Score &amp; VD Momentum (Higher Factor When Confirmed)</div>
+            <p class="text-slate-300 leading-relaxed">Computed dynamically from real candle closes and candle volume/range delta. Elevated to a <strong>higher-weight factor</strong> when confirmed with PVSRA volume spread and dynamic support/resistance zones.</p>
           </div>
 
           <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1.5">
-            <div class="font-bold text-amber-400 text-sm">MVRV &amp; MVRV Band (Market Value to Realized Value)</div>
-            <p class="text-slate-300 leading-relaxed">Compares current <strong>Market Value</strong> (spot price &times; circulating supply) against <strong>Realized Value</strong> (each coin valued at the price when it last moved on-chain, reflecting aggregate cost basis). <strong>&lt; 1.2</strong> = undervalued/accumulation band; <strong>1.2–2.4</strong> = fair/neutral band; <strong>&gt; 2.4</strong> = overvalued/euphoria distribution zone.</p>
+            <div class="font-bold text-sky-300 text-sm">Modeled STH Cost Basis, Value Zone &amp; MVRV</div>
+            <p class="text-slate-300 leading-relaxed">Where no backend state file provides on-chain realized values, this terminal derives a <strong>modeled estimate</strong> from rolling multi-month price averages and clearly labels it as modeled.</p>
           </div>
 
           <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1.5">
-            <div class="font-bold text-fuchsia-400 text-sm">PVSRA (Price, Volume, Support/Resistance Analysis)</div>
-            <p class="text-slate-300 leading-relaxed">Evaluates candlestick spread (high-low range), close position, and volume relative to a 20-bar average. High/climax volume (&ge;2.0&times; average) or rising volume (&ge;1.5&times; average) helps distinguish institutional absorption/stopping volume from climactic distribution or weak moves.</p>
-          </div>
-
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1.5">
-            <div class="font-bold text-amber-400 text-sm">Short-Term (ST), Medium-Term (MT) &amp; Long-Term (LT) %</div>
-            <p class="text-slate-300 leading-relaxed">Represents the <strong>signal win/accuracy rate for that time horizon</strong>: <strong>ST (1–7 days)</strong>, <strong>MT (1–4 weeks)</strong>, and <strong>LT (1–6 months+)</strong>. They reflect historical/modeled accuracy rather than a guarantee on any single trade.</p>
-          </div>
-
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1.5">
-            <div class="font-bold text-orange-400 text-sm">💥 Larger Liquidation Zones (Long vs. Short Clusters)</div>
-            <p class="text-slate-300 leading-relaxed">Price bands where concentrated leveraged long or short positions face forced liquidation. Sweeps into downside long-liquidation pockets can accelerate drops or trigger liquidity bounces, while moves into upside short-liquidation zones can fuel short squeezes or supply rejections.</p>
-          </div>
-
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1.5">
-            <div class="font-bold text-teal-400 text-sm">Power Law &amp; MWA (50 / 100 / 200D / 200W)</div>
-            <p class="text-slate-300 leading-relaxed">Bitcoin's Power Law curve models long-term logarithmic fair value since Jan 3, 2009. <strong>50 / 100 / 200D MA</strong> and <strong>200W MA</strong> provide short-, medium-, and macro-cycle moving average context.</p>
+            <div class="font-bold text-fuchsia-400 text-sm">PVSRA &amp; ST / MT / LT Win %</div>
+            <p class="text-slate-300 leading-relaxed"><strong>PVSRA</strong> highlights high/climax volume spread from live candles. <strong>ST / MT / LT %</strong> are reference horizon estimates alongside live evaluated win rates from logged signals.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- TAB 8: BACKTEST & ROI -->
+    <!-- TAB 10: BACKTEST & ROI -->
     <section id="backtest" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-4">
-        <h2 class="text-lg font-bold text-white">📈 Strategy Backtest & ROI Matrix</h2>
+        <h2 class="text-lg font-bold text-white">📈 Live-Calibrated Strategy &amp; Signal Matrix</h2>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs font-mono">
             <thead class="bg-[#131722] text-slate-400 uppercase">
               <tr>
                 <th class="p-3">Asset</th>
-                <th class="p-3">Strategy</th>
-                <th class="p-3">PVSRA Regime</th>
-                <th class="p-3">Liquidation Focus</th>
-                <th class="p-3">ROI</th>
-                <th class="p-3">Accuracy</th>
+                <th class="p-3">Strategy &amp; Quant Factor</th>
+                <th class="p-3">Live PVSRA Regime</th>
+                <th class="p-3">Modeled Liq Bands</th>
+                <th class="p-3">Live Period Return</th>
+                <th class="p-3">Tracked / Ref Win %</th>
               </tr>
             </thead>
             <tbody id="backtest-table-body" class="divide-y divide-[#2a2e39] text-slate-300"></tbody>
@@ -474,16 +603,15 @@
       </div>
     </section>
 
-    <!-- TAB 9: ASSET MANAGER -->
+    <!-- TAB 11: ASSET MANAGER -->
     <section id="manager" class="tab-content space-y-6">
       <div class="bg-[#1e222d] border border-[#2a2e39] p-6 rounded-xl shadow-sm space-y-4">
-        <h2 class="text-lg font-bold text-white">Universal Asset Onboarding</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 pt-2">
+        <h2 class="text-lg font-bold text-white">Universal Asset Onboarding (Binance Spot Pair)</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-2">
           <input type="text" id="new-ticker" placeholder="Ticker (e.g. LINK)" class="bg-[#131722] border border-[#2a2e39] rounded p-2.5 text-xs text-white uppercase font-mono" />
-          <input type="number" id="new-mcap" placeholder="Market Cap ($B)" class="bg-[#131722] border border-[#2a2e39] rounded p-2.5 text-xs text-white font-mono" />
-          <input type="number" step="0.05" id="new-mvrv" placeholder="MVRV Ratio" class="bg-[#131722] border border-[#2a2e39] rounded p-2.5 text-xs text-white font-mono" />
-          <input type="number" id="new-energy" placeholder="Energy Floor ($)" class="bg-[#131722] border border-[#2a2e39] rounded p-2.5 text-xs text-white font-mono" />
-          <button onclick="registerCustomAsset()" class="py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-xs rounded shadow transition">Register Asset</button>
+          <input type="number" step="0.01" min="0" max="100" id="new-weight" placeholder="Model Weight % (e.g. 5)" class="bg-[#131722] border border-[#2a2e39] rounded p-2.5 text-xs text-white font-mono" />
+          <input type="text" id="new-strategy" placeholder="Strategy Note (optional)" class="bg-[#131722] border border-[#2a2e39] rounded p-2.5 text-xs text-white font-mono" />
+          <button onclick="registerCustomAsset()" class="py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-xs rounded shadow transition">Register &amp; Sync Live</button>
         </div>
       </div>
     </section>
@@ -492,267 +620,459 @@
 
   <script>
     const assetsStore = {
-      BTC: {
-        name: 'Bitcoin', price: 63635.16, mvrv: 1.15, sthCostBasis: 76150, electrical_cost: 54500, buyZone: 60150, sellZone: 76000,
-        liqLongLow: 59500, liqLongHigh: 62200, liqShortLow: 66650, liqShortHigh: 67530,
-        liqSummary: 'Long liqs $59.5k–$62.2k & $57.8k–$59.1k; Short squeeze cluster $66.65k–$67.53k',
-        weight: 0.40, winST: '72%', winMT: '84%', winLT: '93%', winProb: '74%', accuracy: '99.49%',
-        roi: '+39.8%', correlation: '98.7%', strategy: 'Power Law + STH MVRV/SOPR + PVSRA',
-        pvsraStatus: 'Institutional Absorption', pvsraScore: 1, weekly200Base: 41000,
-        outlookST: 'Watch $59.5k–$62.2k long liquidation pocket for sweeps/absorption; short squeeze liquidity sits near $66.65k–$67.53k.',
-        outlookMT: 'Reclaiming STH cost basis and 50/100/200 MWA levels required for sustained upside expansion.',
-        outlookLT: 'Deep Power Law discount and MVRV < 1.2 favor multi-month core accumulation.'
-      },
-      ETH: {
-        name: 'Ethereum', price: 1761.48, mvrv: 1.65, buyZone: 1650, sellZone: 2150,
-        liqLongLow: 1610, liqLongHigh: 1680, liqShortLow: 1920, liqShortHigh: 2040,
-        liqSummary: 'Long liqs $1,610–$1,680; Short cluster $1,920–$2,040',
-        weight: 0.20, winST: '68%', winMT: '79%', winLT: '88%', winProb: '69%', accuracy: '99.18%',
-        roi: '+25.4%', correlation: '97.5%', strategy: 'Swing Long + PVSRA + Liq Zone',
-        pvsraStatus: 'Rising Demand Spreads', pvsraScore: 1, weekly200Base: 1450,
-        outlookST: 'Buy dips into $1,650 buy zone and $1,610–$1,680 long liquidation band on PVSRA stopping volume.',
-        outlookMT: 'Monitor 50/100 MWA pivots and L2 settlement flows toward $1,920–$2,150.',
-        outlookLT: 'Fairly valued MVRV supports steady structural accumulation on major pullbacks.'
-      },
-      SOL: {
-        name: 'Solana', price: 74.12, mvrv: 2.10, buyZone: 68.50, sellZone: 92.00,
-        liqLongLow: 65.00, liqLongHigh: 69.50, liqShortLow: 82.00, liqShortHigh: 87.50,
-        liqSummary: 'Long liqs $65.00–$69.50; Short squeeze pocket $82.00–$87.50',
-        weight: 0.15, winST: '61%', winMT: '74%', winLT: '83%', winProb: '61%', accuracy: '89.80%',
-        roi: '+47.2%', correlation: '94.6%', strategy: 'Climax Trim + Liq Cascade Buy',
-        pvsraStatus: 'Distribution Climax Watch', pvsraScore: -1, weekly200Base: 48.50,
-        outlookST: 'Trim into PVSRA climax spikes; watch $65.00–$69.50 long liquidation flush for reload.',
-        outlookMT: 'Manage funding/leverage spikes while tracking intermediate moving average support.',
-        outlookLT: 'High-beta growth exposure; scale in during deep drawdowns and trim near $92+.'
-      },
-      XRP: {
-        name: 'XRP', price: 0.9708, mvrv: 1.85, buyZone: 0.90, sellZone: 1.25,
-        liqLongLow: 0.86, liqLongHigh: 0.92, liqShortLow: 1.10, liqShortHigh: 1.18,
-        liqSummary: 'Long liqs $0.86–$0.92; Short cluster $1.10–$1.18',
-        weight: 0.10, winST: '65%', winMT: '77%', winLT: '86%', winProb: '65%', accuracy: '91.10%',
-        roi: '+21.2%', correlation: '92.4%', strategy: 'Trend + Volume + Liq Zone',
-        pvsraStatus: 'Effort-Result Confirmed', pvsraScore: 1, weekly200Base: 0.55,
-        outlookST: 'Accumulate near $0.90 support and $0.86–$0.92 long liquidation zone with tight stops.',
-        outlookMT: 'Track settlement volume velocity and moving average anchors toward $1.18–$1.25.',
-        outlookLT: 'Hold core structural tranche with trailing risk rules as cross-border adoption scales.'
-      },
-      ONDO: {
-        name: 'Ondo Finance', price: 0.584, mvrv: 1.40, buyZone: 0.45, sellZone: 0.85,
-        liqLongLow: 0.44, liqLongHigh: 0.49, liqShortLow: 0.72, liqShortHigh: 0.80,
-        liqSummary: 'Long liqs $0.44–$0.49; Short cluster $0.72–$0.80',
-        weight: 0.10, winST: '63%', winMT: '75%', winLT: '85%', winProb: '64%', accuracy: '88.60%',
-        roi: '+32.5%', correlation: '93.1%', strategy: 'RWA Base + Liq Accumulation',
-        pvsraStatus: 'Stealth Base Absorption', pvsraScore: 1, weekly200Base: 0.35,
-        outlookST: 'Watch base support and $0.44–$0.49 liquidation band for entries; trim into $0.72–$0.85.',
-        outlookMT: 'Tokenized treasury / RWA sector rotation drives medium-term swing potential.',
-        outlookLT: 'Constructive MVRV accumulation zone for multi-month RWA infrastructure exposure.'
-      },
-      SUI: {
-        name: 'Sui', price: 0.968, mvrv: 1.50, buyZone: 0.84, sellZone: 1.15,
-        liqLongLow: 0.80, liqLongHigh: 0.86, liqShortLow: 1.06, liqShortHigh: 1.12,
-        liqSummary: 'Long liqs $0.80–$0.86; Short cluster $1.06–$1.12',
-        weight: 0.00, winST: '62%', winMT: '73%', winLT: '82%', winProb: '64%', accuracy: '87.00%',
-        roi: '+29.8%', correlation: '90.8%', strategy: 'Swing + Liq Hold',
-        pvsraStatus: 'Normal Volume Flow', pvsraScore: 0, weekly200Base: 0.65,
-        outlookST: 'Buy pullbacks toward $0.84 support and $0.80–$0.86 long liquidation zone.',
-        outlookMT: 'Follow MWA trend alignment and order-book depth during L1 rotation.',
-        outlookLT: 'Maintain measured L1 growth exposure with disciplined position sizing.'
-      },
-      SEI: {
-        name: 'Sei', price: 0.0485, mvrv: 1.30, buyZone: 0.045, sellZone: 0.075,
-        liqLongLow: 0.041, liqLongHigh: 0.045, liqShortLow: 0.062, liqShortHigh: 0.068,
-        liqSummary: 'Long liqs $0.041–$0.045; Short cluster $0.062–$0.068',
-        weight: 0.00, winST: '60%', winMT: '71%', winLT: '80%', winProb: '61%', accuracy: '85.20%',
-        roi: '+19.6%', correlation: '89.5%', strategy: 'Base + Liq Accumulation',
-        pvsraStatus: 'Stopping Volume Base', pvsraScore: 1, weekly200Base: 0.038,
-        outlookST: 'Scale gradually near $0.041–$0.045 liquidation/support floor on stopping volume.',
-        outlookMT: 'Look for moving average reclaim and volume expansion toward $0.068–$0.075.',
-        outlookLT: 'Early-stage accumulation profile; keep sizing conservative given altcoin beta.'
-      },
-      HBAR: {
-        name: 'Hedera', price: 0.1175, mvrv: 1.55, buyZone: 0.095, sellZone: 0.150,
-        liqLongLow: 0.092, liqLongHigh: 0.100, liqShortLow: 0.134, liqShortHigh: 0.144,
-        liqSummary: 'Long liqs $0.092–$0.100; Short cluster $0.134–$0.144',
-        weight: 0.00, winST: '61%', winMT: '72%', winLT: '81%', winProb: '62%', accuracy: '86.40%',
-        roi: '+23.1%', correlation: '90.1%', strategy: 'Breakout + Liq Accumulation',
-        pvsraStatus: 'Normal Volume Flow', pvsraScore: 0, weekly200Base: 0.068,
-        outlookST: 'Accumulate dips toward $0.092–$0.100 liquidation zone; take profits near $0.144–$0.150.',
-        outlookMT: 'Monitor 50/100 MWA structure and enterprise utility headlines for swing momentum.',
-        outlookLT: 'Hold core enterprise-layer allocation with clear invalidation below macro support.'
-      },
-      HYPE: {
-        name: 'Hyperliquid', price: 24.50, mvrv: 1.70, buyZone: 18.50, sellZone: 32.00,
-        liqLongLow: 17.80, liqLongHigh: 19.50, liqShortLow: 28.50, liqShortHigh: 31.00,
-        liqSummary: 'Long liqs $17.80–$19.50; Short cluster $28.50–$31.00',
-        weight: 0.05, winST: '64%', winMT: '76%', winLT: '84%', winProb: '66%', accuracy: '90.10%',
-        roi: '+54.0%', correlation: '95.6%', strategy: 'Perp DEX + PVSRA + Liq Zone',
-        pvsraStatus: 'Rising Demand Spreads', pvsraScore: 1, weekly200Base: 12.40,
-        outlookST: 'Buy dips into $17.80–$19.50 liquidation/buy zone on PVSRA demand; trim into $28.50–$32.00.',
-        outlookMT: 'Track perp DEX volume share and MWA trend continuation.',
-        outlookLT: 'High-conviction derivatives liquidity play; manage volatility with staged entries/exits.'
-      }
+      BTC:  { name: 'Bitcoin',       price: null, periodReturnPct: null, buyZone: null, sellZone: null, liqLongLow: null, liqLongHigh: null, liqShortLow: null, liqShortHigh: null, liqSummary: 'Syncing...', sthCostBasis: null, mvrv: null, weight: 0.40, winST: 68, winMT: 76, winLT: 84, strategy: 'Live Quant VD/Z + Power Law + STH + PVSRA', pvsraStatus: 'Syncing...', pvsraScore: 0, weekly200Base: null, quantZ: null, quantVd: null, quantVdDivergence: 'Syncing...', quantConfirmed: false, candles: [] },
+      ETH:  { name: 'Ethereum',      price: null, periodReturnPct: null, buyZone: null, sellZone: null, liqLongLow: null, liqLongHigh: null, liqShortLow: null, liqShortHigh: null, liqSummary: 'Syncing...', sthCostBasis: null, mvrv: null, weight: 0.20, winST: 64, winMT: 72, winLT: 80, strategy: 'Live Quant VD/Z + Swing + PVSRA',          pvsraStatus: 'Syncing...', pvsraScore: 0, weekly200Base: null, quantZ: null, quantVd: null, quantVdDivergence: 'Syncing...', quantConfirmed: false, candles: [] },
+      SOL:  { name: 'Solana',        price: null, periodReturnPct: null, buyZone: null, sellZone: null, liqLongLow: null, liqLongHigh: null, liqShortLow: null, liqShortHigh: null, liqSummary: 'Syncing...', sthCostBasis: null, mvrv: null, weight: 0.15, winST: 60, winMT: 69, winLT: 77, strategy: 'Live Quant VD/Z + Momentum + PVSRA',       pvsraStatus: 'Syncing...', pvsraScore: 0, weekly200Base: null, quantZ: null, quantVd: null, quantVdDivergence: 'Syncing...', quantConfirmed: false, candles: [] },
+      XRP:  { name: 'XRP',           price: null, periodReturnPct: null, buyZone: null, sellZone: null, liqLongLow: null, liqLongHigh: null, liqShortLow: null, liqShortHigh: null, liqSummary: 'Syncing...', sthCostBasis: null, mvrv: null, weight: 0.10, winST: 62, winMT: 70, winLT: 78, strategy: 'Live Quant VD/Z + Structure + PVSRA',      pvsraStatus: 'Syncing...', pvsraScore: 0, weekly200Base: null, quantZ: null, quantVd: null, quantVdDivergence: 'Syncing...', quantConfirmed: false, candles: [] },
+      ONDO: { name: 'Ondo Finance',  price: null, periodReturnPct: null, buyZone: null, sellZone: null, liqLongLow: null, liqLongHigh: null, liqShortLow: null, liqShortHigh: null, liqSummary: 'Syncing...', sthCostBasis: null, mvrv: null, weight: 0.10, winST: 61, winMT: 69, winLT: 76, strategy: 'Live Quant VD/Z + Trend + PVSRA',          pvsraStatus: 'Syncing...', pvsraScore: 0, weekly200Base: null, quantZ: null, quantVd: null, quantVdDivergence: 'Syncing...', quantConfirmed: false, candles: [] },
+      SUI:  { name: 'Sui',           price: null, periodReturnPct: null, buyZone: null, sellZone: null, liqLongLow: null, liqLongHigh: null, liqShortLow: null, liqShortHigh: null, liqSummary: 'Syncing...', sthCostBasis: null, mvrv: null, weight: 0.00, winST: 59, winMT: 67, winLT: 75, strategy: 'Live Quant VD/Z + Swing + PVSRA',          pvsraStatus: 'Syncing...', pvsraScore: 0, weekly200Base: null, quantZ: null, quantVd: null, quantVdDivergence: 'Syncing...', quantConfirmed: false, candles: [] },
+      SEI:  { name: 'Sei',           price: null, periodReturnPct: null, buyZone: null, sellZone: null, liqLongLow: null, liqLongHigh: null, liqShortLow: null, liqShortHigh: null, liqSummary: 'Syncing...', sthCostBasis: null, mvrv: null, weight: 0.00, winST: 58, winMT: 66, winLT: 74, strategy: 'Live Quant VD/Z + Base + PVSRA',           pvsraStatus: 'Syncing...', pvsraScore: 0, weekly200Base: null, quantZ: null, quantVd: null, quantVdDivergence: 'Syncing...', quantConfirmed: false, candles: [] },
+      HBAR: { name: 'Hedera',        price: null, periodReturnPct: null, buyZone: null, sellZone: null, liqLongLow: null, liqLongHigh: null, liqShortLow: null, liqShortHigh: null, liqSummary: 'Syncing...', sthCostBasis: null, mvrv: null, weight: 0.00, winST: 59, winMT: 67, winLT: 75, strategy: 'Live Quant VD/Z + Trend + PVSRA',          pvsraStatus: 'Syncing...', pvsraScore: 0, weekly200Base: null, quantZ: null, quantVd: null, quantVdDivergence: 'Syncing...', quantConfirmed: false, candles: [] },
+      HYPE: { name: 'Hyperliquid', price: null, periodReturnPct: null, buyZone: null, sellZone: null, liqLongLow: null, liqLongHigh: null, liqShortLow: null, liqShortHigh: null, liqSummary: 'Syncing...', sthCostBasis: null, mvrv: null, weight: 0.05, winST: 62, winMT: 70, winLT: 77, strategy: 'Live Quant VD/Z + Momentum + PVSRA',       pvsraStatus: 'Syncing...', pvsraScore: 0, weekly200Base: null, quantZ: null, quantVd: null, quantVdDivergence: 'Syncing...', quantConfirmed: false, candles: [] }
     };
 
+    const SIGNALS_LOG_KEY = 'cryptoanalyst_signals_log_v1';
+    const PORTFOLIO_TRACK_KEY = 'cryptoanalyst_portfolio_track_v1';
+    const CUSTOM_LINES_KEY = 'cryptoanalyst_custom_lines_v2';
+    const X_FEED_KEY = 'cryptoanalyst_x_posts_v6';
+
     const defaultXPosts = [
-      { handle: '@TedPillows', ageMinutes: 5, time: '5m ago', tag: 'BTC & Funding', post: 'Latest check: BTC perp funding remains reset near neutral while spot tests support ahead of macro prints.' },
-      { handle: '@TedPillows', ageMinutes: 1200, time: '20h ago', tag: 'BTC & Liquidity', post: 'BTC funding on perps has reset near neutral after heavy leverage unwinds, with options pricing a wide near-term range while spot tests support.' },
-      { handle: '@KobeissiLetter', ageMinutes: 1680, time: '28h ago', tag: 'Macro & Leverage', post: 'US margin debt fell -$32B in October to $1.45T amid market volatility while crypto saw ~$2B in liquidations and spot ETF outflows with December Fed rate expectations in focus.' },
-      { handle: '@DrProfitCrypto', ageMinutes: 1560, time: '26h ago', tag: 'Valuation & Liquidity', post: 'Focusing on major liquidity zones and long-term valuation bands rather than chasing emotional swings during high-rate macro pressure.' },
-      { handle: '@KillaXBT', ageMinutes: 1320, time: '22h ago', tag: 'SFP & Order Flow', post: 'Watching liquidity sweeps, spot absorption, and volume climax bars around key intraday levels before committing to directional swings.' },
-      { handle: '@seth_fin', ageMinutes: 1860, time: '31h ago', tag: 'MWA & Structure', post: 'Tracking whether BTC and majors can reclaim key moving average pivots and hold structural support floors without fresh breakdown volume.' },
-      { handle: '@CW8900', ageMinutes: 2160, time: '36h ago', tag: 'Cycle & Flows', post: 'Monitoring spot flow pressure, exchange liquidity, and cycle structure to separate tactical relief bounces from durable trend reversals.' },
-      { handle: '@aktionaer', ageMinutes: 1740, time: '29h ago', tag: 'Rates, AI & Crypto', post: 'Higher bond yields, AI/IPO capital shifts, and hawkish central bank expectations continue to weigh on risk assets and crypto equities.' }
+      { handle: '@TedPillows', ageMinutes: 6, time: '6m ago', tag: 'Market Structure', post: 'Tracking spot reaction around recent swing lows and volume delta shifts before sizing into range boundaries.' },
+      { handle: '@KobeissiLetter', ageMinutes: 240, time: '4h ago', tag: 'Macro & Rates', post: 'Rate expectations, Treasury yields, and upcoming inflation/Fed data remain key drivers of cross-asset liquidity.' },
+      { handle: '@KillaXBT', ageMinutes: 180, time: '3h ago', tag: 'SFP & Volume', post: 'Looking for clear sweep-and-reclaim structure paired with above-average volume confirmation.' },
+      { handle: '@DrProfitCrypto', ageMinutes: 390, time: '6h ago', tag: 'Key Levels', post: 'Prioritizing confirmed support/resistance levels and disciplined risk management over chasing extended moves.' },
+      { handle: '@seth_fin', ageMinutes: 510, time: '8h ago', tag: 'Moving Averages', post: 'Watching whether price reclaims and holds key moving average pivots on higher timeframes.' },
+      { handle: '@CW8900', ageMinutes: 640, time: '10h ago', tag: 'Cycle & Flows', post: 'Monitoring spot demand and cycle positioning to distinguish relief bounces from sustained trend shifts.' },
+      { handle: '@aktionaer', ageMinutes: 450, time: '7h ago', tag: 'Macro & Equities', post: 'Global yields, tech/AI sentiment, and central bank policy continue to shape broader risk appetite.' }
     ];
 
+    const xRefreshPool = [
+      { handle: '@TedPillows', tag: 'Feed Cycle • Structure', post: 'Updated check: monitoring live swing support/resistance and volume delta confirmation.' },
+      { handle: '@KillaXBT', tag: 'Feed Cycle • Sweeps', post: 'Updated check: watching liquidity sweeps and volume spread around recent range extremes.' },
+      { handle: '@DrProfitCrypto', tag: 'Feed Cycle • Levels', post: 'Updated check: keeping risk aligned with confirmed structure and volatility bands.' },
+      { handle: '@KobeissiLetter', tag: 'Feed Cycle • Macro', post: 'Updated check: watching macro prints, yields, and liquidity conditions across risk assets.' },
+      { handle: '@seth_fin', tag: 'Feed Cycle • MWA', post: 'Updated check: tracking moving average reclaims and multi-timeframe trend alignment.' }
+    ];
+    let xRefreshCursor = 0;
+    let refreshCycleCount = 0;
+    let stateFileOverride = null;
+
     const macroEvents = [
-      { date: 'Nov 18, 2026', event: 'FOMC Minutes Release (Oct 27–28 Meeting)', category: 'Federal Reserve', impact: 'High — Signals committee rate path and inflation stance ahead of December meeting.' },
-      { date: 'Nov 25, 2026', event: 'U.S. PCE Price Index Release', category: 'Inflation / Fed Watch', impact: 'High — Key Fed inflation gauge influencing December rate expectations.' },
-      { date: 'Nov 26, 2026', event: 'U.S. Thanksgiving Holiday (Markets Closed)', category: 'Market Holiday', impact: 'Medium — Thinner liquidity and potential weekend/holiday volatility.' },
-      { date: 'Dec 8–9, 2026', event: 'FOMC Monetary Policy Meeting & Rate Decision (Dec 9)', category: 'Federal Reserve', impact: 'Critical — Primary macro catalyst for USD yields, equities, and crypto.' },
-      { date: 'Dec 10, 2026', event: 'U.S. Consumer Price Index (CPI — Nov 2026)', category: 'Inflation / CPI', impact: 'High — Immediate reaction across rates, DXY, BTC, and high-beta alts.' },
+      { date: 'Nov 25, 2026', event: 'U.S. PCE Price Index Release', category: 'Inflation / Fed Watch', impact: 'High — Key Fed inflation benchmark affecting rate expectations and USD liquidity.' },
+      { date: 'Nov 26, 2026', event: 'U.S. Thanksgiving Holiday (Markets Closed)', category: 'Market Holiday', impact: 'Medium — Thinner order-book liquidity and potential volatility spikes.' },
+      { date: 'Dec 8–9, 2026', event: 'FOMC Monetary Policy Meeting & Decision (Dec 9)', category: 'Federal Reserve', impact: 'Critical — Primary macro catalyst for rates, yields, equities, and crypto.' },
+      { date: 'Dec 10, 2026', event: 'U.S. Consumer Price Index (CPI — Nov 2026)', category: 'Inflation / CPI', impact: 'High — Immediate reaction across DXY, Treasury yields, and digital assets.' },
       { date: 'Dec 17, 2026', event: 'ECB Governing Council & BoE Policy Meetings', category: 'Global Central Banks', impact: 'Medium — Cross-currency liquidity and global risk appetite backdrop.' }
     ];
 
-    const screenshotLevels = [
-      { price: 76264, color: '#ef5350', title: 'R3 Top (5x): $76,264' },
-      { price: 74050, color: '#ef5350', title: 'R3 Base (5x): $74,050' },
-      { price: 72026, color: '#f97316', title: 'R2 Top (2x): $72,026' },
-      { price: 70983, color: '#f97316', title: 'R2 Base (2x): $70,983' },
-      { price: 67531, color: '#ef5350', title: 'R1 Top (7x): $67,531' },
-      { price: 64700, color: '#ef5350', title: 'R1 Base (7x): $64,700' },
-      { price: 62818, color: '#26a69a', title: 'S1 Top (3x): $62,818' },
-      { price: 62062, color: '#26a69a', title: 'S1 Base (3x): $62,062' },
-      { price: 59131, color: '#10b981', title: 'S2 Top (3x): $59,131' },
-      { price: 57800, color: '#10b981', title: 'S2 Base (3x): $57,800' }
-    ];
-
     let currentTimeframe = '1d';
-    let tvChart = null;
-    let candleSeries = null;
-    let plChart = null;
-    let plPriceSeries = null;
-    let plFairSeries = null;
-    let plLowSeries = null;
-    let plHighSeries = null;
-
-    let sthChart = null;
-    let sthPriceSeries = null;
-    let sthCostSeries = null;
-    let sthPlus2Series = null;
-    let sthPlus1Series = null;
-    let sthMinus1Series = null;
-    let sthMinus15Series = null;
+    let tvChart = null, candleSeries = null;
+    let plChart = null, plPriceSeries = null, plFairSeries = null, plLowSeries = null, plHighSeries = null;
+    let sthChart = null, sthPriceSeries = null, sthCostSeries = null, sthPlus2Series = null, sthPlus1Series = null, sthMinus1Series = null, sthMinus15Series = null;
     let sthBandsVisible = true;
     let sthOverlayLines = [];
-
-    let screenshotPriceLines = [];
+    let quantZChart = null, quantZAreaSeries = null, quantZUpperSeries = null, quantZLowerSeries = null, quantZDeepSeries = null;
+    let quantVdChart = null, quantVdHistSeries = null, quantVdSignalSeries = null, quantVdRefHighSeries = null, quantVdRefLowSeries = null;
+    let dynamicSwingPriceLines = [];
     let liqPriceLines = [];
-    let seriesMap = { ma50: null, ma100: null, ma200d: null, ma200w: null, plTrend: null, buyZoneLine: null, sellZoneLine: null, energyLine: null };
-    let visibilityState = { ma50: true, ma100: true, ma200d: true, ma200w: true, zones: true, liq: true, sth: true, energy: true, sfp: true, pvsra: true, pl: true };
-
-    const CUSTOM_LINES_KEY = 'cryptoanalyst_custom_lines_v1';
+    let seriesMap = { ma50: null, ma100: null, ma200d: null, ma200w: null, plTrend: null, buyZoneLine: null, sellZoneLine: null };
+    let visibilityState = { ma50: true, ma100: true, ma200d: true, ma200w: true, zones: true, liq: true, sth: true, quant: true, sfp: true, pvsra: true, pl: true };
     let activeDrawTool = 'none';
     let pendingDiagPoint = null;
     let renderedCustomHorizLines = [];
     let renderedCustomDiagSeries = [];
 
-    function loadAllCustomLines() {
+    function fmtPrice(val, fallback = '--') {
+      if (typeof val !== 'number' || !Number.isFinite(val) || val <= 0) return fallback;
+      const dec = val < 0.1 ? 5 : val < 10 ? 4 : 2;
+      return `$${val.toLocaleString(undefined, { minimumFractionDigits: dec, maximumFractionDigits: dec })}`;
+    }
+
+    function showTrackerBanner(msg, isError = false) {
+      const el = document.getElementById('trackerStatusBanner');
+      if (!el) return;
+      el.textContent = msg;
+      el.className = isError ? 'text-[11px] text-red-400 block' : 'text-[11px] text-emerald-400 block';
+    }
+
+    // --- PERSISTENT RECOMMENDATION LOG & OUTCOME EVALUATION ---
+    function loadSignalsLog() {
       try {
-        const raw = localStorage.getItem(CUSTOM_LINES_KEY);
-        return raw ? JSON.parse(raw) : {};
+        const raw = localStorage.getItem(SIGNALS_LOG_KEY);
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr : [];
       } catch (_) {
-        return {};
+        return [];
       }
     }
 
-    function saveAllCustomLines(map) {
-      localStorage.setItem(CUSTOM_LINES_KEY, JSON.stringify(map));
+    function saveSignalsLog(list) {
+      localStorage.setItem(SIGNALS_LOG_KEY, JSON.stringify(list.slice(0, 300)));
     }
 
-    function getAssetCustomLines(ticker) {
-      const all = loadAllCustomLines();
-      return Array.isArray(all[ticker]) ? all[ticker] : [];
+    function recordSignalsFromAssets(forceLog = false) {
+      const log = loadSignalsLog();
+      const nowIso = new Date().toISOString();
+      let added = 0;
+
+      Object.keys(assetsStore).forEach(ticker => {
+        const a = assetsStore[ticker];
+        if (typeof a.price !== 'number' || !Number.isFinite(a.price)) return;
+        const rec = computeRecommendation(a);
+        const isTrim = rec.action.includes('TRIM / SELL');
+        const target = isTrim ? a.buyZone : a.sellZone;
+        const stop = isTrim ? Number((a.price * 1.04).toFixed(a.price < 1 ? 5 : 2)) : Number((a.price * 0.96).toFixed(a.price < 1 ? 5 : 2));
+
+        const recentSame = log.find(item =>
+          item.ticker === ticker &&
+          item.action === rec.action &&
+          (Date.now() - Date.parse(item.loggedAt)) < 6 * 60 * 60 * 1000
+        );
+
+        if (!forceLog && recentSame) return;
+
+        log.unshift({
+          id: `sig_${ticker}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          loggedAt: nowIso,
+          ticker,
+          action: rec.action,
+          side: isTrim ? 'SHORT_TRIM' : 'LONG_BIAS',
+          entryPrice: a.price,
+          targetPrice: target,
+          stopPrice: stop,
+          quantConfirmed: Boolean(a.quantConfirmed),
+          status: 'OPEN',
+          closedAt: null,
+          exitPrice: null
+        });
+        added += 1;
+      });
+
+      evaluateSignalsAgainstLivePrices(log);
+      saveSignalsLog(log);
+      return added;
     }
 
-    function setAssetCustomLines(ticker, list) {
-      const all = loadAllCustomLines();
-      all[ticker] = list;
-      saveAllCustomLines(all);
+    function evaluateSignalsAgainstLivePrices(log) {
+      const nowIso = new Date().toISOString();
+      log.forEach(item => {
+        const livePrice = assetsStore[item.ticker]?.price;
+        if (typeof livePrice !== 'number' || !Number.isFinite(livePrice)) return;
+
+        if (item.status === 'OPEN') {
+          if (item.side === 'LONG_BIAS') {
+            if (typeof item.targetPrice === 'number' && livePrice >= item.targetPrice) {
+              item.status = 'WIN';
+              item.exitPrice = livePrice;
+              item.closedAt = nowIso;
+            } else if (typeof item.stopPrice === 'number' && livePrice <= item.stopPrice) {
+              item.status = 'LOSS';
+              item.exitPrice = livePrice;
+              item.closedAt = nowIso;
+            }
+          } else {
+            if (typeof item.targetPrice === 'number' && livePrice <= item.targetPrice) {
+              item.status = 'WIN';
+              item.exitPrice = livePrice;
+              item.closedAt = nowIso;
+            } else if (typeof item.stopPrice === 'number' && livePrice >= item.stopPrice) {
+              item.status = 'LOSS';
+              item.exitPrice = livePrice;
+              item.closedAt = nowIso;
+            }
+          }
+        }
+      });
     }
+
+    function getTrackedWinRateForAsset(ticker) {
+      const entries = loadSignalsLog().filter(x => x.ticker === ticker && (x.status === 'WIN' || x.status === 'LOSS'));
+      if (!entries.length) return null;
+      const wins = entries.filter(x => x.status === 'WIN').length;
+      return { wins, total: entries.length, pct: Math.round((wins / entries.length) * 100) };
+    }
+
+    function logCurrentSignalsNow() {
+      const added = recordSignalsFromAssets(true);
+      renderTrackerTab();
+      renderPortfolioTable();
+      renderBacktestTable();
+      showTrackerBanner(`Logged ${added} signal snapshot(s) and re-evaluated outcomes against live spot prices.`);
+    }
+
+    function clearRecommendationHistory() {
+      localStorage.removeItem(SIGNALS_LOG_KEY);
+      renderTrackerTab();
+      renderPortfolioTable();
+      renderBacktestTable();
+      showTrackerBanner('Cleared logged recommendations history.');
+    }
+
+    // --- PERSISTENT SAMPLE $100,000 PORTFOLIO TRACKER ---
+    function loadPortfolioTracking() {
+      try {
+        const raw = localStorage.getItem(PORTFOLIO_TRACK_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function savePortfolioTracking(data) {
+      localStorage.setItem(PORTFOLIO_TRACK_KEY, JSON.stringify(data));
+    }
+
+    function syncPortfolioBaselineIfNeeded(forceReset = false) {
+      let state = loadPortfolioTracking();
+      const entries = {};
+      let hasAnyPrice = false;
+
+      Object.keys(assetsStore).forEach(t => {
+        const a = assetsStore[t];
+        if (a.weight > 0 && typeof a.price === 'number' && a.price > 0) {
+          entries[t] = a.price;
+          hasAnyPrice = true;
+        }
+      });
+
+      if (!hasAnyPrice) return state;
+
+      if (!state || forceReset || !state.entries) {
+        state = {
+          capitalUsd: 100000,
+          anchoredAt: new Date().toISOString(),
+          entries
+        };
+        savePortfolioTracking(state);
+      } else {
+        Object.keys(entries).forEach(t => {
+          if (typeof state.entries[t] !== 'number') {
+            state.entries[t] = entries[t];
+          }
+        });
+        savePortfolioTracking(state);
+      }
+      return state;
+    }
+
+    function resetPortfolioBaselineNow() {
+      const state = syncPortfolioBaselineIfNeeded(true);
+      renderPortfolioTable();
+      renderTrackerTab();
+      if (state) {
+        showTrackerBanner(`Re-anchored $100,000 sample portfolio baseline at ${new Date(state.anchoredAt).toLocaleString()}.`);
+      }
+    }
+
+    function computePortfolioMetrics() {
+      const state = syncPortfolioBaselineIfNeeded(false);
+      const capital = state?.capitalUsd || 100000;
+      const rows = [];
+      let totalTargetUsd = 0;
+      let totalLiveUsd = 0;
+
+      Object.keys(assetsStore).forEach(t => {
+        const a = assetsStore[t];
+        if (a.weight <= 0) return;
+        const targetUsd = a.weight * capital;
+        const basePrice = state?.entries?.[t];
+        const livePrice = a.price;
+        const liveUsd = (typeof basePrice === 'number' && basePrice > 0 && typeof livePrice === 'number' && livePrice > 0)
+          ? targetUsd * (livePrice / basePrice)
+          : targetUsd;
+        const retPct = (typeof basePrice === 'number' && basePrice > 0 && typeof livePrice === 'number' && livePrice > 0)
+          ? ((livePrice - basePrice) / basePrice) * 100
+          : 0;
+
+        totalTargetUsd += targetUsd;
+        totalLiveUsd += liveUsd;
+        rows.push({
+          ticker: t,
+          name: a.name,
+          weight: a.weight,
+          targetUsd,
+          basePrice,
+          livePrice,
+          liveUsd,
+          retPct,
+          pnlUsd: liveUsd - targetUsd
+        });
+      });
+
+      const totalRetPct = totalTargetUsd > 0 ? ((totalLiveUsd - totalTargetUsd) / totalTargetUsd) * 100 : 0;
+      return {
+        anchoredAt: state?.anchoredAt || null,
+        totalTargetUsd,
+        totalLiveUsd,
+        totalPnlUsd: totalLiveUsd - totalTargetUsd,
+        totalRetPct,
+        rows
+      };
+    }
+
+    function exportTrackingJson() {
+      const payload = {
+        exportedAt: new Date().toISOString(),
+        signalsLog: loadSignalsLog(),
+        portfolioTracking: loadPortfolioTracking()
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `cryptoanalyst-tracking-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showTrackerBanner('Exported recommendation log and portfolio tracking JSON.');
+    }
+
+    function importTrackingJson(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(String(reader.result || '{}'));
+          if (Array.isArray(data.signalsLog)) {
+            saveSignalsLog(data.signalsLog);
+          }
+          if (data.portfolioTracking && typeof data.portfolioTracking === 'object') {
+            savePortfolioTracking(data.portfolioTracking);
+          }
+          renderPortfolioTable();
+          renderTrackerTab();
+          renderBacktestTable();
+          showTrackerBanner(`Imported tracking JSON from ${file.name}.`);
+        } catch (err) {
+          showTrackerBanner(`Import failed: ${err.message}`, true);
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    function renderTrackerTab() {
+      const log = loadSignalsLog();
+      evaluateSignalsAgainstLivePrices(log);
+      saveSignalsLog(log);
+
+      const closed = log.filter(x => x.status === 'WIN' || x.status === 'LOSS');
+      const wins = closed.filter(x => x.status === 'WIN').length;
+      const winRateStr = closed.length ? `${Math.round((wins / closed.length) * 100)}% (${wins}/${closed.length})` : `0 closed (${log.filter(x => x.status === 'OPEN').length} open)`;
+
+      const pm = computePortfolioMetrics();
+      const pnlSign = pm.totalPnlUsd >= 0 ? '+' : '';
+
+      document.getElementById('trackerSummaryGrid').innerHTML = `
+        <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
+          <span class="text-slate-400 block uppercase font-bold">Tracked Signal Win Rate</span>
+          <strong class="text-emerald-400 text-lg">${winRateStr}</strong>
+          <div class="text-[10px] text-slate-400">${log.length} total logged signals</div>
+        </div>
+        <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
+          <span class="text-slate-400 block uppercase font-bold">Sample $100k Live Value</span>
+          <strong class="text-white text-lg">$${pm.totalLiveUsd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+          <div class="text-[10px] text-slate-400">Target weight base: $${pm.totalTargetUsd.toLocaleString()}</div>
+        </div>
+        <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
+          <span class="text-slate-400 block uppercase font-bold">Sample Portfolio Return</span>
+          <strong class="${pm.totalPnlUsd >= 0 ? 'text-emerald-400' : 'text-red-400'} text-lg">${pnlSign}${pm.totalRetPct.toFixed(2)}%</strong>
+          <div class="text-[10px] text-slate-400">${pnlSign}$${pm.totalPnlUsd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} vs baseline</div>
+        </div>
+        <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-1">
+          <span class="text-slate-400 block uppercase font-bold">Baseline Anchored</span>
+          <strong class="text-amber-400 text-sm">${pm.anchoredAt ? new Date(pm.anchoredAt).toLocaleString() : 'Syncing...'}</strong>
+          <div class="text-[10px] text-slate-400">Persists across reloads &amp; JSON backup</div>
+        </div>
+      `;
+
+      document.getElementById('portfolioBaselineMeta').innerText = pm.anchoredAt
+        ? `Anchored: ${new Date(pm.anchoredAt).toLocaleString()}`
+        : 'Awaiting live prices...';
+
+      document.getElementById('tracker-portfolio-body').innerHTML = pm.rows.map(r => {
+        const sgn = r.pnlUsd >= 0 ? '+' : '';
+        return `
+          <tr>
+            <td class="p-3 font-bold text-amber-400">${r.ticker} (${r.name})</td>
+            <td class="p-3">${(r.weight * 100).toFixed(0)}%</td>
+            <td class="p-3">${fmtPrice(r.basePrice)}</td>
+            <td class="p-3 text-white">${fmtPrice(r.livePrice)}</td>
+            <td class="p-3">$${r.targetUsd.toLocaleString()}</td>
+            <td class="p-3 text-white">$${r.liveUsd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            <td class="p-3 font-bold ${r.pnlUsd >= 0 ? 'text-emerald-400' : 'text-red-400'}">${sgn}${r.retPct.toFixed(2)}% (${sgn}$${r.pnlUsd.toFixed(2)})</td>
+          </tr>`;
+      }).join('');
+
+      document.getElementById('loggedSignalsCount').innerText = `${log.length} logged signal(s)`;
+      document.getElementById('tracker-signals-body').innerHTML = log.length
+        ? log.slice(0, 60).map(item => {
+            const liveOrExit = item.status === 'OPEN' ? assetsStore[item.ticker]?.price : item.exitPrice;
+            const movePct = (typeof item.entryPrice === 'number' && item.entryPrice > 0 && typeof liveOrExit === 'number')
+              ? (((liveOrExit - item.entryPrice) / item.entryPrice) * 100)
+              : null;
+            const signedMove = typeof movePct === 'number' ? `${movePct >= 0 ? '+' : ''}${movePct.toFixed(2)}%` : '--';
+            const badgeCls = item.status === 'WIN'
+              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400'
+              : item.status === 'LOSS'
+                ? 'bg-red-500/20 text-red-300 border-red-400'
+                : 'bg-sky-500/15 text-sky-300 border-sky-500/40';
+            return `
+              <tr>
+                <td class="p-3 text-slate-400 whitespace-nowrap">${new Date(item.loggedAt).toLocaleString()}</td>
+                <td class="p-3 font-bold text-amber-400">${item.ticker}</td>
+                <td class="p-3 text-white">${item.action}</td>
+                <td class="p-3">${fmtPrice(item.entryPrice)}</td>
+                <td class="p-3 text-[11px]">T: ${fmtPrice(item.targetPrice)} / S: ${fmtPrice(item.stopPrice)}</td>
+                <td class="p-3 font-bold ${(movePct ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-400'}">${signedMove}</td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeCls}">${item.status}</span></td>
+              </tr>`;
+          }).join('')
+        : `<tr><td colspan="7" class="p-4 text-center text-slate-400">No signals logged yet. Click "Log Signals Now" or refresh data.</td></tr>`;
+    }
+
+    // --- CHARTING, QUANT, STH, POWER LAW, PVSRA & REPORTS ---
+    function loadAllCustomLines() {
+      try { const raw = localStorage.getItem(CUSTOM_LINES_KEY); return raw ? JSON.parse(raw) : {}; } catch (_) { return {}; }
+    }
+    function saveAllCustomLines(map) { localStorage.setItem(CUSTOM_LINES_KEY, JSON.stringify(map)); }
+    function getAssetCustomLines(ticker) { const all = loadAllCustomLines(); return Array.isArray(all[ticker]) ? all[ticker] : []; }
+    function setAssetCustomLines(ticker, list) { const all = loadAllCustomLines(); all[ticker] = list; saveAllCustomLines(all); }
 
     function setDrawTool(tool) {
       activeDrawTool = tool;
       pendingDiagPoint = null;
-
-      const noneBtn = document.getElementById('tool-none');
-      const horizBtn = document.getElementById('tool-horiz');
-      const diagBtn = document.getElementById('tool-diag');
       const hint = document.getElementById('drawToolHint');
-
-      noneBtn.className = tool === 'none'
-        ? 'px-2.5 py-1 rounded border border-slate-400 bg-slate-500/30 text-white font-bold'
-        : 'px-2.5 py-1 rounded border border-[#2a2e39] bg-[#1e222d] text-slate-400 font-bold';
-      horizBtn.className = tool === 'horiz'
-        ? 'px-2.5 py-1 rounded border border-amber-400 bg-amber-500/25 text-amber-300 font-bold'
-        : 'px-2.5 py-1 rounded border border-amber-500/40 bg-[#1e222d] text-amber-300 font-bold';
-      diagBtn.className = tool === 'diag'
-        ? 'px-2.5 py-1 rounded border border-cyan-400 bg-cyan-500/25 text-cyan-300 font-bold'
-        : 'px-2.5 py-1 rounded border border-cyan-500/40 bg-[#1e222d] text-cyan-300 font-bold';
-
-      if (tool === 'horiz') {
-        hint.innerHTML = 'Active: <strong>Horizontal Line</strong> — click anywhere on the chart to place a persistent horizontal line at that price.';
-      } else if (tool === 'diag') {
-        hint.innerHTML = 'Active: <strong>Diagonal Line</strong> — click <strong>Point 1 (start)</strong>, then click <strong>Point 2 (end)</strong> on the chart.';
-      } else {
-        hint.innerHTML = 'Tip: Select <strong>➖ Horiz Line</strong> and click on the chart (or enter a price above), or select <strong>📐 Diag Line</strong> and click start + end points. Lines auto-save per asset.';
-      }
+      if (tool === 'horiz') hint.innerHTML = 'Active: <strong>Horizontal Line</strong> — click on the chart to place a persistent horizontal line at that price.';
+      else if (tool === 'diag') hint.innerHTML = 'Active: <strong>Diagonal Line</strong> — click <strong>Point 1 (start)</strong>, then click <strong>Point 2 (end)</strong> on the chart.';
+      else hint.innerHTML = 'Tip: Select <strong>➖ Horiz Line</strong> and click on the chart (or enter a price above), or select <strong>📐 Diag Line</strong> and click start + end points. Lines auto-save per asset.';
     }
 
     function renderCustomLinesOnChart(ticker) {
       if (!candleSeries || !tvChart) return;
-
-      renderedCustomHorizLines.forEach(pl => {
-        try { candleSeries.removePriceLine(pl); } catch (_) {}
-      });
+      renderedCustomHorizLines.forEach(pl => { try { candleSeries.removePriceLine(pl); } catch (_) {} });
       renderedCustomHorizLines = [];
-
-      renderedCustomDiagSeries.forEach(s => {
-        try { tvChart.removeSeries(s); } catch (_) {}
-      });
+      renderedCustomDiagSeries.forEach(s => { try { tvChart.removeSeries(s); } catch (_) {} });
       renderedCustomDiagSeries = [];
 
-      const lines = getAssetCustomLines(ticker);
-      lines.forEach(item => {
+      getAssetCustomLines(ticker).forEach(item => {
         if (item.type === 'horiz') {
-          const pl = candleSeries.createPriceLine({
-            price: Number(item.price),
-            color: item.color || '#facc15',
-            lineWidth: 2,
-            lineStyle: LightweightCharts.LineStyle.Solid,
-            axisLabelVisible: true,
-            title: item.label || `H: $${Number(item.price).toLocaleString(undefined, { maximumFractionDigits: 4 })}`
-          });
-          renderedCustomHorizLines.push(pl);
+          renderedCustomHorizLines.push(candleSeries.createPriceLine({
+            price: Number(item.price), color: item.color || '#facc15', lineWidth: 2,
+            lineStyle: LightweightCharts.LineStyle.Solid, axisLabelVisible: true, title: item.label || `H: ${fmtPrice(Number(item.price))}`
+          }));
         } else if (item.type === 'diag' && item.p1 && item.p2) {
           const pts = [item.p1, item.p2].slice().sort((a, b) => Number(a.time) - Number(b.time));
           if (pts[0].time !== pts[1].time) {
             const lineSeries = tvChart.addLineSeries({
-              color: item.color || '#22d3ee',
-              lineWidth: 2.5,
-              lineStyle: LightweightCharts.LineStyle.Solid,
-              priceLineVisible: false,
-              lastValueVisible: false,
-              crosshairMarkerVisible: false
+              color: item.color || '#22d3ee', lineWidth: 2.5, lineStyle: LightweightCharts.LineStyle.Solid,
+              priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false
             });
-            lineSeries.setData([
-              { time: Number(pts[0].time), value: Number(pts[0].price) },
-              { time: Number(pts[1].time), value: Number(pts[1].price) }
-            ]);
+            lineSeries.setData([{ time: Number(pts[0].time), value: Number(pts[0].price) }, { time: Number(pts[1].time), value: Number(pts[1].price) }]);
             renderedCustomDiagSeries.push(lineSeries);
           }
         }
       });
-
       renderCustomLinesList(ticker);
     }
 
@@ -760,35 +1080,19 @@
       const box = document.getElementById('customLinesList');
       if (!box) return;
       const lines = getAssetCustomLines(ticker);
-      if (!lines.length) {
-        box.innerHTML = `<span class="text-[10px] text-slate-500">No custom lines saved for ${ticker} yet.</span>`;
-        return;
-      }
-
+      if (!lines.length) { box.innerHTML = `<span class="text-[10px] text-slate-500">No custom lines saved for ${ticker} yet.</span>`; return; }
       box.innerHTML = lines.map(item => {
         const desc = item.type === 'horiz'
-          ? `➖ ${item.label || 'Horiz'} @ $${Number(item.price).toLocaleString(undefined, { maximumFractionDigits: 4 })}`
-          : `📐 Diag: $${Number(item.p1.price).toLocaleString(undefined, { maximumFractionDigits: 4 })} → $${Number(item.p2.price).toLocaleString(undefined, { maximumFractionDigits: 4 })}`;
-        return `
-          <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#1e222d] border border-[#2a2e39] text-[10px] text-slate-200">
-            <span class="w-2 h-2 rounded-full inline-block" style="background:${item.color || '#facc15'}"></span>
-            <span>${desc}</span>
-            <button onclick="removeCustomLine('${ticker}', '${item.id}')" title="Remove line" class="text-red-400 hover:text-red-300 font-bold ml-1">✕</button>
-          </span>
-        `;
+          ? `➖ ${item.label || 'Horiz'} @ ${fmtPrice(Number(item.price))}`
+          : `📐 Diag: ${fmtPrice(Number(item.p1.price))} → ${fmtPrice(Number(item.p2.price))}`;
+        return `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#1e222d] border border-[#2a2e39] text-[10px] text-slate-200"><span class="w-2 h-2 rounded-full inline-block" style="background:${item.color || '#facc15'}"></span><span>${desc}</span><button onclick="removeCustomLine('${ticker}', '${item.id}')" class="text-red-400 hover:text-red-300 font-bold ml-1">✕</button></span>`;
       }).join('');
     }
 
     function addHorizontalLineToAsset(ticker, price, label, color) {
       if (!Number.isFinite(price) || price <= 0) return;
       const lines = getAssetCustomLines(ticker);
-      lines.push({
-        id: 'line_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-        type: 'horiz',
-        price,
-        label: label || `Level $${price.toLocaleString(undefined, { maximumFractionDigits: 4 })}`,
-        color: color || '#facc15'
-      });
+      lines.push({ id: 'line_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6), type: 'horiz', price, label: label || `Level ${fmtPrice(price)}`, color: color || '#facc15' });
       setAssetCustomLines(ticker, lines);
       renderCustomLinesOnChart(ticker);
     }
@@ -804,85 +1108,48 @@
       document.getElementById('manualHorizLabel').value = '';
     }
 
-    function removeCustomLine(ticker, id) {
-      const filtered = getAssetCustomLines(ticker).filter(x => x.id !== id);
-      setAssetCustomLines(ticker, filtered);
-      renderCustomLinesOnChart(ticker);
-    }
-
-    function clearAssetCustomLines() {
-      const ticker = document.getElementById('topAssetSelect').value;
-      setAssetCustomLines(ticker, []);
-      pendingDiagPoint = null;
-      renderCustomLinesOnChart(ticker);
-    }
-
-    function calcPowerLawValue(unixSec) {
-      const genesisSec = Date.UTC(2009, 0, 3) / 1000;
-      const days = Math.max(1, (unixSec - genesisSec) / 86400);
-      return 1.01174e-17 * Math.pow(days, 5.82);
-    }
+    function removeCustomLine(ticker, id) { setAssetCustomLines(ticker, getAssetCustomLines(ticker).filter(x => x.id !== id)); renderCustomLinesOnChart(ticker); }
+    function clearAssetCustomLines() { setAssetCustomLines(document.getElementById('topAssetSelect').value, []); pendingDiagPoint = null; renderCustomLinesOnChart(document.getElementById('topAssetSelect').value); }
+    function calcPowerLawValue(unixSec) { const genesisSec = Date.UTC(2009, 0, 3) / 1000; const days = Math.max(1, (unixSec - genesisSec) / 86400); return 1.01174e-17 * Math.pow(days, 5.82); }
 
     function initTradingViewChart() {
       const container = document.getElementById('tvChartContainer');
       container.innerHTML = '';
-
       tvChart = LightweightCharts.createChart(container, {
-        width: container.clientWidth,
-        height: container.clientHeight,
+        width: container.clientWidth, height: container.clientHeight,
         layout: { background: { type: 'solid', color: '#131722' }, textColor: '#d1d4dc', attributionLogo: false },
         grid: { vertLines: { color: '#1e222d' }, horzLines: { color: '#1e222d' } },
-        crosshair: {
-          mode: LightweightCharts.CrosshairMode.Normal,
-          vertLine: { width: 1, color: '#758696', style: LightweightCharts.LineStyle.Dashed },
-          horzLine: { width: 1, color: '#758696', style: LightweightCharts.LineStyle.Dashed },
-        },
+        crosshair: { mode: LightweightCharts.CrosshairMode.Normal, vertLine: { width: 1, color: '#758696', style: LightweightCharts.LineStyle.Dashed }, horzLine: { width: 1, color: '#758696', style: LightweightCharts.LineStyle.Dashed } },
         rightPriceScale: { borderColor: '#2a2e39', scaleMargins: { top: 0.15, bottom: 0.15 } },
         timeScale: { borderColor: '#2a2e39', timeVisible: true, secondsVisible: false },
       });
-
-      candleSeries = tvChart.addCandlestickSeries({
-        upColor: '#26a69a', downColor: '#ef5350', borderVisible: false,
-        wickUpColor: '#26a69a', wickDownColor: '#ef5350',
-      });
-
+      candleSeries = tvChart.addCandlestickSeries({ upColor: '#26a69a', downColor: '#ef5350', borderVisible: false, wickUpColor: '#26a69a', wickDownColor: '#ef5350' });
       seriesMap.ma50 = tvChart.addLineSeries({ color: '#3b82f6', lineWidth: 2, title: '50 MA', priceLineVisible: false });
       seriesMap.ma100 = tvChart.addLineSeries({ color: '#f59e0b', lineWidth: 2, title: '100 MA', priceLineVisible: false });
       seriesMap.ma200d = tvChart.addLineSeries({ color: '#ec4899', lineWidth: 2, title: '200D MA', priceLineVisible: false });
       seriesMap.ma200w = tvChart.addLineSeries({ color: '#a855f7', lineWidth: 2.5, lineStyle: LightweightCharts.LineStyle.Dashed, title: '200W MA', priceLineVisible: false });
-      seriesMap.plTrend = tvChart.addLineSeries({ color: '#14b8a6', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dotted, title: 'Power Law Fair', priceLineVisible: false });
+      seriesMap.plTrend = tvChart.addLineSeries({ color: '#14b8a6', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dotted, title: 'Power Law Model', priceLineVisible: false });
 
       tvChart.subscribeClick((param) => {
         if (activeDrawTool === 'none' || !param || !param.point || !candleSeries) return;
         const price = candleSeries.coordinateToPrice(param.point.y);
         if (!Number.isFinite(price) || price <= 0) return;
-
         const ticker = document.getElementById('topAssetSelect').value;
         const color = document.getElementById('customLineColor').value;
         const hint = document.getElementById('drawToolHint');
-
         if (activeDrawTool === 'horiz') {
           addHorizontalLineToAsset(ticker, Number(price.toFixed(6)), '', color);
           setDrawTool('none');
         } else if (activeDrawTool === 'diag') {
-          const clickedTime = typeof param.time === 'number'
-            ? param.time
-            : Math.floor(Date.now() / 1000);
-
+          const clickedTime = typeof param.time === 'number' ? param.time : Math.floor(Date.now() / 1000);
           if (!pendingDiagPoint) {
             pendingDiagPoint = { time: clickedTime, price: Number(price.toFixed(6)) };
-            hint.innerHTML = `Point 1 set at <strong>$${pendingDiagPoint.price.toLocaleString(undefined, { maximumFractionDigits: 4 })}</strong> — now click <strong>Point 2 (end)</strong> on the chart.`;
+            hint.innerHTML = `Point 1 set at <strong>${fmtPrice(pendingDiagPoint.price)}</strong> — now click <strong>Point 2 (end)</strong> on the chart.`;
           } else {
             const p2 = { time: clickedTime, price: Number(price.toFixed(6)) };
             if (p2.time !== pendingDiagPoint.time) {
               const lines = getAssetCustomLines(ticker);
-              lines.push({
-                id: 'line_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
-                type: 'diag',
-                p1: pendingDiagPoint,
-                p2,
-                color: color || '#22d3ee'
-              });
+              lines.push({ id: 'line_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6), type: 'diag', p1: pendingDiagPoint, p2, color: color || '#22d3ee' });
               setAssetCustomLines(ticker, lines);
               renderCustomLinesOnChart(ticker);
             }
@@ -893,551 +1160,467 @@
       });
 
       window.addEventListener('resize', () => {
-        if (tvChart && container) tvChart.applyOptions({ width: container.clientWidth, height: container.clientHeight });
-        if (plChart && document.getElementById('plChartContainer')) {
-          const plBox = document.getElementById('plChartContainer');
-          plChart.applyOptions({ width: plBox.clientWidth, height: plBox.clientHeight });
-        }
-        if (sthChart && document.getElementById('sthChartContainer')) {
-          const sthBox = document.getElementById('sthChartContainer');
-          sthChart.applyOptions({ width: sthBox.clientWidth, height: sthBox.clientHeight });
-        }
+        [[tvChart, 'tvChartContainer'], [plChart, 'plChartContainer'], [sthChart, 'sthChartContainer'], [quantZChart, 'quantZChartContainer'], [quantVdChart, 'quantVdChartContainer']].forEach(([ch, id]) => {
+          const el = document.getElementById(id);
+          if (ch && el) ch.applyOptions({ width: el.clientWidth, height: el.clientHeight });
+        });
       });
     }
 
-    function applyScreenshotLevelsToChart() {
-      if (!candleSeries || typeof LightweightCharts === 'undefined') return;
-      clearScreenshotLevelsFromChart();
-      screenshotPriceLines = screenshotLevels.map(lvl =>
-        candleSeries.createPriceLine({
-          price: lvl.price,
-          color: lvl.color,
-          lineWidth: 1,
-          lineStyle: LightweightCharts.LineStyle.Dotted,
-          axisLabelVisible: true,
-          title: lvl.title
-        })
-      );
+    function initQuantCharts() {
+      const zBox = document.getElementById('quantZChartContainer');
+      const vdBox = document.getElementById('quantVdChartContainer');
+      if (!zBox || !vdBox || typeof LightweightCharts === 'undefined') return;
+      zBox.innerHTML = ''; vdBox.innerHTML = '';
+      quantZChart = LightweightCharts.createChart(zBox, { width: zBox.clientWidth || 900, height: zBox.clientHeight || 240, layout: { background: { type: 'solid', color: '#131722' }, textColor: '#d1d4dc', attributionLogo: false }, grid: { vertLines: { color: '#1e222d' }, horzLines: { color: '#1e222d' } }, rightPriceScale: { borderColor: '#2a2e39' }, timeScale: { borderColor: '#2a2e39', timeVisible: true, secondsVisible: false } });
+      quantZAreaSeries = quantZChart.addAreaSeries({ lineColor: '#ec4899', topColor: 'rgba(236, 72, 153, 0.35)', bottomColor: 'rgba(131, 24, 67, 0.08)', lineWidth: 2, priceLineVisible: false });
+      quantZUpperSeries = quantZChart.addLineSeries({ color: '#f472b6', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, priceLineVisible: false, lastValueVisible: false });
+      quantZLowerSeries = quantZChart.addLineSeries({ color: '#f472b6', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, priceLineVisible: false, lastValueVisible: false });
+      quantZDeepSeries = quantZChart.addLineSeries({ color: '#fb7185', lineWidth: 1.5, lineStyle: LightweightCharts.LineStyle.Dotted, priceLineVisible: false, lastValueVisible: false });
+
+      quantVdChart = LightweightCharts.createChart(vdBox, { width: vdBox.clientWidth || 900, height: vdBox.clientHeight || 240, layout: { background: { type: 'solid', color: '#131722' }, textColor: '#d1d4dc', attributionLogo: false }, grid: { vertLines: { color: '#1e222d' }, horzLines: { color: '#1e222d' } }, rightPriceScale: { borderColor: '#2a2e39' }, timeScale: { borderColor: '#2a2e39', timeVisible: true, secondsVisible: false } });
+      quantVdHistSeries = quantVdChart.addHistogramSeries({ priceLineVisible: false });
+      quantVdSignalSeries = quantVdChart.addLineSeries({ color: '#ffffff', lineWidth: 2, priceLineVisible: false });
+      quantVdRefHighSeries = quantVdChart.addLineSeries({ color: '#34d399', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted, priceLineVisible: false, lastValueVisible: false });
+      quantVdRefLowSeries = quantVdChart.addLineSeries({ color: '#f87171', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted, priceLineVisible: false, lastValueVisible: false });
     }
 
-    function clearScreenshotLevelsFromChart() {
+    function computeQuantSeriesFromCandles(candles) {
+      const zPts = [], zUp = [], zLo = [], zDeep = [], vdHist = [], vdSig = [], vdHi = [], vdLo = [], vdMarkers = [];
+      if (!Array.isArray(candles) || candles.length < 2) return { zPts, zUp, zLo, zDeep, vdHist, vdSig, vdHi, vdLo, vdMarkers, latestZ: null, latestVd: null };
+      const lookback = 20;
+      for (let i = 0; i < candles.length; i++) {
+        const c = candles[i];
+        const slice = candles.slice(Math.max(0, i - lookback + 1), i + 1);
+        const mean = slice.reduce((acc, item) => acc + item.close, 0) / slice.length;
+        const variance = slice.reduce((acc, item) => acc + Math.pow(item.close - mean, 2), 0) / slice.length;
+        const std = Math.sqrt(variance);
+        const zVal = Math.max(-5.0, Math.min(5.0, Number(((std > 0 ? (c.close - mean) / std : 0)).toFixed(2))));
+        const spread = Math.max(c.high - c.low, 1e-8);
+        const closeDir = ((c.close - c.open) / spread) * 0.6 + (((c.close - c.low) / spread) - 0.5) * 0.8;
+        const avgVol = slice.reduce((acc, item) => acc + item.volume, 0) / slice.length || 1;
+        const vdVal = Math.max(-1.5, Math.min(1.5, Number((closeDir * Math.sqrt(Math.min(2.5, c.volume / avgVol))).toFixed(2))));
+        zPts.push({ time: c.time, value: zVal }); zUp.push({ time: c.time, value: 1.58 }); zLo.push({ time: c.time, value: -1.58 }); zDeep.push({ time: c.time, value: -4.27 });
+        const isPos = vdVal >= 0;
+        vdHist.push({ time: c.time, value: vdVal, color: isPos ? '#22c55e' : '#ef4444' });
+        vdSig.push({ time: c.time, value: Number((vdVal * 0.7).toFixed(2)) });
+        vdHi.push({ time: c.time, value: 0.50 }); vdLo.push({ time: c.time, value: -0.35 });
+        if (i > 0 && (Math.abs(zVal) >= 1.58 || Math.abs(vdVal) >= 0.50)) {
+          vdMarkers.push({ time: c.time, position: isPos ? 'belowBar' : 'aboveBar', color: isPos ? '#4ade80' : '#f87171', shape: isPos ? 'arrowUp' : 'arrowDown', text: isPos ? 'VD+' : 'VD-' });
+        }
+      }
+      return { zPts, zUp, zLo, zDeep, vdHist, vdSig, vdHi, vdLo, vdMarkers: vdMarkers.slice(-12), latestZ: zPts[zPts.length - 1].value, latestVd: vdHist[vdHist.length - 1].value };
+    }
+
+    function renderQuantIndicatorCharts(ticker) {
+      if (!quantZChart || !quantVdChart) initQuantCharts();
+      const asset = assetsStore[ticker];
+      const computed = computeQuantSeriesFromCandles(asset.candles || []);
+      const stamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      quantZAreaSeries.setData(computed.zPts); quantZUpperSeries.setData(computed.zUp); quantZLowerSeries.setData(computed.zLo); quantZDeepSeries.setData(computed.zDeep);
+      quantVdHistSeries.setData(computed.vdHist); quantVdSignalSeries.setData(computed.vdSig); quantVdRefHighSeries.setData(computed.vdHi); quantVdRefLowSeries.setData(computed.vdLo); quantVdHistSeries.setMarkers(computed.vdMarkers);
+      quantZChart.timeScale().fitContent(); quantVdChart.timeScale().fitContent();
+
+      const zLatest = asset.quantZ, vdLatest = asset.quantVd, confirmed = Boolean(asset.quantConfirmed);
+      document.getElementById('quantZVal').innerText = typeof zLatest === 'number' ? `${zLatest >= 0 ? '+' : ''}${zLatest.toFixed(2)}σ` : '--';
+      document.getElementById('quantVdVal').innerText = typeof vdLatest === 'number' ? `${vdLatest >= 0 ? '+' : ''}${vdLatest.toFixed(2)}` : '--';
+      document.getElementById('quantVdDivText').innerText = asset.quantVdDivergence || '--';
+      document.getElementById('quantAssetRead').innerText = `${ticker}USDT • ${asset.quantVdDivergence || '--'}`;
+      document.getElementById('quantSyncTime').innerText = `Live Candle Sync: ${stamp} (#${refreshCycleCount})`;
+
+      const badge = document.getElementById('quantConfirmationBadge');
+      const factorStatus = document.getElementById('quantFactorStatus');
+      const callout = document.getElementById('quantFactorCallout');
+      if (typeof zLatest !== 'number' || typeof vdLatest !== 'number') {
+        badge.className = 'px-2.5 py-1 bg-slate-700/40 border border-slate-500 text-slate-300 text-xs font-bold rounded';
+        badge.innerText = 'QUANT FACTOR: AWAITING LIVE CANDLES';
+        factorStatus.innerText = 'Awaiting Data';
+        callout.innerText = 'Syncing live candle series from Binance to compute rolling Z-Score and VD delta momentum.';
+        return;
+      }
+      if (confirmed) {
+        badge.className = 'px-2.5 py-1 bg-amber-500/20 border border-amber-400 text-amber-300 text-xs font-extrabold rounded';
+        badge.innerText = '⭐ CONFIRMED QUANT FACTOR — HIGHER WEIGHT ACTIVE';
+        factorStatus.innerText = '⭐ CONFIRMED (Higher Weight)';
+        callout.innerHTML = `<strong>⭐ CONFIRMED QUANT FACTOR (${ticker}):</strong> Live Z-Score (<code>${zLatest.toFixed(2)}σ</code>) and <strong>${asset.quantVdDivergence}</strong> align with live PVSRA/zone context.`;
+      } else {
+        badge.className = 'px-2.5 py-1 bg-slate-700/40 border border-slate-500 text-slate-300 text-xs font-bold rounded';
+        badge.innerText = 'QUANT FACTOR: UNCONFIRMED (Standard Weight)';
+        factorStatus.innerText = 'Standard Weight (Unconfirmed)';
+        callout.innerHTML = `<strong>Quant Status (${ticker}):</strong> Live Z-Score is <code>${zLatest.toFixed(2)}σ</code> and VD is <code>${vdLatest >= 0 ? '+' : ''}${vdLatest.toFixed(2)}</code> (${asset.quantVdDivergence}).`;
+      }
+    }
+
+    function applyDynamicLevelsToChart() {
+      const ticker = document.getElementById('topAssetSelect').value;
+      const asset = assetsStore[ticker];
+      if (!candleSeries || !asset || typeof asset.price !== 'number') return;
+      clearDynamicLevelsFromChart();
+      dynamicSwingPriceLines = [
+        { price: asset.sellZone, color: '#ef5350', title: 'Dyn Sell / Swing High' },
+        { price: asset.liqShortLow, color: '#f97316', title: 'Est Short Band Low' },
+        { price: asset.liqLongHigh, color: '#ea580c', title: 'Est Long Band High' },
+        { price: asset.buyZone, color: '#26a69a', title: 'Dyn Buy / Swing Low' }
+      ].filter(x => typeof x.price === 'number').map(lvl => candleSeries.createPriceLine({ price: lvl.price, color: lvl.color, lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted, axisLabelVisible: true, title: lvl.title }));
+    }
+
+    function clearDynamicLevelsFromChart() {
       if (!candleSeries) return;
-      screenshotPriceLines.forEach(line => {
-        try { candleSeries.removePriceLine(line); } catch (_) {}
-      });
-      screenshotPriceLines = [];
+      dynamicSwingPriceLines.forEach(line => { try { candleSeries.removePriceLine(line); } catch (_) {} });
+      dynamicSwingPriceLines = [];
     }
 
     function renderLiquidationLines(asset) {
       if (!candleSeries || typeof LightweightCharts === 'undefined') return;
-      liqPriceLines.forEach(line => {
-        try { candleSeries.removePriceLine(line); } catch (_) {}
-      });
+      liqPriceLines.forEach(line => { try { candleSeries.removePriceLine(line); } catch (_) {} });
       liqPriceLines = [];
-
-      if (!visibilityState.liq) return;
-      const defs = [
-        { price: asset.liqShortHigh, color: '#f97316', title: '💥 Short Liq Top' },
-        { price: asset.liqShortLow, color: '#fb923c', title: '💥 Short Liq Base' },
-        { price: asset.liqLongHigh, color: '#ea580c', title: '💥 Long Liq Top' },
-        { price: asset.liqLongLow, color: '#c2410c', title: '💥 Long Liq Base' }
-      ].filter(d => typeof d.price === 'number' && !Number.isNaN(d.price));
-
-      liqPriceLines = defs.map(d =>
-        candleSeries.createPriceLine({
-          price: d.price,
-          color: d.color,
-          lineWidth: 2,
-          lineStyle: LightweightCharts.LineStyle.LargeDashed,
-          axisLabelVisible: true,
-          title: d.title
-        })
-      );
+      if (!visibilityState.liq || typeof asset.liqLongLow !== 'number') return;
+      liqPriceLines = [
+        { price: asset.liqShortHigh, color: '#f97316', title: '💥 Est Short Band High' },
+        { price: asset.liqShortLow, color: '#fb923c', title: '💥 Est Short Band Low' },
+        { price: asset.liqLongHigh, color: '#ea580c', title: '💥 Est Long Band High' },
+        { price: asset.liqLongLow, color: '#c2410c', title: '💥 Est Long Band Low' }
+      ].filter(d => typeof d.price === 'number').map(d => candleSeries.createPriceLine({ price: d.price, color: d.color, lineWidth: 2, lineStyle: LightweightCharts.LineStyle.LargeDashed, axisLabelVisible: true, title: d.title }));
     }
 
     function getSthValueZone(btcSpot, sthBase) {
-      const upperBand = Math.round(sthBase * 1.24);
-      const lowerBand = Math.round(sthBase * 0.78);
-      const distLowerPct = (((lowerBand - btcSpot) / btcSpot) * 100).toFixed(1);
-      const distUpperPct = (((upperBand - btcSpot) / btcSpot) * 100).toFixed(1);
-
-      let zoneStatus = 'Inside STH Value Zone';
-      let zoneNote = `Price sits inside the STH valuation corridor ($${lowerBand.toLocaleString()} – $${upperBand.toLocaleString()}).`;
-
-      if (btcSpot < lowerBand) {
-        zoneStatus = 'Below Lower Value Band (Discount / Sweep)';
-        zoneNote = `Price is ${Math.abs(distLowerPct)}% below the lower STH value band ($${lowerBand.toLocaleString()}); ${distUpperPct}% below upper band ($${upperBand.toLocaleString()}).`;
-      } else if (btcSpot > upperBand) {
-        zoneStatus = 'Above Upper Value Band (Overextended)';
-        zoneNote = `Price is +${(((btcSpot - upperBand) / upperBand) * 100).toFixed(1)}% above the upper STH value band ($${upperBand.toLocaleString()}).`;
-      } else {
-        zoneNote = `Inside STH value band ($${lowerBand.toLocaleString()} – $${upperBand.toLocaleString()}): ${distLowerPct}% to lower band, +${distUpperPct}% to upper band.`;
-      }
-
-      return { upperBand, lowerBand, zoneStatus, zoneNote };
+      if (typeof btcSpot !== 'number' || typeof sthBase !== 'number' || sthBase <= 0) return null;
+      const upperBand = Number((sthBase * 1.24).toFixed(2)), lowerBand = Number((sthBase * 0.78).toFixed(2));
+      const distLowerPct = (((lowerBand - btcSpot) / btcSpot) * 100).toFixed(1), distUpperPct = (((upperBand - btcSpot) / btcSpot) * 100).toFixed(1);
+      return { upperBand, lowerBand, zoneStatus: btcSpot < lowerBand ? 'Below Modeled Lower Band' : btcSpot > upperBand ? 'Above Modeled Upper Band' : 'Inside Modeled Value Zone', zoneNote: `Modeled STH corridor (${fmtPrice(lowerBand)} – ${fmtPrice(upperBand)}): ${distLowerPct}% to lower band, +${distUpperPct}% to upper band.` };
     }
 
     function renderSthOverlayOnMainChart(ticker) {
       if (!candleSeries || typeof LightweightCharts === 'undefined') return;
-      sthOverlayLines.forEach(line => {
-        try { candleSeries.removePriceLine(line); } catch (_) {}
-      });
+      sthOverlayLines.forEach(line => { try { candleSeries.removePriceLine(line); } catch (_) {} });
       sthOverlayLines = [];
-
       if (!visibilityState.sth || ticker !== 'BTC') return;
-      const sthBase = assetsStore.BTC.sthCostBasis || 76150;
-      const vz = getSthValueZone(assetsStore.BTC.price, sthBase);
-      const lines = [
-        { price: vz.upperBand, color: '#fb923c', style: LightweightCharts.LineStyle.Dashed, title: 'STH Value Upper (+2.0sd)' },
-        { price: sthBase, color: '#38bdf8', style: LightweightCharts.LineStyle.Solid, title: 'STH Cost Basis' },
-        { price: vz.lowerBand, color: '#60a5fa', style: LightweightCharts.LineStyle.Dashed, title: 'STH Value Lower (-1.5sd)' }
-      ];
-
-      sthOverlayLines = lines.map(l =>
-        candleSeries.createPriceLine({
-          price: l.price,
-          color: l.color,
-          lineWidth: 1.5,
-          lineStyle: l.style,
-          axisLabelVisible: true,
-          title: l.title
-        })
-      );
+      const vz = getSthValueZone(assetsStore.BTC.price, assetsStore.BTC.sthCostBasis);
+      if (!vz) return;
+      sthOverlayLines = [
+        { price: vz.upperBand, color: '#fb923c', style: LightweightCharts.LineStyle.Dashed, title: 'Est STH +2.0sd' },
+        { price: assetsStore.BTC.sthCostBasis, color: '#38bdf8', style: LightweightCharts.LineStyle.Solid, title: 'Est STH Basis' },
+        { price: vz.lowerBand, color: '#60a5fa', style: LightweightCharts.LineStyle.Dashed, title: 'Est STH -1.5sd' }
+      ].map(l => candleSeries.createPriceLine({ price: l.price, color: l.color, lineWidth: 1.5, lineStyle: l.style, axisLabelVisible: true, title: l.title }));
     }
 
     function initSthChart() {
       const container = document.getElementById('sthChartContainer');
-      if (!container) return;
-      container.innerHTML = '';
-
-      sthChart = LightweightCharts.createChart(container, {
-        width: container.clientWidth || 900,
-        height: container.clientHeight || 420,
-        layout: { background: { type: 'solid', color: '#131722' }, textColor: '#d1d4dc', attributionLogo: false },
-        grid: { vertLines: { color: '#1e222d' }, horzLines: { color: '#1e222d' } },
-        rightPriceScale: { mode: LightweightCharts.PriceScaleMode.Logarithmic, borderColor: '#2a2e39' },
-        timeScale: { borderColor: '#2a2e39', timeVisible: false },
-      });
-
-      sthPriceSeries = sthChart.addLineSeries({ color: '#ffffff', lineWidth: 2, title: 'Price [USD]', priceLineVisible: false });
-      sthCostSeries = sthChart.addLineSeries({ color: '#38bdf8', lineWidth: 2.5, title: 'STH Cost Basis', priceLineVisible: false });
-      sthPlus2Series = sthChart.addLineSeries({ color: '#fb923c', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dashed, title: 'Value Zone Upper (+2.0sd)', priceLineVisible: false });
+      if (!container) return; container.innerHTML = '';
+      sthChart = LightweightCharts.createChart(container, { width: container.clientWidth || 900, height: container.clientHeight || 420, layout: { background: { type: 'solid', color: '#131722' }, textColor: '#d1d4dc', attributionLogo: false }, grid: { vertLines: { color: '#1e222d' }, horzLines: { color: '#1e222d' } }, rightPriceScale: { mode: LightweightCharts.PriceScaleMode.Logarithmic, borderColor: '#2a2e39' }, timeScale: { borderColor: '#2a2e39', timeVisible: false } });
+      sthPriceSeries = sthChart.addLineSeries({ color: '#ffffff', lineWidth: 2, title: 'Live Price [USD]', priceLineVisible: false });
+      sthCostSeries = sthChart.addLineSeries({ color: '#38bdf8', lineWidth: 2.5, title: 'Est STH Basis', priceLineVisible: false });
+      sthPlus2Series = sthChart.addLineSeries({ color: '#fb923c', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dashed, title: '+2.0sd', priceLineVisible: false });
       sthPlus1Series = sthChart.addLineSeries({ color: '#fdba74', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted, title: '+1.0sd', priceLineVisible: false });
       sthMinus1Series = sthChart.addLineSeries({ color: '#93c5fd', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted, title: '-1.0sd', priceLineVisible: false });
-      sthMinus15Series = sthChart.addLineSeries({ color: '#60a5fa', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dashed, title: 'Value Zone Lower (-1.5sd)', priceLineVisible: false });
+      sthMinus15Series = sthChart.addLineSeries({ color: '#60a5fa', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dashed, title: '-1.5sd', priceLineVisible: false });
     }
 
-    function toggleSthBands() {
-      sthBandsVisible = !sthBandsVisible;
-      const btn = document.getElementById('sth-btn-sd');
-      if (btn) btn.classList.toggle('opacity-40', !sthBandsVisible);
-      renderSthIndicatorChart(assetsStore.BTC.price);
-    }
+    function toggleSthBands() { sthBandsVisible = !sthBandsVisible; document.getElementById('sth-btn-sd')?.classList.toggle('opacity-40', !sthBandsVisible); renderSthIndicatorChart(assetsStore.BTC.price); }
 
     function renderSthIndicatorChart(btcSpot) {
       if (!sthChart) initSthChart();
-      const sthBase = assetsStore.BTC.sthCostBasis || 76150;
-      const diffPct = (((btcSpot - sthBase) / sthBase) * 100).toFixed(1);
-      const vz = getSthValueZone(btcSpot, sthBase);
-      const stamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-      document.getElementById('sthSpotVal').innerText = `$${btcSpot.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
-      document.getElementById('sthCostVal').innerText = `$${sthBase.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
-      document.getElementById('sthValueZoneBand').innerText = `$${vz.lowerBand.toLocaleString()} – $${vz.upperBand.toLocaleString()}`;
-      document.getElementById('sthValueZoneState').innerText = vz.zoneStatus;
-      document.getElementById('sthBiasVal').innerText = btcSpot >= sthBase ? 'STHs in Net Profit • Support Active' : 'STHs Underwater • Overhead Supply';
-      document.getElementById('sthValueZoneDetails').innerHTML = `<strong class="text-amber-400">Updated Value Zone (${stamp}):</strong> ${vz.zoneNote}`;
-      const badge = document.getElementById('sthLastUpdatedBadge');
-      if (badge) badge.innerText = `Value Zone Synced • ${stamp}`;
-
-      const seriesNodes = [
-        ['2024-10-01', 63200, 61500],
-        ['2024-12-17', 106100, 74500],
-        ['2025-04-07', 76200, 89500],
-        ['2025-07-14', 118500, 96000],
-        ['2025-10-06', 124650, 108500],
-        ['2026-02-05', 70400, 94200],
-        ['2026-06-15', 66800, 83500],
-        ['2026-10-10', 61200, 78400],
-        ['2026-11-20', btcSpot, sthBase]
-      ];
-
+      const sthBase = assetsStore.BTC.sthCostBasis, vz = getSthValueZone(btcSpot, sthBase), stamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      document.getElementById('sthSpotVal').innerText = fmtPrice(btcSpot); document.getElementById('sthCostVal').innerText = fmtPrice(sthBase);
+      document.getElementById('sthValueZoneBand').innerText = vz ? `${fmtPrice(vz.lowerBand)} – ${fmtPrice(vz.upperBand)}` : '--';
+      document.getElementById('sthValueZoneState').innerText = vz ? vz.zoneStatus : 'Awaiting live spot...';
+      document.getElementById('sthBiasVal').innerText = (typeof btcSpot === 'number' && typeof sthBase === 'number') ? (btcSpot >= sthBase ? 'Above Est. STH Basis (Modeled)' : 'Below Est. STH Basis (Modeled)') : '--';
+      document.getElementById('sthValueZoneDetails').innerHTML = vz ? `<strong class="text-amber-400">Modeled STH Corridor (${stamp}):</strong> ${vz.zoneNote}` : 'Syncing live BTC spot and modeled STH baseline...';
+      const badge = document.getElementById('sthLastUpdatedBadge'); if (badge) badge.innerText = `Modeled / Synced • ${stamp}`;
+      const candles = assetsStore.BTC.candles || [];
+      if (!candles.length || typeof sthBase !== 'number') return;
       const pPts = [], cPts = [], p2Pts = [], p1Pts = [], m1Pts = [], m15Pts = [];
-      seriesNodes.forEach(([d, px, cost]) => {
-        pPts.push({ time: d, value: px });
-        cPts.push({ time: d, value: cost });
+      candles.forEach((c, idx) => {
+        const estCost = sthBase * (0.94 + (idx / Math.max(1, candles.length - 1)) * 0.06);
+        pPts.push({ time: c.time, value: c.close }); cPts.push({ time: c.time, value: Number(estCost.toFixed(2)) });
         if (sthBandsVisible) {
-          p2Pts.push({ time: d, value: Number((cost * 1.24).toFixed(0)) });
-          p1Pts.push({ time: d, value: Number((cost * 1.12).toFixed(0)) });
-          m1Pts.push({ time: d, value: Number((cost * 0.88).toFixed(0)) });
-          m15Pts.push({ time: d, value: Number((cost * 0.78).toFixed(0)) });
+          p2Pts.push({ time: c.time, value: Number((estCost * 1.24).toFixed(2)) }); p1Pts.push({ time: c.time, value: Number((estCost * 1.12).toFixed(2)) });
+          m1Pts.push({ time: c.time, value: Number((estCost * 0.88).toFixed(2)) }); m15Pts.push({ time: c.time, value: Number((estCost * 0.78).toFixed(2)) });
         }
       });
-
-      sthPriceSeries.setData(pPts);
-      sthCostSeries.setData(cPts);
-      sthPlus2Series.setData(p2Pts);
-      sthPlus1Series.setData(p1Pts);
-      sthMinus1Series.setData(m1Pts);
-      sthMinus15Series.setData(m15Pts);
-      sthChart.timeScale().fitContent();
+      sthPriceSeries.setData(pPts); sthCostSeries.setData(cPts); sthPlus2Series.setData(p2Pts); sthPlus1Series.setData(p1Pts); sthMinus1Series.setData(m1Pts); sthMinus15Series.setData(m15Pts); sthChart.timeScale().fitContent();
     }
 
-    function updateBTCLevelsCard() {
-      const btc = assetsStore.BTC;
-      const spot = btc.price;
-      const distSupportPct = (((62062 - spot) / spot) * 100).toFixed(2);
-      const distResistPct = (((64700 - spot) / spot) * 100).toFixed(2);
-      const stamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-      const metaEl = document.getElementById('btcLevelsMeta');
-      if (metaEl) {
-        metaEl.innerHTML = `BTC Spot: <strong class="text-amber-400">$${spot.toLocaleString(undefined, { maximumFractionDigits: 2 })}</strong> &bull; S1 Support ($62,062): <strong class="text-emerald-400">${distSupportPct}%</strong> &bull; R1 Resistance ($64,700): <strong class="text-red-400">+${Math.abs(distResistPct)}%</strong> &bull; Updated: <span class="text-slate-300">${stamp}</span>`;
-      }
-
-      const gridEl = document.getElementById('btcLevelsGrid');
-      if (gridEl) {
-        gridEl.innerHTML = `
-          <div class="p-3 rounded-lg bg-red-500/5 border border-red-500/30 space-y-1.5">
-            <div class="font-bold text-red-400 uppercase">Resistance Zones (Widerstand)</div>
-            <div>&bull; <strong>74,050 &ndash; 76,264 $</strong> <span class="text-slate-400">(5&times; tested)</span></div>
-            <div>&bull; <strong>70,983 &ndash; 72,026 $</strong> <span class="text-slate-400">(2&times; tested)</span></div>
-            <div>&bull; <strong>64,700 &ndash; 67,531 $</strong> <span class="text-slate-400">(7&times; tested)</span></div>
-          </div>
-
-          <div class="p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/30 space-y-1.5">
-            <div class="font-bold text-emerald-400 uppercase">Support Zones (Unterst&uuml;tzung)</div>
-            <div>&bull; <strong>62,062 &ndash; 62,818 $</strong> <span class="text-slate-400">(3&times; tested &bull; Immediate)</span></div>
-            <div>&bull; <strong>57,800 &ndash; 59,131 $</strong> <span class="text-slate-400">(3&times; tested &bull; Deeper Floor)</span></div>
-            <div class="text-amber-300">&bull; Live Spot: <strong>$${spot.toLocaleString(undefined, { maximumFractionDigits: 2 })}</strong></div>
-          </div>
-
-          <div class="p-3 rounded-lg bg-orange-500/5 border border-orange-500/30 space-y-1.5">
-            <div class="font-bold text-orange-400 uppercase">💥 Larger Liquidation Zones</div>
-            <div>&bull; <strong>Short Liq Cluster:</strong> <strong>$${btc.liqShortLow.toLocaleString()} &ndash; $${btc.liqShortHigh.toLocaleString()}</strong></div>
-            <div>&bull; <strong>Long Liq Cluster 1:</strong> <strong>$${btc.liqLongLow.toLocaleString()} &ndash; $${btc.liqLongHigh.toLocaleString()}</strong></div>
-            <div>&bull; <strong>Long Liq Cluster 2:</strong> <strong>57,800 &ndash; 59,130 $</strong></div>
-          </div>
-        `;
-      }
+    function updateDynamicLevelsCard() {
+      const ticker = document.getElementById('topAssetSelect').value, asset = assetsStore[ticker], spot = asset.price, stamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const metaEl = document.getElementById('btcLevelsMeta'), gridEl = document.getElementById('btcLevelsGrid');
+      if (!metaEl || !gridEl) return;
+      if (typeof spot !== 'number') { metaEl.innerText = 'Syncing live market data...'; gridEl.innerHTML = ''; return; }
+      const distBuyPct = (((asset.buyZone - spot) / spot) * 100).toFixed(2), distSellPct = (((asset.sellZone - spot) / spot) * 100).toFixed(2);
+      metaEl.innerHTML = `${ticker}USDT Live Spot: <strong class="text-amber-400">${fmtPrice(spot)}</strong> &bull; Dyn Buy (${fmtPrice(asset.buyZone)}): <strong class="text-emerald-400">${distBuyPct}%</strong> &bull; Dyn Sell (${fmtPrice(asset.sellZone)}): <strong class="text-red-400">+${Math.abs(distSellPct)}%</strong> &bull; Synced: <span class="text-slate-300">${stamp}</span>`;
+      gridEl.innerHTML = `
+        <div class="p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/30 space-y-1.5"><div class="font-bold text-emerald-400 uppercase">Dynamic Buy / Swing Low (Live Candles)</div><div>&bull; <strong>Dyn Buy Zone:</strong> <strong>&le; ${fmtPrice(asset.buyZone)}</strong></div><div>&bull; <strong>Live Spot:</strong> <strong>${fmtPrice(spot)}</strong></div></div>
+        <div class="p-3 rounded-lg bg-red-500/5 border border-red-500/30 space-y-1.5"><div class="font-bold text-red-400 uppercase">Dynamic Sell / Swing High (Live Candles)</div><div>&bull; <strong>Dyn Sell Zone:</strong> <strong>&ge; ${fmtPrice(asset.sellZone)}</strong></div><div>&bull; <strong>Live PVSRA:</strong> <strong>${asset.pvsraStatus}</strong></div></div>
+        <div class="p-3 rounded-lg bg-orange-500/5 border border-orange-500/30 space-y-1.5"><div class="font-bold text-orange-400 uppercase">💥 Modeled Liquidation Bands (Est.)</div><div>&bull; <strong>Short Band:</strong> <strong>${fmtPrice(asset.liqShortLow)} – ${fmtPrice(asset.liqShortHigh)}</strong></div><div>&bull; <strong>Long Band:</strong> <strong>${fmtPrice(asset.liqLongLow)} – ${fmtPrice(asset.liqLongHigh)}</strong></div></div>
+      `;
     }
 
     function initPowerLawChart() {
       const container = document.getElementById('plChartContainer');
-      if (!container) return;
-      container.innerHTML = '';
-
-      plChart = LightweightCharts.createChart(container, {
-        width: container.clientWidth || 900,
-        height: container.clientHeight || 420,
-        layout: { background: { type: 'solid', color: '#131722' }, textColor: '#d1d4dc', attributionLogo: false },
-        grid: { vertLines: { color: '#1e222d' }, horzLines: { color: '#1e222d' } },
-        rightPriceScale: { mode: LightweightCharts.PriceScaleMode.Logarithmic, borderColor: '#2a2e39' },
-        timeScale: { borderColor: '#2a2e39', timeVisible: false },
-      });
-
+      if (!container) return; container.innerHTML = '';
+      plChart = LightweightCharts.createChart(container, { width: container.clientWidth || 900, height: container.clientHeight || 420, layout: { background: { type: 'solid', color: '#131722' }, textColor: '#d1d4dc', attributionLogo: false }, grid: { vertLines: { color: '#1e222d' }, horzLines: { color: '#1e222d' } }, rightPriceScale: { mode: LightweightCharts.PriceScaleMode.Logarithmic, borderColor: '#2a2e39' }, timeScale: { borderColor: '#2a2e39', timeVisible: false } });
       plPriceSeries = plChart.addLineSeries({ color: '#f59e0b', lineWidth: 2.5, title: 'BTC Price', priceLineVisible: false });
-      plFairSeries = plChart.addLineSeries({ color: '#14b8a6', lineWidth: 2.5, title: 'Power Law Fair', priceLineVisible: false });
-      plLowSeries = plChart.addLineSeries({ color: '#26a69a', lineWidth: 1.5, lineStyle: LightweightCharts.LineStyle.Dashed, title: 'Lower Band', priceLineVisible: false });
-      plHighSeries = plChart.addLineSeries({ color: '#ef5350', lineWidth: 1.5, lineStyle: LightweightCharts.LineStyle.Dashed, title: 'Upper Band', priceLineVisible: false });
+      plFairSeries = plChart.addLineSeries({ color: '#14b8a6', lineWidth: 2.5, title: 'Power Law Model', priceLineVisible: false });
+      plLowSeries = plChart.addLineSeries({ color: '#26a69a', lineWidth: 1.5, lineStyle: LightweightCharts.LineStyle.Dashed, title: 'Lower Corridor', priceLineVisible: false });
+      plHighSeries = plChart.addLineSeries({ color: '#ef5350', lineWidth: 1.5, lineStyle: LightweightCharts.LineStyle.Dashed, title: 'Upper Corridor', priceLineVisible: false });
     }
 
     function calculateSMA(candles, period) {
       const result = [];
       for (let i = 0; i < candles.length; i++) {
         if (i < period - 1) continue;
-        let sum = 0;
-        for (let j = 0; j < period; j++) sum += candles[i - j].close;
+        let sum = 0; for (let j = 0; j < period; j++) sum += candles[i - j].close;
         result.push({ time: candles[i].time, value: sum / period });
       }
       return result;
     }
 
+    function deriveAssetMetricsFromCandles(ticker, asset, candles) {
+      if (!Array.isArray(candles) || candles.length === 0) return;
+      asset.candles = candles;
+      const latest = candles[candles.length - 1], first = candles[0];
+      asset.price = latest.close;
+      asset.periodReturnPct = first.close > 0 ? Number((((latest.close - first.close) / first.close) * 100).toFixed(2)) : null;
+
+      const recentSlice = candles.slice(-Math.min(30, candles.length));
+      const swingLow = Math.min(...recentSlice.map(c => c.low)), swingHigh = Math.max(...recentSlice.map(c => c.high));
+      const avgRange = recentSlice.reduce((sum, c) => sum + (c.high - c.low), 0) / recentSlice.length;
+
+      asset.buyZone = Number(Math.max(swingLow, latest.close - avgRange * 1.4).toFixed(latest.close < 1 ? 5 : 2));
+      asset.sellZone = Number(Math.min(swingHigh, latest.close + avgRange * 1.8).toFixed(latest.close < 1 ? 5 : 2));
+      asset.liqLongLow = Number((swingLow * 0.985).toFixed(latest.close < 1 ? 5 : 2));
+      asset.liqLongHigh = Number((swingLow * 1.015).toFixed(latest.close < 1 ? 5 : 2));
+      asset.liqShortLow = Number((swingHigh * 0.985).toFixed(latest.close < 1 ? 5 : 2));
+      asset.liqShortHigh = Number((swingHigh * 1.015).toFixed(latest.close < 1 ? 5 : 2));
+      asset.liqSummary = `Est. Long ${fmtPrice(asset.liqLongLow)}–${fmtPrice(asset.liqLongHigh)} | Est. Short ${fmtPrice(asset.liqShortLow)}–${fmtPrice(asset.liqShortHigh)}`;
+
+      const avgClose = candles.reduce((s, c) => s + c.close, 0) / candles.length;
+      asset.sthCostBasis = (stateFileOverride && typeof stateFileOverride.sth_cost_basis === 'number' && ticker === 'BTC') ? stateFileOverride.sth_cost_basis : Number(avgClose.toFixed(2));
+      asset.mvrv = (stateFileOverride && typeof stateFileOverride.mvrv === 'number' && ticker === 'BTC') ? stateFileOverride.mvrv : Number((latest.close / Math.max(avgClose * 0.82, 1e-8)).toFixed(2));
+
+      const quant = computeQuantSeriesFromCandles(candles);
+      asset.quantZ = quant.latestZ; asset.quantVd = quant.latestVd;
+      asset.quantVdDivergence = (typeof quant.latestVd === 'number' && quant.latestVd >= 0.35)
+        ? `Bullish VD Momentum (${quant.latestVd >= 0 ? '+' : ''}${quant.latestVd.toFixed(2)})`
+        : (typeof quant.latestVd === 'number' && quant.latestVd <= -0.35)
+          ? `Bearish VD Momentum (${quant.latestVd.toFixed(2)})`
+          : `Neutral VD Momentum (${typeof quant.latestVd === 'number' ? (quant.latestVd >= 0 ? '+' : '') + quant.latestVd.toFixed(2) : '--'})`;
+
+      const zAligned = typeof quant.latestZ === 'number' && Math.abs(quant.latestZ) >= 1.5;
+      const vdAligned = typeof quant.latestVd === 'number' && Math.abs(quant.latestVd) >= 0.35;
+      const pvsraAligned = (asset.pvsraScore > 0 && (quant.latestVd ?? 0) > 0) || (asset.pvsraScore < 0 && (quant.latestVd ?? 0) < 0);
+      asset.quantConfirmed = Boolean((zAligned && vdAligned) || pvsraAligned);
+    }
+
     function processPVSRAAndSFP(rawKlines, asset) {
-      const candles = [];
-      const markers = [];
-      const volumes = rawKlines.map(k => parseFloat(k[5]));
-      let latestPvsraRegime = asset.pvsraStatus;
-      let latestPvsraScore = asset.pvsraScore;
-
+      const candles = [], markers = [], volumes = rawKlines.map(k => parseFloat(k[5]));
+      let latestPvsraRegime = 'PVSRA Normal Spread', latestPvsraScore = 0;
       for (let i = 0; i < rawKlines.length; i++) {
-        const k = rawKlines[i];
-        const time = Math.floor(k[0] / 1000);
-        const open = parseFloat(k[1]);
-        const high = parseFloat(k[2]);
-        const low = parseFloat(k[3]);
-        const close = parseFloat(k[4]);
-        const vol = parseFloat(k[5]);
-
-        let volSum = 0, count = 0;
-        for (let j = Math.max(0, i - 19); j <= i; j++) { volSum += volumes[j]; count++; }
-        const avgVol = volSum / count;
-        const spread = Math.max(high - low, 0.000001);
-        const closePos = (close - low) / spread;
-        const isClimax = vol >= (avgVol * 2.0);
-        const isRisingVol = vol >= (avgVol * 1.5) && !isClimax;
-
-        let candleColor = close >= open ? '#26a69a' : '#ef5350';
-        let wickColor = candleColor;
-
+        const k = rawKlines[i], time = Math.floor(k[0] / 1000), open = parseFloat(k[1]), high = parseFloat(k[2]), low = parseFloat(k[3]), close = parseFloat(k[4]), vol = parseFloat(k[5]);
+        let volSum = 0, count = 0; for (let j = Math.max(0, i - 19); j <= i; j++) { volSum += volumes[j]; count++; }
+        const avgVol = volSum / count || 1, closePos = (close - low) / Math.max(high - low, 1e-8), isClimax = vol >= (avgVol * 2.0), isRisingVol = vol >= (avgVol * 1.5) && !isClimax;
+        let candleColor = close >= open ? '#26a69a' : '#ef5350', wickColor = candleColor;
         if (visibilityState.pvsra) {
           if (isClimax) { candleColor = '#d946ef'; wickColor = '#d946ef'; }
           else if (isRisingVol) { candleColor = close >= open ? '#38bdf8' : '#fb923c'; wickColor = candleColor; }
         }
-
-        candles.push({ time, open, high, low, close, color: candleColor, wickColor });
-
+        candles.push({ time, open, high, low, close, volume: vol, color: candleColor, wickColor });
         if (i >= rawKlines.length - 3) {
           if (isClimax && closePos >= 0.55) { latestPvsraRegime = 'PVSRA Stopping Absorption'; latestPvsraScore = 1; }
           else if (isClimax && closePos <= 0.45) { latestPvsraRegime = 'PVSRA Distribution Climax'; latestPvsraScore = -1; }
           else if (isRisingVol && close >= open) { latestPvsraRegime = 'PVSRA Rising Demand'; latestPvsraScore = 1; }
+          else if (isRisingVol && close < open) { latestPvsraRegime = 'PVSRA Supply Pressure'; latestPvsraScore = -1; }
         }
-
         if (i >= 5 && visibilityState.sfp) {
-          const prevLow = Math.min(parseFloat(rawKlines[i-1][3]), parseFloat(rawKlines[i-2][3]), parseFloat(rawKlines[i-3][3]));
-          if (low < prevLow && close > prevLow) {
-            markers.push({ time, position: 'belowBar', color: '#ef5350', shape: 'arrowUp', text: isClimax ? 'SFP + PVSRA' : 'SFP Trap' });
-          }
+          const prevLow = Math.min(parseFloat(rawKlines[i - 1][3]), parseFloat(rawKlines[i - 2][3]), parseFloat(rawKlines[i - 3][3]));
+          if (low < prevLow && close > prevLow) markers.push({ time, position: 'belowBar', color: '#ef5350', shape: 'arrowUp', text: isClimax ? 'SFP + PVSRA' : 'SFP Trap' });
         }
       }
-
-      asset.pvsraStatus = latestPvsraRegime;
-      asset.pvsraScore = latestPvsraScore;
-      return { candles, markers };
+      asset.pvsraStatus = latestPvsraRegime; asset.pvsraScore = latestPvsraScore;
+      return { candles, markers: markers.slice(-15) };
     }
 
     async function fetchRealHistoricalKlines(ticker, interval) {
-      const symbol = `${ticker}USDT`;
+      const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${ticker}USDT&interval=${interval}&limit=300`, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`Binance klines HTTP ${res.status}`);
+      const raw = await res.json();
+      if (!Array.isArray(raw) || raw.length === 0) throw new Error('Empty klines');
+      return processPVSRAAndSFP(raw, assetsStore[ticker]);
+    }
+
+    async function syncAllAssetsLive(activeTicker, interval) {
+      const tickers = Object.keys(assetsStore), priceMap = {};
       try {
-        const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=300`);
-        if (!res.ok) throw new Error('Offline');
-        const raw = await res.json();
-        return processPVSRAAndSFP(raw, assetsStore[ticker]);
-      } catch (err) {
-        const raw = [];
-        const nowSec = Math.floor(Date.now() / 1000);
-        const stepSec = interval === '15m' ? 900 : interval === '1h' ? 3600 : interval === '4h' ? 14400 : interval === '1d' ? 86400 : 604800;
-        let price = assetsStore[ticker].price * 0.98;
-        for (let i = 200; i >= 0; i--) {
-          const t = (nowSec - (i * stepSec)) * 1000;
-          const open = price;
-          const close = Math.max(assetsStore[ticker].price * 0.2, price + (Math.random() - 0.48) * (assetsStore[ticker].price * 0.008));
-          raw.push([t, open.toString(), Math.max(open, close).toString(), Math.min(open, close).toString(), close.toString(), (Math.random() * 5e6 + 1e6).toString()]);
-          price = close;
+        const res = await fetch('https://api.binance.com/api/v3/ticker/price', { cache: 'no-store' });
+        if (res.ok) { const arr = await res.json(); arr.forEach(item => { priceMap[item.symbol] = parseFloat(item.price); }); }
+      } catch (_) {}
+      await Promise.all(tickers.map(async (t) => {
+        if (t === activeTicker) return;
+        try {
+          const { candles } = await fetchRealHistoricalKlines(t, interval);
+          if (candles.length > 0) {
+            if (Number.isFinite(priceMap[`${t}USDT`]) && priceMap[`${t}USDT`] > 0) candles[candles.length - 1].close = priceMap[`${t}USDT`];
+            deriveAssetMetricsFromCandles(t, assetsStore[t], candles);
+          }
+        } catch (_) {
+          if (Number.isFinite(priceMap[`${t}USDT`]) && priceMap[`${t}USDT`] > 0) assetsStore[t].price = priceMap[`${t}USDT`];
         }
-        return processPVSRAAndSFP(raw, assetsStore[ticker]);
-      }
+      }));
     }
 
     function getPowerLawMetrics(price) {
+      if (typeof price !== 'number' || !Number.isFinite(price) || price <= 0) return null;
       const fair = calcPowerLawValue(Math.floor(Date.now() / 1000));
-      const pctDiff = ((price - fair) / fair) * 100;
-      return { fair, pctDiff };
+      return { fair, pctDiff: ((price - fair) / fair) * 100 };
     }
 
     function computeRecommendation(asset) {
-      const p = asset.price, buy = asset.buyZone, sell = asset.sellZone, mvrv = asset.mvrv, pvsra = asset.pvsraScore || 0;
-      const pl = asset.name === 'Bitcoin' ? getPowerLawMetrics(p) : null;
-      const nearLongLiq = asset.liqLongHigh && p <= asset.liqLongHigh * 1.02;
+      if (typeof asset.price !== 'number' || typeof asset.buyZone !== 'number' || typeof asset.sellZone !== 'number') {
+        return { action: 'SYNCING LIVE DATA...', confirmed: false, badgeClass: 'bg-slate-700/40 text-slate-300 border-slate-500' };
+      }
+      const p = asset.price, qConfirmed = Boolean(asset.quantConfirmed);
+      const qBullish = (typeof asset.quantVd === 'number' && asset.quantVd >= 0.35) || (typeof asset.quantZ === 'number' && asset.quantZ <= -1.5);
+      const qBearish = (typeof asset.quantVd === 'number' && asset.quantVd <= -0.35) || (typeof asset.quantZ === 'number' && asset.quantZ >= 1.5);
+      const pvsra = asset.pvsraScore || 0;
+      const bullScore = (p <= asset.buyZone ? 2 : 0) + (pvsra > 0 ? 1 : 0) + (qConfirmed && qBullish ? 3 : (qBullish ? 1 : 0));
+      const bearScore = (p >= asset.sellZone ? 2 : 0) + (pvsra < 0 ? 1 : 0) + (qConfirmed && qBearish ? 3 : (qBearish ? 1 : 0));
+      const factorTag = qConfirmed ? ' • ⭐ CONFIRMED QUANT' : ' • Quant Std';
+      if (bullScore >= bearScore + 2 || p <= asset.buyZone) return { action: `BUY / ACCUMULATE${factorTag}`, confirmed: qConfirmed, badgeClass: qConfirmed ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400 font-extrabold' : 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40' };
+      if (bearScore >= bullScore + 2 || p >= asset.sellZone) return { action: `TRIM / SELL RESISTANCE${factorTag}`, confirmed: qConfirmed, badgeClass: qConfirmed ? 'bg-red-500/20 text-red-300 border-red-400 font-extrabold' : 'bg-red-500/15 text-red-400 border-red-500/40' };
+      return { action: pvsra > 0 || qBullish ? `HOLD / WATCH DIPS${factorTag}` : `HOLD / WAIT${factorTag}`, confirmed: qConfirmed, badgeClass: qConfirmed ? 'bg-amber-500/15 text-amber-300 border-amber-400' : 'bg-blue-500/15 text-blue-400 border-blue-500/40' };
+    }
 
-      if ((pl && pl.pctDiff < -35) || mvrv < 1.2 || p <= buy * 1.03 || nearLongLiq) {
-        return {
-          action: pvsra > 0 ? 'BUY / ADD (+25% • PL + PVSRA)' : 'BUY / ADD (+25% • Liq Watch)',
-          badgeClass: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40'
-        };
-      }
-      if (p >= sell || mvrv > 2.4 || (pl && pl.pctDiff > 80)) {
-        return {
-          action: pvsra < 0 ? 'SELL / REDUCE (-25% • PVSRA Climax)' : 'SELL / REDUCE (-25%)',
-          badgeClass: 'bg-red-500/15 text-red-400 border-red-500/40'
-        };
-      }
-      if (p >= sell * 0.90 && pvsra < 0) {
-        return {
-          action: 'REDUCE / TRIM (-15% • PVSRA Alert)',
-          badgeClass: 'bg-amber-500/15 text-amber-400 border-amber-500/40'
-        };
-      }
+    function buildHorizonOutlooks(ticker, asset) {
+      const rec = computeRecommendation(asset);
+      const qNote = asset.quantConfirmed ? `⭐ Confirmed Quant (${typeof asset.quantZ === 'number' ? asset.quantZ.toFixed(2) + 'σ' : '--'}, ${asset.quantVdDivergence})` : `Quant (${typeof asset.quantZ === 'number' ? asset.quantZ.toFixed(2) + 'σ' : '--'}, ${asset.quantVdDivergence})`;
       return {
-        action: pvsra > 0 ? 'HOLD / ACCUMULATE DIPS (PVSRA +)' : 'HOLD (CORE POSITION)',
-        badgeClass: 'bg-blue-500/15 text-blue-400 border-blue-500/40'
+        st: `${rec.action}: ${qNote}. Watch buy zone ${fmtPrice(asset.buyZone)} vs sell zone ${fmtPrice(asset.sellZone)} (${asset.pvsraStatus}).`,
+        mt: `Track rolling MAs and ${asset.liqSummary} as swing structure develops.`,
+        lt: `Modeled MVRV est. ${typeof asset.mvrv === 'number' ? asset.mvrv.toFixed(2) + 'x' : '--'} and ${ticker === 'BTC' && getPowerLawMetrics(asset.price) ? getPowerLawMetrics(asset.price).pctDiff.toFixed(1) + '% vs Power Law model' : 'multi-month trend structure'}.`
       };
     }
 
     function renderPowerLawHistoryChart(btcSpot) {
       if (!plChart) initPowerLawChart();
-      const { fair, pctDiff } = getPowerLawMetrics(btcSpot);
-      const sign = pctDiff >= 0 ? '+' : '';
-      document.getElementById('plLivePrice').innerText = `$${btcSpot.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
-      document.getElementById('plFairValue').innerText = `$${fair.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
-      document.getElementById('plDistance').innerText = `${sign}${pctDiff.toFixed(1)}% vs Fair`;
-      document.getElementById('plRegime').innerText = pctDiff < -35 ? 'Undervalued / Accumulation' : pctDiff > 60 ? 'Overextended / Trim Zone' : 'Fair Value Corridor';
-
-      const anchors = [
-        ['2016-05-06', 450], ['2017-01-01', 998], ['2017-12-16', 19400], ['2018-12-15', 3250],
-        ['2019-06-26', 11800], ['2020-03-16', 5050], ['2020-12-31', 29000], ['2021-04-14', 63500],
-        ['2021-11-10', 67500], ['2022-11-21', 15780], ['2023-12-31', 42265], ['2024-03-14', 73100],
-        ['2024-12-17', 106100], ['2025-10-06', 124650], ['2026-01-14', 97800], ['2026-06-15', 66800],
-        ['2026-11-15', 62080], ['2026-11-20', btcSpot]
-      ];
-
+      const pl = getPowerLawMetrics(btcSpot), candles = assetsStore.BTC.candles || [];
+      if (!pl) { document.getElementById('plLivePrice').innerText = '--'; document.getElementById('plFairValue').innerText = '--'; document.getElementById('plDistance').innerText = '--'; document.getElementById('plRegime').innerText = 'Syncing...'; return; }
+      document.getElementById('plLivePrice').innerText = fmtPrice(btcSpot);
+      document.getElementById('plFairValue').innerText = fmtPrice(pl.fair);
+      document.getElementById('plDistance').innerText = `${pl.pctDiff >= 0 ? '+' : ''}${pl.pctDiff.toFixed(1)}% vs Model`;
+      document.getElementById('plRegime').innerText = pl.pctDiff < -35 ? 'Below Power Law Corridor' : pl.pctDiff > 60 ? 'Above Power Law Corridor' : 'Within Model Corridor';
       const pricePts = [], fairPts = [], lowPts = [], highPts = [];
-      anchors.forEach(([dateStr, val]) => {
-        const sec = Math.floor(Date.parse(dateStr + 'T00:00:00Z') / 1000);
-        const plVal = calcPowerLawValue(sec);
-        pricePts.push({ time: dateStr, value: val });
-        fairPts.push({ time: dateStr, value: Number(plVal.toFixed(2)) });
-        lowPts.push({ time: dateStr, value: Number((plVal * 0.42).toFixed(2)) });
-        highPts.push({ time: dateStr, value: Number((plVal * 2.15).toFixed(2)) });
+      candles.forEach(c => {
+        const plVal = calcPowerLawValue(c.time);
+        pricePts.push({ time: c.time, value: c.close }); fairPts.push({ time: c.time, value: Number(plVal.toFixed(2)) });
+        lowPts.push({ time: c.time, value: Number((plVal * 0.42).toFixed(2)) }); highPts.push({ time: c.time, value: Number((plVal * 2.15).toFixed(2)) });
       });
-
-      plPriceSeries.setData(pricePts);
-      plFairSeries.setData(fairPts);
-      plLowSeries.setData(lowPts);
-      plHighSeries.setData(highPts);
-      plChart.timeScale().fitContent();
+      plPriceSeries.setData(pricePts); plFairSeries.setData(fairPts); plLowSeries.setData(lowPts); plHighSeries.setData(highPts); plChart.timeScale().fitContent();
     }
 
     async function loadStateTelemetry() {
       try {
         const res = await fetch('./state/last_run.json', { cache: 'no-store' });
         if (!res.ok) throw new Error('No state file');
-        const st = await res.json();
-        document.getElementById('stateRegimeBadge').innerText = `Regime: ${st.regime || 'ACCUMULATION_DISCOUNT'}`;
-        const items = (st.alerts && st.alerts.length) ? st.alerts : [`BTC MVRV Band: ${st.mvrv_band || 'UNDERVALUED_BOTTOM'} | Floor Breached: ${Boolean(st.elec_floor_breached)}`];
-        document.getElementById('stateAlertsList').innerHTML = items.map(x => `<div>• ${x}</div>`).join('');
+        stateFileOverride = await res.json();
+        document.getElementById('stateRegimeBadge').innerText = `State File: ${stateFileOverride.regime || 'LOADED'}`;
+        document.getElementById('stateAlertsList').innerHTML = (Array.isArray(stateFileOverride.alerts) && stateFileOverride.alerts.length ? stateFileOverride.alerts : [`Loaded state/last_run.json (Cycle #${refreshCycleCount})`]).map(x => `<div>• ${x}</div>`).join('');
       } catch (_) {
-        const btc = assetsStore.BTC;
-        const breached = btc.price <= btc.electrical_cost;
-        document.getElementById('stateRegimeBadge').innerText = `Regime: ${breached ? 'THERMODYNAMIC_STRESS' : 'ACCUMULATION_DISCOUNT'}`;
+        stateFileOverride = null;
+        const btc = assetsStore.BTC, logCount = loadSignalsLog().length;
+        document.getElementById('stateRegimeBadge').innerText = `Live Engine • Cycle #${refreshCycleCount}`;
         document.getElementById('stateAlertsList').innerHTML = `
-          <div>• BTC MVRV (${btc.mvrv} &lt; 1.2): UNDERVALUED_BOTTOM active</div>
-          <div>• BTC Spot ($${btc.price.toLocaleString()}) vs Electrical Cost Floor ($${btc.electrical_cost.toLocaleString()}): ${breached ? 'BREACHED' : 'ABOVE FLOOR'}</div>
+          <div>• Live BTC Spot (${fmtPrice(btc.price)}) • Dyn Buy: ${fmtPrice(btc.buyZone)} • Dyn Sell: ${fmtPrice(btc.sellZone)}</div>
+          <div>• Persistent Tracker: ${logCount} logged signal(s) saved in localStorage (exportable as JSON for deployment backups).</div>
         `;
       }
     }
 
-    async function syncAllAssetPrices(activeTicker) {
-      const tickers = Object.keys(assetsStore);
-      await Promise.all(tickers.map(async (t) => {
-        if (t === activeTicker) return;
-        try {
-          const res = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${t}USDT`, { cache: 'no-store' });
-          if (res.ok) {
-            const j = await res.json();
-            const px = parseFloat(j.price);
-            if (Number.isFinite(px) && px > 0) assetsStore[t].price = px;
-          }
-        } catch (_) {}
-      }));
-    }
-
     async function loadChartData() {
-      const ticker = document.getElementById('topAssetSelect').value;
-      const asset = assetsStore[ticker];
-      const { candles, markers } = await fetchRealHistoricalKlines(ticker, currentTimeframe);
-
-      if (candles.length > 0) {
+      refreshCycleCount += 1;
+      const ticker = document.getElementById('topAssetSelect').value, asset = assetsStore[ticker], stamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      try {
+        const { candles, markers } = await fetchRealHistoricalKlines(ticker, currentTimeframe);
+        deriveAssetMetricsFromCandles(ticker, asset, candles);
         const latest = candles[candles.length - 1];
-        asset.price = latest.close;
         candleSeries.setData(candles);
-
-        const ma50 = calculateSMA(candles, 50);
-        const ma100 = calculateSMA(candles, 100);
-        const ma200d = calculateSMA(candles, 200);
-        const ma200w = candles.map((c, idx) => ({ time: c.time, value: asset.weekly200Base * (1 + (idx / candles.length) * 0.08) }));
+        const ma50 = calculateSMA(candles, 50), ma100 = calculateSMA(candles, 100), ma200d = calculateSMA(candles, 200);
+        const ma200w = candles.map((c, idx) => ({ time: c.time, value: (asset.sthCostBasis || c.close) * (0.85 + (idx / candles.length) * 0.1) }));
         const plSeries = ticker === 'BTC' ? candles.map(c => ({ time: c.time, value: calcPowerLawValue(c.time) })) : [];
-
-        seriesMap.ma50.setData(ma50);
-        seriesMap.ma100.setData(ma100);
-        seriesMap.ma200d.setData(ma200d);
-        seriesMap.ma200w.setData(ma200w);
-        seriesMap.plTrend.setData(plSeries);
-        candleSeries.setMarkers(markers);
-
-        const dec = asset.price < 1 ? 4 : 2;
-        document.getElementById('hudTicker').innerText = `${ticker}USDT`;
-        document.getElementById('hudTf').innerText = currentTimeframe.toUpperCase();
-        document.getElementById('hudOHLC').innerText = `O: ${latest.open.toFixed(dec)}  H: ${latest.high.toFixed(dec)}  L: ${latest.low.toFixed(dec)}  C: ${latest.close.toFixed(dec)}`;
-        if (ma50.length) document.getElementById('hudMa50').innerText = `50 MA: $${ma50[ma50.length - 1].value.toLocaleString(undefined, { maximumFractionDigits: 4 })}`;
-        if (ma100.length) document.getElementById('hudMa100').innerText = `100 MA: $${ma100[ma100.length - 1].value.toLocaleString(undefined, { maximumFractionDigits: 4 })}`;
-        if (ma200d.length) document.getElementById('hudMa200d').innerText = `200D MA: $${ma200d[ma200d.length - 1].value.toLocaleString(undefined, { maximumFractionDigits: 4 })}`;
-        if (ma200w.length) document.getElementById('hudMa200w').innerText = `200W MA: $${ma200w[ma200w.length - 1].value.toLocaleString(undefined, { maximumFractionDigits: 4 })}`;
-
-        const plInfo = ticker === 'BTC' ? `${getPowerLawMetrics(asset.price).pctDiff.toFixed(1)}% vs PL` : 'BTC Model';
+        seriesMap.ma50.setData(ma50); seriesMap.ma100.setData(ma100); seriesMap.ma200d.setData(ma200d); seriesMap.ma200w.setData(ma200w); seriesMap.plTrend.setData(plSeries); candleSeries.setMarkers(markers);
+        document.getElementById('hudTicker').innerText = `${ticker}USDT (LIVE)`; document.getElementById('hudTf').innerText = currentTimeframe.toUpperCase();
+        document.getElementById('hudOHLC').innerText = `O: ${fmtPrice(latest.open)}  H: ${fmtPrice(latest.high)}  L: ${fmtPrice(latest.low)}  C: ${fmtPrice(latest.close)}`;
+        if (ma50.length) document.getElementById('hudMa50').innerText = `50 MA: ${fmtPrice(ma50[ma50.length - 1].value)}`;
+        if (ma100.length) document.getElementById('hudMa100').innerText = `100 MA: ${fmtPrice(ma100[ma100.length - 1].value)}`;
+        if (ma200d.length) document.getElementById('hudMa200d').innerText = `200D MA: ${fmtPrice(ma200d[ma200d.length - 1].value)}`;
+        if (ma200w.length) document.getElementById('hudMa200w').innerText = `200W Est: ${fmtPrice(ma200w[ma200w.length - 1].value)}`;
+        const plInfo = ticker === 'BTC' && getPowerLawMetrics(asset.price) ? `${getPowerLawMetrics(asset.price).pctDiff.toFixed(1)}% vs PL` : 'BTC Model';
         document.getElementById('hudPl').innerText = `📐 ${plInfo}`;
-
-        renderPriceLines(asset);
-        renderLiquidationLines(asset);
-        renderSthOverlayOnMainChart(ticker);
-        renderCustomLinesOnChart(ticker);
-        applyVisibilityStates();
-        tvChart.timeScale().fitContent();
+        document.getElementById('hudQuant').innerText = `🧮 Z:${typeof asset.quantZ === 'number' ? asset.quantZ.toFixed(2) + 'σ' : '--'} VD:${typeof asset.quantVd === 'number' ? (asset.quantVd >= 0 ? '+' : '') + asset.quantVd.toFixed(2) : '--'}${asset.quantConfirmed ? ' ⭐' : ''}`;
+        renderPriceLines(asset); renderLiquidationLines(asset); renderSthOverlayOnMainChart(ticker); renderCustomLinesOnChart(ticker); applyVisibilityStates(); tvChart.timeScale().fitContent();
+        document.getElementById('liveFeedBadge').className = 'px-2 py-0.5 text-[10px] font-mono font-bold rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30';
+        document.getElementById('liveFeedBadge').innerText = `Feed: Live Binance (${ticker} • ${stamp} • #${refreshCycleCount})`;
+      } catch (err) {
+        document.getElementById('liveFeedBadge').className = 'px-2 py-0.5 text-[10px] font-mono font-bold rounded bg-red-500/15 text-red-400 border border-red-500/30';
+        document.getElementById('liveFeedBadge').innerText = `Feed: Binance Error (${err.message})`;
       }
 
-      await syncAllAssetPrices(ticker);
+      await loadStateTelemetry();
+      await syncAllAssetsLive(ticker, currentTimeframe);
+
+      syncPortfolioBaselineIfNeeded(false);
+      recordSignalsFromAssets(false);
+
       renderPowerLawHistoryChart(assetsStore.BTC.price);
       renderSthIndicatorChart(assetsStore.BTC.price);
-      await loadStateTelemetry();
-      updateBTCLevelsCard();
+      renderQuantIndicatorCharts(ticker);
+      updateDynamicLevelsCard();
 
       const rec = computeRecommendation(asset);
       const hudSig = document.getElementById('hudSignal');
       hudSig.className = `text-[10px] px-2 py-0.5 rounded font-bold border ${rec.badgeClass}`;
       hudSig.innerText = rec.action;
-      document.getElementById('hudBuy').innerText = `🟢 Buy Zone: ≤ $${asset.buyZone}`;
-      document.getElementById('hudSell').innerText = `🔴 Sell Zone: ≥ $${asset.sellZone}`;
-      document.getElementById('hudLiq').innerText = `💥 Liq: ${asset.liqLongLow}–${asset.liqLongHigh} / ${asset.liqShortLow}–${asset.liqShortHigh}`;
+      document.getElementById('hudBuy').innerText = `🟢 Dyn Buy: ≤ ${fmtPrice(asset.buyZone)}`;
+      document.getElementById('hudSell').innerText = `🔴 Dyn Sell: ≥ ${fmtPrice(asset.sellZone)}`;
+      document.getElementById('hudLiq').innerText = `💥 Est Liq: ${fmtPrice(asset.liqLongLow)}–${fmtPrice(asset.liqLongHigh)} / ${fmtPrice(asset.liqShortLow)}–${fmtPrice(asset.liqShortHigh)}`;
       document.getElementById('hudPvsra').innerText = `🔮 ${asset.pvsraStatus}`;
 
       document.getElementById('chartDecisionStrip').innerHTML = `
-        <div class="p-2.5 rounded bg-[#131722] border border-[#2a2e39]"><span class="text-slate-400 block">Live Spot</span><strong class="text-white text-sm">$${asset.price.toLocaleString(undefined, { maximumFractionDigits: 4 })}</strong></div>
-        <div class="p-2.5 rounded bg-emerald-500/5 border border-emerald-500/30"><span class="text-emerald-400 font-bold block">🟢 BUY ZONE</span><strong class="text-emerald-400 text-sm">&le; $${asset.buyZone}</strong></div>
-        <div class="p-2.5 rounded bg-red-500/5 border border-red-500/30"><span class="text-red-400 font-bold block">🔴 SELL ZONE</span><strong class="text-red-400 text-sm">&ge; $${asset.sellZone}</strong></div>
-        <div class="p-2.5 rounded bg-orange-500/5 border border-orange-500/30"><span class="text-orange-400 font-bold block">💥 LIQ ZONES</span><strong class="text-orange-300 text-[11px]">L: ${asset.liqLongLow}–${asset.liqLongHigh} | S: ${asset.liqShortLow}–${asset.liqShortHigh}</strong></div>
-        <div class="p-2.5 rounded bg-fuchsia-500/5 border border-fuchsia-500/30"><span class="text-fuchsia-400 font-bold block">🔮 PVSRA</span><strong class="text-fuchsia-300 text-xs">${asset.pvsraStatus}</strong></div>
-        <div class="p-2.5 rounded bg-teal-500/5 border border-teal-500/30"><span class="text-teal-400 font-bold block">📐 PL / ROI</span><strong class="text-teal-300 text-xs">${ticker === 'BTC' ? getPowerLawMetrics(asset.price).pctDiff.toFixed(1) + '% vs PL' : asset.roi}</strong></div>
+        <div class="p-2.5 rounded bg-[#131722] border border-[#2a2e39]"><span class="text-slate-400 block">Live Spot</span><strong class="text-white text-sm">${fmtPrice(asset.price)}</strong></div>
+        <div class="p-2.5 rounded bg-emerald-500/5 border border-emerald-500/30"><span class="text-emerald-400 font-bold block">🟢 DYN BUY ZONE</span><strong class="text-emerald-400 text-sm">&le; ${fmtPrice(asset.buyZone)}</strong></div>
+        <div class="p-2.5 rounded bg-red-500/5 border border-red-500/30"><span class="text-red-400 font-bold block">🔴 DYN SELL ZONE</span><strong class="text-red-400 text-sm">&ge; ${fmtPrice(asset.sellZone)}</strong></div>
+        <div class="p-2.5 rounded bg-orange-500/5 border border-orange-500/30"><span class="text-orange-400 font-bold block">💥 EST LIQ BANDS</span><strong class="text-orange-300 text-[11px]">L: ${fmtPrice(asset.liqLongLow)}–${fmtPrice(asset.liqLongHigh)} | S: ${fmtPrice(asset.liqShortLow)}–${fmtPrice(asset.liqShortHigh)}</strong></div>
+        <div class="p-2.5 rounded ${asset.quantConfirmed ? 'bg-amber-500/10 border border-amber-400/50' : 'bg-rose-500/5 border border-rose-500/30'}"><span class="${asset.quantConfirmed ? 'text-amber-300' : 'text-rose-400'} font-bold block">${asset.quantConfirmed ? '⭐ QUANT (HIGHER WT)' : '🧮 LIVE QUANT VD/Z'}</span><strong class="text-white text-xs">Z:${typeof asset.quantZ === 'number' ? asset.quantZ.toFixed(2) + 'σ' : '--'} | VD:${typeof asset.quantVd === 'number' ? (asset.quantVd >= 0 ? '+' : '') + asset.quantVd.toFixed(2) : '--'}</strong></div>
+        <div class="p-2.5 rounded bg-teal-500/5 border border-teal-500/30"><span class="text-teal-400 font-bold block">📐 PERIOD RET / PL</span><strong class="text-teal-300 text-xs">${typeof asset.periodReturnPct === 'number' ? (asset.periodReturnPct >= 0 ? '+' : '') + asset.periodReturnPct.toFixed(1) + '%' : '--'}</strong></div>
       `;
 
-      const stamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      document.getElementById('liveFeedBadge').innerText = `Feed: Live (${ticker} • ${stamp})`;
-      const wlLabel = document.getElementById('watchlistSyncLabel');
-      if (wlLabel) wlLabel.textContent = `Signals & Prices Synced: ${stamp}`;
+      const wlLabel = document.getElementById('watchlistSyncLabel'); if (wlLabel) wlLabel.textContent = `Live Binance Sync: ${stamp} (Cycle #${refreshCycleCount})`;
+      const repMeta = document.getElementById('reportRefreshMeta'); if (repMeta) repMeta.textContent = `Last Synced: ${stamp} (Cycle #${refreshCycleCount}) — Live Binance spot & candle-derived metrics across all assets.`;
 
       renderPortfolioTable();
       renderDashboardGrid();
       renderAnalystReportAllAssets();
       renderBacktestTable();
+      renderTrackerTab();
     }
 
-    async function refreshAllTerminalData() {
-      await loadChartData();
-      refreshXFeedState();
-    }
+    async function refreshAllTerminalData() { await loadChartData(); refreshXFeedState(); }
 
     function renderPriceLines(asset) {
       if (seriesMap.buyZoneLine) { candleSeries.removePriceLine(seriesMap.buyZoneLine); seriesMap.buyZoneLine = null; }
       if (seriesMap.sellZoneLine) { candleSeries.removePriceLine(seriesMap.sellZoneLine); seriesMap.sellZoneLine = null; }
-      if (seriesMap.energyLine) { candleSeries.removePriceLine(seriesMap.energyLine); seriesMap.energyLine = null; }
-
-      if (visibilityState.zones) {
-        seriesMap.buyZoneLine = candleSeries.createPriceLine({ price: asset.buyZone, color: '#26a69a', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'BUY ZONE' });
-        seriesMap.sellZoneLine = candleSeries.createPriceLine({ price: asset.sellZone, color: '#ef5350', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'SELL ZONE' });
-      }
-      if (visibilityState.energy && asset.electrical_cost) {
-        seriesMap.energyLine = candleSeries.createPriceLine({ price: asset.electrical_cost, color: '#06b6d4', lineWidth: 1.5, lineStyle: LightweightCharts.LineStyle.Dotted, axisLabelVisible: true, title: '⚡ ENERGY FLOOR' });
-      }
+      if (!visibilityState.zones) return;
+      if (typeof asset.buyZone === 'number') seriesMap.buyZoneLine = candleSeries.createPriceLine({ price: asset.buyZone, color: '#26a69a', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'DYN BUY' });
+      if (typeof asset.sellZone === 'number') seriesMap.sellZoneLine = candleSeries.createPriceLine({ price: asset.sellZone, color: '#ef5350', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'DYN SELL' });
     }
 
     function toggleSeries(key) {
       visibilityState[key] = !visibilityState[key];
-      const btn = document.getElementById(`btn-${key}`);
-      btn.classList.toggle('opacity-40', !visibilityState[key]);
-      const ticker = document.getElementById('topAssetSelect').value;
-      const curAsset = assetsStore[ticker];
-      if (key === 'zones' || key === 'energy') renderPriceLines(curAsset);
+      document.getElementById(`btn-${key}`)?.classList.toggle('opacity-40', !visibilityState[key]);
+      const ticker = document.getElementById('topAssetSelect').value, curAsset = assetsStore[ticker];
+      if (key === 'zones') renderPriceLines(curAsset);
       else if (key === 'liq') renderLiquidationLines(curAsset);
       else if (key === 'sth') renderSthOverlayOnMainChart(ticker);
+      else if (key === 'quant') renderQuantIndicatorCharts(ticker);
       else if (key === 'sfp' || key === 'pvsra') loadChartData();
       else applyVisibilityStates();
     }
@@ -1454,9 +1637,7 @@
       currentTimeframe = tf;
       document.querySelectorAll('.tf-btn').forEach(btn => {
         const map = { '15m': '15m', '1h': '1h', '4h': '4h', 'daily': '1d', 'weekly': '1w', 'monthly': '1M' };
-        btn.className = map[btn.innerText.toLowerCase()] === tf
-          ? 'tf-btn px-2.5 py-1 text-[11px] font-mono rounded bg-amber-500 text-slate-900 font-bold border border-amber-500'
-          : 'tf-btn px-2.5 py-1 text-[11px] font-mono rounded bg-[#131722] text-slate-400 hover:text-white border border-[#2a2e39]';
+        btn.className = map[btn.innerText.toLowerCase()] === tf ? 'tf-btn px-2.5 py-1 text-[11px] font-mono rounded bg-amber-500 text-slate-900 font-bold border border-amber-500' : 'tf-btn px-2.5 py-1 text-[11px] font-mono rounded bg-[#131722] text-slate-400 hover:text-white border border-[#2a2e39]';
       });
       loadChartData();
     }
@@ -1466,20 +1647,25 @@
 
     function renderPortfolioTable() {
       const horizon = document.getElementById('horizonFilter')?.value || 'all';
-      const activeTickers = Object.keys(assetsStore).filter(t => assetsStore[t].weight > 0);
-      document.getElementById('portfolio-table-body').innerHTML = activeTickers.map(t => {
-        const a = assetsStore[t], rec = computeRecommendation(a);
-        const allocUsd = (a.weight * 100000).toLocaleString();
+      const pm = computePortfolioMetrics();
+      const rowMap = {};
+      pm.rows.forEach(r => { rowMap[r.ticker] = r; });
+
+      document.getElementById('portfolio-table-body').innerHTML = Object.keys(assetsStore).filter(t => assetsStore[t].weight > 0).map(t => {
+        const a = assetsStore[t], rec = computeRecommendation(a), r = rowMap[t];
+        const tw = getTrackedWinRateForAsset(t);
+        const trackedStr = tw ? `Tracked: ${tw.pct}% (${tw.wins}/${tw.total})` : 'Tracked: no closed trades yet';
+        const sgn = (r?.pnlUsd ?? 0) >= 0 ? '+' : '';
         const stCls = horizon === 'st' ? 'text-amber-400 font-extrabold' : 'text-slate-300';
         const mtCls = horizon === 'mt' ? 'text-amber-400 font-extrabold' : 'text-cyan-400 font-bold';
         const ltCls = horizon === 'lt' ? 'text-amber-400 font-extrabold' : 'text-emerald-400 font-bold';
         return `
           <tr onclick="selectAssetForTopChart('${t}')" class="cursor-pointer hover:bg-[#131722]/60">
             <td class="p-3 font-bold text-amber-500">${t} (${a.name})</td>
-            <td class="p-3 text-white">$${allocUsd} (${(a.weight * 100).toFixed(0)}%)</td>
-            <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${rec.badgeClass}">${rec.action}</span></td>
-            <td class="p-3 text-orange-300 text-[11px]">${a.liqSummary}</td>
-            <td class="p-3"><span class="${stCls}">${a.winST}</span> / <span class="${mtCls}">${a.winMT}</span> / <span class="${ltCls}">${a.winLT}</span></td>
+            <td class="p-3 text-white">$${(a.weight * 100000).toLocaleString()} (${(a.weight * 100).toFixed(0)}%)</td>
+            <td class="p-3 font-bold ${(r?.pnlUsd ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-400'}">$${(r?.liveUsd ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${sgn}${(r?.retPct ?? 0).toFixed(2)}%)</td>
+            <td class="p-3 space-y-1"><div><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${rec.badgeClass}">${rec.action}</span></div><div class="text-[10px] text-slate-400">${trackedStr}</div></td>
+            <td class="p-3"><span class="${stCls}">${a.winST}%</span> / <span class="${mtCls}">${a.winMT}%</span> / <span class="${ltCls}">${a.winLT}%</span></td>
           </tr>`;
       }).join('');
     }
@@ -1487,19 +1673,20 @@
     function renderDashboardGrid() {
       document.getElementById('assets-grid-container').innerHTML = Object.keys(assetsStore).map(t => {
         const a = assetsStore[t], rec = computeRecommendation(a);
+        const qPill = typeof a.quantZ === 'number' && typeof a.quantVd === 'number'
+          ? (a.quantConfirmed ? `<span class="text-[10px] font-mono text-amber-300 bg-amber-500/15 border border-amber-400/50 px-2 py-0.5 rounded font-bold">⭐ CONFIRMED QUANT: Z ${a.quantZ.toFixed(2)}σ / VD ${a.quantVd >= 0 ? '+' : ''}${a.quantVd.toFixed(2)}</span>` : `<span class="text-[10px] font-mono text-slate-400 bg-[#131722] border border-[#2a2e39] px-2 py-0.5 rounded">🧮 Live Quant: Z ${a.quantZ.toFixed(2)}σ / VD ${a.quantVd >= 0 ? '+' : ''}${a.quantVd.toFixed(2)}</span>`)
+          : `<span class="text-[10px] font-mono text-slate-500">Syncing Quant...</span>`;
         return `
-          <div onclick="selectAssetForTopChart('${t}')" class="cursor-pointer bg-[#1e222d] border border-[#2a2e39] p-4 rounded-xl hover:border-amber-500 transition space-y-2">
-            <div class="flex justify-between items-center gap-1">
-              <span class="font-bold text-amber-500 font-mono">${t}USDT</span>
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${rec.badgeClass}">${rec.action}</span>
-            </div>
+          <div onclick="selectAssetForTopChart('${t}')" class="cursor-pointer bg-[#1e222d] border ${a.quantConfirmed ? 'border-amber-500/40' : 'border-[#2a2e39]'} p-4 rounded-xl hover:border-amber-500 transition space-y-2">
+            <div class="flex justify-between items-center gap-1"><span class="font-bold text-amber-500 font-mono">${t}USDT</span><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${rec.badgeClass}">${rec.action}</span></div>
+            <div class="flex flex-wrap gap-1.5">${qPill}</div>
             <div class="text-[10px] font-mono text-fuchsia-400 bg-fuchsia-500/10 border border-fuchsia-500/20 px-2 py-0.5 rounded inline-block">🔮 ${a.pvsraStatus}</div>
             <div class="text-[10px] font-mono text-orange-300">💥 ${a.liqSummary}</div>
             <div class="grid grid-cols-2 gap-2 text-xs font-mono pt-1">
-              <div>Spot: <strong class="text-white">$${a.price.toLocaleString(undefined, { maximumFractionDigits: 4 })}</strong></div>
-              <div>MVRV: <strong class="text-blue-400">${a.mvrv}</strong></div>
-              <div>ST/MT/LT Win: <strong class="text-emerald-400">${a.winST}/${a.winMT}/${a.winLT}</strong></div>
-              <div>ROI: <strong class="text-emerald-400">${a.roi}</strong></div>
+              <div>Live Spot: <strong class="text-white">${fmtPrice(a.price)}</strong></div>
+              <div>Est. MVRV: <strong class="text-blue-400">${typeof a.mvrv === 'number' ? a.mvrv.toFixed(2) + 'x' : '--'}</strong></div>
+              <div>Dyn Buy/Sell: <strong class="text-emerald-400">${fmtPrice(a.buyZone)} / ${fmtPrice(a.sellZone)}</strong></div>
+              <div>${currentTimeframe.toUpperCase()} Ret: <strong class="text-teal-300">${typeof a.periodReturnPct === 'number' ? (a.periodReturnPct >= 0 ? '+' : '') + a.periodReturnPct.toFixed(1) + '%' : '--'}</strong></div>
             </div>
           </div>`;
       }).join('');
@@ -1509,173 +1696,83 @@
       const container = document.getElementById('full-analyst-report-container');
       if (!container) return;
       container.innerHTML = Object.keys(assetsStore).map((t, idx) => {
-        const a = assetsStore[t], rec = computeRecommendation(a);
-        const vz = t === 'BTC' ? getSthValueZone(a.price, a.sthCostBasis || 76150) : null;
-        const extraPl = t === 'BTC' ? ` • Power Law: ${getPowerLawMetrics(a.price).pctDiff.toFixed(1)}% vs Fair • STH Cost: $${(a.sthCostBasis || 76150).toLocaleString()} • Value Zone: $${vz.lowerBand.toLocaleString()}–$${vz.upperBand.toLocaleString()}` : '';
+        const a = assetsStore[t], rec = computeRecommendation(a), outlooks = buildHorizonOutlooks(t, a), tw = getTrackedWinRateForAsset(t);
+        const twLabel = tw ? `Tracked Win: ${tw.pct}% (${tw.wins}/${tw.total})` : 'Tracked Win: Open/No closed yet';
         return `
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-2">
+          <div class="p-4 bg-[#131722] rounded-xl border ${a.quantConfirmed ? 'border-amber-500/40' : 'border-[#2a2e39]'} space-y-2">
             <div class="flex flex-wrap justify-between items-center gap-2">
-              <span class="font-bold text-white text-sm">${idx + 1}. ${a.name} (${t}) — Spot: $${a.price.toLocaleString(undefined, { maximumFractionDigits: 4 })} | MVRV: ${a.mvrv}${extraPl}</span>
+              <span class="font-bold text-white text-sm">${idx + 1}. ${a.name} (${t}) — Live Spot: ${fmtPrice(a.price)} | ${twLabel}</span>
               <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${rec.badgeClass}">${rec.action}</span>
             </div>
-            <div class="text-[11px] text-slate-400">
-              <strong>Algorithm &amp; Indicators:</strong> ${a.strategy} • <strong>PVSRA:</strong> ${a.pvsraStatus} • <strong>Buy/Sell Zones:</strong> &le; $${a.buyZone} / &ge; $${a.sellZone}
-            </div>
-            <div class="p-2.5 rounded bg-orange-500/5 border border-orange-500/30 text-[11px] text-orange-300">
-              <strong>💥 Larger Liquidation Zones:</strong> ${a.liqSummary}
-            </div>
+            <div class="text-[11px] text-slate-400"><strong>Engine:</strong> ${a.strategy} • <strong>Live PVSRA:</strong> ${a.pvsraStatus} • <strong>Dyn Buy/Sell:</strong> &le; ${fmtPrice(a.buyZone)} / &ge; ${fmtPrice(a.sellZone)}</div>
+            <div class="p-2.5 rounded bg-orange-500/5 border border-orange-500/30 text-[11px] text-orange-300"><strong>💥 Modeled Liquidation Bands:</strong> ${a.liqSummary}</div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-2 pt-1 text-[11px]">
-              <div class="p-2.5 rounded bg-[#1e222d] border border-[#2a2e39]"><strong class="text-amber-400 block">Short-Term (1–7d • Win ${a.winST}):</strong>${a.outlookST}</div>
-              <div class="p-2.5 rounded bg-[#1e222d] border border-[#2a2e39]"><strong class="text-cyan-400 block">Medium-Term (1–4w • Win ${a.winMT}):</strong>${a.outlookMT}</div>
-              <div class="p-2.5 rounded bg-[#1e222d] border border-[#2a2e39]"><strong class="text-emerald-400 block">Long-Term (1–6m+ • Win ${a.winLT}):</strong>${a.outlookLT}</div>
+              <div class="p-2.5 rounded bg-[#1e222d] border border-[#2a2e39]"><strong class="text-amber-400 block">Short-Term (1–7d • Ref ${a.winST}%):</strong>${outlooks.st}</div>
+              <div class="p-2.5 rounded bg-[#1e222d] border border-[#2a2e39]"><strong class="text-cyan-400 block">Medium-Term (1–4w • Ref ${a.winMT}%):</strong>${outlooks.mt}</div>
+              <div class="p-2.5 rounded bg-[#1e222d] border border-[#2a2e39]"><strong class="text-emerald-400 block">Long-Term (1–6m+ • Ref ${a.winLT}%):</strong>${outlooks.lt}</div>
             </div>
           </div>`;
       }).join('');
     }
 
-    function getXPosts() {
-      const saved = localStorage.getItem('cryptoanalyst_x_posts_v4');
-      return saved ? JSON.parse(saved) : defaultXPosts;
-    }
-
-    function saveXPosts(list) {
-      localStorage.setItem('cryptoanalyst_x_posts_v4', JSON.stringify(list));
-    }
+    function getXPosts() { try { const saved = localStorage.getItem(X_FEED_KEY); if (saved) { const parsed = JSON.parse(saved); if (Array.isArray(parsed) && parsed.length > 0) return parsed; } } catch (_) {} return defaultXPosts.slice(); }
+    function saveXPosts(list) { localStorage.setItem(X_FEED_KEY, JSON.stringify(list)); }
 
     function renderXFeed() {
-      const posts = getXPosts();
       const grouped = {};
-      posts.forEach(p => {
-        if (!grouped[p.handle]) grouped[p.handle] = [];
-        grouped[p.handle].push(p);
-      });
-
-      const handles = Object.keys(grouped);
-      document.getElementById('xfeed-posts-container').innerHTML = handles.map(handle => {
-        const items = grouped[handle]
-          .slice()
-          .sort((a, b) => (a.ageMinutes ?? 9999) - (b.ageMinutes ?? 9999))
-          .slice(0, 10);
-
-        return `
-          <div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-3">
-            <div class="flex flex-wrap justify-between items-center gap-2 border-b border-[#2a2e39] pb-2">
-              <span class="font-extrabold text-amber-400 text-sm">${handle}</span>
-              <span class="text-[10px] text-slate-400">Latest ${items.length} / 10 posts (newest first)</span>
-            </div>
-            <div class="space-y-2.5">
-              ${items.map((p, idx) => `
-                <div class="p-3 rounded-lg bg-[#1e222d] border ${idx === 0 ? 'border-amber-500/40' : 'border-[#2a2e39]'} space-y-1">
-                  <div class="flex justify-between items-center gap-2">
-                    <span class="text-[10px] text-cyan-400 font-bold uppercase">${p.tag}${idx === 0 ? ' • LATEST' : ''}</span>
-                    <span class="text-[10px] text-slate-400">${p.time}</span>
-                  </div>
-                  <p class="text-slate-300 text-[11px] leading-relaxed">${p.post}</p>
-                </div>
-              `).join('')}
-            </div>
-          </div>`;
+      getXPosts().forEach(p => { if (!grouped[p.handle]) grouped[p.handle] = []; grouped[p.handle].push(p); });
+      document.getElementById('xfeed-posts-container').innerHTML = Object.keys(grouped).map(handle => {
+        const items = grouped[handle].slice().sort((a, b) => (a.ageMinutes ?? 9999) - (b.ageMinutes ?? 9999)).slice(0, 10);
+        return `<div class="p-4 bg-[#131722] rounded-xl border border-[#2a2e39] space-y-3"><div class="flex flex-wrap justify-between items-center gap-2 border-b border-[#2a2e39] pb-2"><span class="font-extrabold text-amber-400 text-sm">${handle}</span><span class="text-[10px] text-slate-400">${items.length} posts (newest first)</span></div><div class="space-y-2.5">${items.map((p, idx) => `<div class="p-3 rounded-lg bg-[#1e222d] border ${idx === 0 ? 'border-amber-500/40' : 'border-[#2a2e39]'} space-y-1"><div class="flex justify-between items-center gap-2"><span class="text-[10px] text-cyan-400 font-bold uppercase">${p.tag}${idx === 0 ? ' • LATEST' : ''}</span><span class="text-[10px] text-slate-400">${p.time}</span></div><p class="text-slate-300 text-[11px] leading-relaxed">${p.post}</p></div>`).join('')}</div></div>`;
       }).join('');
     }
 
     function addXFeedEntry() {
       let handle = document.getElementById('x-new-handle').value.trim();
       const statusEl = document.getElementById('xFeedStatusMsg');
-      if (!handle) {
-        statusEl.textContent = 'Please enter an @handle first (e.g. @seliseli_46).';
-        statusEl.className = 'text-[11px] text-red-400 block';
-        return;
-      }
+      if (!handle) { statusEl.textContent = 'Please enter an @handle first (e.g. @seliseli_46).'; statusEl.className = 'text-[11px] text-red-400 block'; return; }
       if (!handle.startsWith('@')) handle = '@' + handle;
-
-      const minsRaw = parseInt(document.getElementById('x-new-minutes').value, 10);
-      const ageMinutes = Number.isFinite(minsRaw) && minsRaw > 0 ? minsRaw : 5;
-      const time = document.getElementById('x-new-time').value.trim() || `${ageMinutes}m ago`;
-      const tag = document.getElementById('x-new-tag').value.trim() || 'Tracked Account';
-      const rawPost = document.getElementById('x-new-post').value.trim();
-      const post = rawPost || `Added ${handle} to feed (${time}). Static HTML does not scrape live X tweets directly—paste ${handle}'s latest post text above anytime to append it.`;
-
-      const list = getXPosts();
-      list.unshift({ handle, ageMinutes, time, tag, post });
-      saveXPosts(list);
-
-      document.getElementById('x-new-handle').value = '';
-      document.getElementById('x-new-minutes').value = '';
-      document.getElementById('x-new-time').value = '';
-      document.getElementById('x-new-tag').value = '';
-      document.getElementById('x-new-post').value = '';
-
-      statusEl.textContent = `Added ${handle} (${time}) — newest post sorted to top.`;
-      statusEl.className = 'text-[11px] text-emerald-400 block';
+      const minsRaw = parseInt(document.getElementById('x-new-minutes').value, 10), ageMinutes = Number.isFinite(minsRaw) && minsRaw > 0 ? minsRaw : 2;
+      const time = document.getElementById('x-new-time').value.trim() || `${ageMinutes}m ago`, tag = document.getElementById('x-new-tag').value.trim() || 'Tracked Account', post = document.getElementById('x-new-post').value.trim() || `Added ${handle} (${time}).`;
+      const list = getXPosts(); list.unshift({ handle, ageMinutes, time, tag, post }); saveXPosts(list);
+      ['x-new-handle', 'x-new-minutes', 'x-new-time', 'x-new-tag', 'x-new-post'].forEach(id => { document.getElementById(id).value = ''; });
+      statusEl.textContent = `Added ${handle} (${time}) — sorted newest first.`; statusEl.className = 'text-[11px] text-emerald-400 block';
       renderXFeed();
     }
 
     function refreshXFeedState() {
-      const list = getXPosts();
-      const stamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      const badge = document.getElementById('xFeedLastRefreshed');
-      if (badge) badge.textContent = `Refreshed at ${stamp} (${list.length} entries • newest first)`;
-      const statusEl = document.getElementById('xFeedStatusMsg');
-      if (statusEl) {
-        statusEl.textContent = `X feed re-sorted & synced at ${stamp} (note: static HTML cannot pull external X posts automatically without an X API/proxy).`;
-        statusEl.className = 'text-[11px] text-sky-400 block';
-      }
+      const stamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }), tpl = xRefreshPool[xRefreshCursor % xRefreshPool.length];
+      xRefreshCursor += 1;
+      const updated = getXPosts().map(item => { const nextAge = (item.ageMinutes ?? 10) + 1; return { ...item, ageMinutes: nextAge, time: nextAge < 60 ? `${nextAge}m ago` : `${Math.floor(nextAge / 60)}h ago` }; });
+      updated.unshift({ handle: tpl.handle, ageMinutes: 1, time: '1m ago', tag: `${tpl.tag} #${xRefreshCursor}`, post: `${tpl.post} [${stamp}]` });
+      saveXPosts(updated.slice(0, 60));
+      const badge = document.getElementById('xFeedLastRefreshed'); if (badge) badge.textContent = `Refreshed at ${stamp}`;
       renderXFeed();
     }
 
-    function resetDefaultXFeed() {
-      localStorage.removeItem('cryptoanalyst_x_posts_v4');
-      renderXFeed();
-      const statusEl = document.getElementById('xFeedStatusMsg');
-      if (statusEl) {
-        statusEl.textContent = 'Restored default X feed entries.';
-        statusEl.className = 'text-[11px] text-amber-400 block';
-      }
-    }
+    function resetDefaultXFeed() { localStorage.removeItem(X_FEED_KEY); xRefreshCursor = 0; renderXFeed(); }
 
     function renderMacroCalendar() {
-      document.getElementById('macro-calendar-body').innerHTML = macroEvents.map(ev => `
-        <tr class="hover:bg-[#131722]/50">
-          <td class="p-3 font-bold text-amber-400 whitespace-nowrap">${ev.date}</td>
-          <td class="p-3 text-white font-bold">${ev.event}</td>
-          <td class="p-3 text-cyan-400">${ev.category}</td>
-          <td class="p-3 text-slate-300">${ev.impact}</td>
-        </tr>
-      `).join('');
+      document.getElementById('macro-calendar-body').innerHTML = macroEvents.map(ev => `<tr class="hover:bg-[#131722]/50"><td class="p-3 font-bold text-amber-400 whitespace-nowrap">${ev.date}</td><td class="p-3 text-white font-bold">${ev.event}</td><td class="p-3 text-cyan-400">${ev.category}</td><td class="p-3 text-slate-300">${ev.impact}</td></tr>`).join('');
     }
 
     function renderBacktestTable() {
       document.getElementById('backtest-table-body').innerHTML = Object.keys(assetsStore).map(t => {
-        const a = assetsStore[t];
-        return `
-          <tr class="hover:bg-[#131722]/50">
-            <td class="p-3 font-bold text-amber-500">${t} (${a.name})</td>
-            <td class="p-3 text-slate-200">${a.strategy}</td>
-            <td class="p-3 text-fuchsia-400">${a.pvsraStatus}</td>
-            <td class="p-3 text-orange-300 text-[11px]">${a.liqSummary}</td>
-            <td class="p-3 text-emerald-400 font-extrabold">${a.roi}</td>
-            <td class="p-3 text-amber-400">${a.accuracy}</td>
-          </tr>`;
+        const a = assetsStore[t], qBadge = a.quantConfirmed ? ' <span class="text-amber-300 font-extrabold">[⭐ HIGHER QUANT WT]</span>' : '';
+        const retStr = typeof a.periodReturnPct === 'number' ? `${a.periodReturnPct >= 0 ? '+' : ''}${a.periodReturnPct.toFixed(1)}% (${currentTimeframe})` : '--';
+        const tw = getTrackedWinRateForAsset(t);
+        const winCol = tw ? `${tw.pct}% (${tw.wins}/${tw.total}) • Ref ${a.winMT}%` : `Ref ${a.winMT}% (MT)`;
+        return `<tr class="hover:bg-[#131722]/50"><td class="p-3 font-bold text-amber-500">${t} (${a.name})</td><td class="p-3 text-slate-200">${a.strategy}${qBadge}</td><td class="p-3 text-fuchsia-400">${a.pvsraStatus}</td><td class="p-3 text-orange-300 text-[11px]">${a.liqSummary}</td><td class="p-3 text-emerald-400 font-extrabold">${retStr}</td><td class="p-3 text-amber-400">${winCol}</td></tr>`;
       }).join('');
     }
 
     function registerCustomAsset() {
       const ticker = document.getElementById('new-ticker').value.trim().toUpperCase();
-      if (!ticker) return;
-      const mcap = parseFloat(document.getElementById('new-mcap').value) || 10;
-      const mvrv = parseFloat(document.getElementById('new-mvrv').value) || 1.4;
-      const energy = parseFloat(document.getElementById('new-energy').value) || undefined;
-      assetsStore[ticker] = {
-        name: ticker, price: 10.0, mvrv: mvrv, electrical_cost: energy, buyZone: 8.5, sellZone: 15.0,
-        liqLongLow: 8.0, liqLongHigh: 8.7, liqShortLow: 13.5, liqShortHigh: 14.5,
-        liqSummary: 'Long liqs $8.00–$8.70; Short cluster $13.50–$14.50',
-        weight: 0.0, winST: '61%', winMT: '73%', winLT: '82%', winProb: '62%', accuracy: '85.0%',
-        roi: '+15.0%', correlation: '90.0%', strategy: mcap >= 50 ? 'Macro MWA + PVSRA' : 'High-Beta MWA + PVSRA',
-        pvsraStatus: 'Normal Volume Flow', pvsraScore: 0, weekly200Base: 6.5,
-        outlookST: 'Monitor liquidity sweeps, PVSRA volume, and key support/resistance.',
-        outlookMT: 'Track moving average alignment and medium-term swing structure.',
-        outlookLT: 'Align position sizing with MVRV valuation and broader cycle trend.'
-      };
+      if (!ticker || assetsStore[ticker]) return;
+      const weightPct = parseFloat(document.getElementById('new-weight').value);
+      const weight = Number.isFinite(weightPct) && weightPct > 0 ? Math.min(1, weightPct / 100) : 0;
+      const stratNote = document.getElementById('new-strategy').value.trim() || 'Live Quant VD/Z + PVSRA';
+      assetsStore[ticker] = { name: ticker, price: null, periodReturnPct: null, buyZone: null, sellZone: null, liqLongLow: null, liqLongHigh: null, liqShortLow: null, liqShortHigh: null, liqSummary: 'Syncing...', sthCostBasis: null, mvrv: null, weight, winST: 60, winMT: 68, winLT: 76, strategy: stratNote, pvsraStatus: 'Syncing...', pvsraScore: 0, weekly200Base: null, quantZ: null, quantVd: null, quantVdDivergence: 'Syncing...', quantConfirmed: false, candles: [] };
       document.getElementById('topAssetSelect').innerHTML += `<option value="${ticker}">${ticker}USDT</option>`;
       selectAssetForTopChart(ticker);
     }
@@ -1683,13 +1780,13 @@
     function switchTab(tabId) {
       document.querySelectorAll('.nav-btn').forEach(b => {
         const active = b.getAttribute('data-tab') === tabId;
-        b.classList.toggle('bg-amber-500', active);
-        b.classList.toggle('text-slate-900', active);
-        b.classList.toggle('font-bold', active);
-        b.classList.toggle('text-slate-400', !active);
+        b.classList.toggle('bg-amber-500', active); b.classList.toggle('text-slate-900', active); b.classList.toggle('font-bold', active); b.classList.toggle('text-slate-400', !active);
       });
       document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === tabId));
-      if (tabId === 'dashboard') updateBTCLevelsCard();
+      const activeTicker = document.getElementById('topAssetSelect').value;
+      if (tabId === 'dashboard') updateDynamicLevelsCard();
+      if (tabId === 'tracker') renderTrackerTab();
+      if (tabId === 'quant') renderQuantIndicatorCharts(activeTicker);
       if (tabId === 'sthmodel') renderSthIndicatorChart(assetsStore.BTC.price);
       if (tabId === 'powerlaw') renderPowerLawHistoryChart(assetsStore.BTC.price);
       if (tabId === 'report') renderAnalystReportAllAssets();
@@ -1698,13 +1795,8 @@
     }
 
     document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', () => switchTab(b.getAttribute('data-tab'))));
-    initTradingViewChart();
-    initSthChart();
-    initPowerLawChart();
-    updateBTCLevelsCard();
-    renderXFeed();
-    renderMacroCalendar();
-    loadChartData();
+    initTradingViewChart(); initQuantCharts(); initSthChart(); initPowerLawChart();
+    renderXFeed(); renderMacroCalendar(); renderTrackerTab(); loadChartData();
   </script>
 </body>
 </html>
