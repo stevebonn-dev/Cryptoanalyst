@@ -1,90 +1,153 @@
-To ensure that your algorithms, advanced indicators, and self-improving feedback loop apply seamlessly to any asset you add right now or in the future, we can architect a Dynamic Asset Onboarding & Universal Feedback Protocol into your engine.
-Instead of hardcoding specific tokens, this extensible framework automatically classifies new additions, provisions their indicator suites, and enrolls them into the rolling self-improving loop.
-1. Dynamic Asset Classification & Automatic \alpha Assignment
-When a new asset ticker (e.g., AVAX, LINK, NEAR) is added to your watchlist, the engine evaluates its volatility and market capitalization profile to automatically assign the correct institutional learning rate (\alpha):
- * Macro / Large-Cap Anchors (Low Beta):
-   * Criteria: Market Cap > $50B, deep liquidity, tight bid-ask spreads.
-   * Assigned Learning Rate: \alpha = 0.08 (smoother corrections, lower sensitivity to noise).
- * High-Beta / Emerging Altcoins:
-   * Criteria: Market Cap < $50B or high volatility index.
-   * Assigned Learning Rate: \alpha = 0.12 (faster adaptation to rapid liquidity shifts and order-book sweeps).
-2. Universal Indicator Pipeline Template
-Any newly registered asset automatically inherits the full institutional indicator stack without manual setup:
- * Moving Weighted Averages (MWAs): Automated calculation of 50, 100, and 200 MWA threshold levels.
- * Cumulative Volume Delta (CVD): Real-time spot vs. derivatives buying pressure analysis.
- * Whale Inflow & Exchange Netflow Velocity: Large-holder accumulation tracking.
- * Funding Rate & Open Interest (OI) Z-Scores: Leverage and liquidation cascade risk detection.
- * SFP & Failed Auction Detector: Automated monitoring of local sweep-and-reclaim setups into volume nodes (VAH, nPOC).
-3. Automated 24h / 48h / 7d Rolling Feedback Loop
-The self-improvement loop treats newly added assets identically to core benchmarks:
- * Every hypothesis generated for the new asset is time-stamped and benchmarked against realized price action at 24-hour, 48-hour, and 7-day intervals.
- * If forecast variance exceeds \pm 2.5\%, the engine automatically scales indicator weighting for that specific asset class for the next execution cycle.
-4. Updated Python Implementation (run.py)
-Below is the upgraded, universal backend engine designed to automatically handle any future asset you introduce:
 """
-Universal Institutional Crypto Intelligence Engine - Run Module
-Dynamically registers new assets, assigns learning rates, provisions indicators,
-and executes the self-improving feedback loop.
+Institutional Crypto Intelligence Engine - Run Module
+Handles automated dispatch, SFP detection, self-improving feedback loop,
+and persistent state files for the frontend dashboard.
 """
+import json
+import os
+from datetime import datetime, timezone
 import numpy as np
 
-class UniversalCryptoEngine:
-    def __init__(self):
-        self.watchlist = {}
-        self.feedback_history = []
 
-    def register_asset(self, ticker, market_cap_billions):
-        """Automatically classifies and provisions any new asset added to the engine."""
-        # Automatic classification rule
-        is_macro = market_cap_billions >= 50.0
-        alpha = 0.08 if is_macro else 0.12
-        
-        self.watchlist[ticker] = {
-            "classification": "Macro Anchor" if is_macro else "High-Beta Altcoin",
-            "alpha": alpha,
-            "indicators": {
-                "mwa_50": None, "mwa_100": None, "mwa_200": None,
-                "cvd_bias": "Neutral",
-                "oi_zscore": 0.0,
-                "sfp_status": "Monitoring"
-            },
-            "status": "Active"
-        }
-        print(f"[ONBOARDING] Asset {ticker} registered successfully. Assigned Alpha: {alpha} ({self.watchlist[ticker]['classification']})")
+DEFAULT_ASSETS = ["BTC", "ETH", "SOL", "XRP", "ONDO", "SUI", "SEI", "HBAR", "HYPE"]
+MACRO_ASSETS = {"BTC", "ETH"}
 
-    def run_universal_feedback_loop(self, ticker, predicted_target, realized_price, timeframe="24h"):
-        """Evaluates predictive variance and auto-calibrates the asset's indicators."""
-        if ticker not in self.watchlist:
-            raise ValueError(f"Asset {ticker} not found in watchlist. Register first.")
-            
-        asset_meta = self.watchlist[ticker]
-        alpha = asset_meta["alpha"]
-        
-        # Calculate error and accuracy
+
+class CryptoEngine:
+    def __init__(
+        self,
+        alpha_macro: float = 0.08,
+        alpha_high_beta: float = 0.12,
+        state_path: str = "state/last_run.json",
+        recommendations_path: str = "state/recommendations_log.json",
+        reliability_path: str = "state/feed_reliability.json",
+    ):
+        self.alpha_macro = alpha_macro
+        self.alpha_high_beta = alpha_high_beta
+        self.state_path = state_path
+        self.recommendations_path = recommendations_path
+        self.reliability_path = reliability_path
+        self.history = []
+        self.recommendations = []
+        self._load_existing_state()
+
+    def _load_existing_state(self):
+        """Loads existing run history and recommendations so deployments do not wipe state."""
+        if os.path.exists(self.state_path):
+            try:
+                with open(self.state_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                if isinstance(data, dict) and isinstance(data.get("history"), list):
+                    self.history = data["history"]
+            except (OSError, json.JSONDecodeError):
+                pass
+
+        if os.path.exists(self.recommendations_path):
+            try:
+                with open(self.recommendations_path, "r", encoding="utf-8") as f:
+                    recs = json.load(f)
+                if isinstance(recs, list):
+                    self.recommendations = recs
+            except (OSError, json.JSONDecodeError):
+                pass
+
+    def calculate_sfp_signal(self, price_series, volume_series, vh_level: float) -> bool:
+        """Detects Swing Failure Pattern (SFP) / Failed Auction setups."""
+        if len(price_series) < 2 or len(volume_series) < 1:
+            return False
+        sweep = price_series[-2] < vh_level and price_series[-1] > vh_level
+        volume_spike = volume_series[-1] > np.mean(volume_series) * 1.5
+        return bool(sweep and volume_spike)
+
+    def run_feedback_loop(
+        self, asset: str, predicted_target: float, realized_price: float, timeframe: str = "24h"
+    ) -> dict:
+        """Closed-loop error correction tracking predictive variance."""
+        if predicted_target == 0:
+            raise ValueError("predicted_target must be non-zero")
         error = abs(realized_price - predicted_target) / predicted_target
-        accuracy = max(0.0, 100.0 * (1.0 - error))
+        alpha = self.alpha_macro if asset in MACRO_ASSETS else self.alpha_high_beta
+
+        accuracy_score = max(0.0, 100.0 * (1.0 - error))
         adjustment = alpha * error
-        
+
         log_entry = {
-            "asset": ticker,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "asset": asset,
             "timeframe": timeframe,
             "error_pct": round(error * 100, 2),
-            "accuracy_score": round(accuracy, 2),
-            "dynamic_adjustment": round(adjustment, 4)
+            "accuracy_pct": round(accuracy_score, 2),
+            "adjustment_applied": round(adjustment, 4),
         }
-        self.feedback_history.append(log_entry)
+        self.history.append(log_entry)
         return log_entry
 
-# Example Usage:
-if __name__ == "__main__":
-    engine = UniversalCryptoEngine()
-    
-    # Existing core assets
-    engine.register_asset("BTC", 1300.0)
-    engine.register_asset("SOL", 85.0)
-    
-    # Adding a brand new asset dynamically in the future
-    engine.register_asset("AVAX", 14.5)  # Automatically gets high-beta alpha = 0.12
+    def record_recommendation(
+        self,
+        asset: str,
+        action: str,
+        entry_price: float,
+        target_price: float | None = None,
+        bias: str = "NEUTRAL",
+        notes: str = "",
+    ) -> dict:
+        """Appends a recommendation record while preserving backward-compatible keys."""
+        entry = {
+            "id": f"rec_{len(self.recommendations) + 1}_{int(datetime.now(timezone.utc).timestamp())}",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "asset": asset,
+            "ticker": asset,
+            "action": action,
+            "bias": bias,
+            "entryPrice": entry_price,
+            "targetPrice": target_price,
+            "notes": notes,
+        }
+        self.recommendations.append(entry)
+        return entry
 
-Summary
-By implementing this Universal Onboarding Protocol, whenever you add a new token to your interface, the system will instantly and automatically classify its volatility, apply the correct error-correction learning rate (\alpha), feed it through your custom indicator suite, and track its predictive accuracy in the rolling feedback loop!
+    def write_feed_reliability_benchmark(self, feed_scores: dict | None = None):
+        """Writes ./state/feed_reliability.json for frontend reliability syncing."""
+        os.makedirs(os.path.dirname(self.reliability_path) or ".", exist_ok=True)
+        payload = {
+            "sourceName": "ThirdPartySignalIndex",
+            "updatedAt": datetime.now(timezone.utc).isoformat(),
+            "defaultPrior": {
+                "score": 55,
+                "source": "DefaultBaseline",
+            },
+            "feeds": feed_scores
+            if feed_scores is not None
+            else {
+                "@seliseli_46": {
+                    "score": 72,
+                    "source": "ThirdPartySignalIndex",
+                    "verifiedCalls": 10,
+                }
+            },
+        }
+        with open(self.reliability_path, "w", encoding="utf-8") as f:
+            json.dump(payload, f, indent=2)
+
+    def save_state(self):
+        """Persists latest execution telemetry and recommendations to disk."""
+        os.makedirs(os.path.dirname(self.state_path) or ".", exist_ok=True)
+        os.makedirs(os.path.dirname(self.recommendations_path) or ".", exist_ok=True)
+
+        run_payload = {
+            "lastRunAt": datetime.now(timezone.utc).isoformat(),
+            "assets": DEFAULT_ASSETS,
+            "history": self.history,
+        }
+        with open(self.state_path, "w", encoding="utf-8") as f:
+            json.dump(run_payload, f, indent=2)
+
+        with open(self.recommendations_path, "w", encoding="utf-8") as f:
+            json.dump(self.recommendations, f, indent=2)
+
+
+if __name__ == "__main__":
+    engine = CryptoEngine()
+    engine.write_feed_reliability_benchmark()
+    engine.save_state()
+    print("Institutional Crypto Intelligence Engine Initialized & State Saved.")
