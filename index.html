@@ -276,6 +276,7 @@
     </div>
 
     <div id="tvMaToggles" style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 0.85rem;">
+      <label><input type="checkbox" id="toggleBollinger" checked /> Bollinger (20, 2σ)</label>
       <label><input type="checkbox" id="toggleMa50" checked /> 50 MA</label>
       <label><input type="checkbox" id="toggleMa100" checked /> 100 MA</label>
       <label><input type="checkbox" id="toggleMa200" checked /> 200 MA</label>
@@ -1330,6 +1331,52 @@
       seriesMap.ma200w = tvChart.addLineSeries({ color: '#a855f7', lineWidth: 2.5, lineStyle: LightweightCharts.LineStyle.Dashed, title: '200W MA', priceLineVisible: false });
       seriesMap.plTrend = tvChart.addLineSeries({ color: '#14b8a6', lineWidth: 2, lineStyle: LightweightCharts.LineStyle.Dotted, title: 'Power Law Model', priceLineVisible: false });
 
+      const bbUpperSeries = chart.addLineSeries({
+  color: "#38bdf8",
+  lineWidth: 1.2,
+  lineStyle: 2,
+  title: "BB Upper",
+});
+const bbMiddleSeries = chart.addLineSeries({
+  color: "#94a3b8",
+  lineWidth: 1.2,
+  title: "BB Mid (20 SMA)",
+});
+const bbLowerSeries = chart.addLineSeries({
+  color: "#38bdf8",
+  lineWidth: 1.2,
+  lineStyle: 2,
+  title: "BB Lower",
+});
+
+function calcBollingerBands(candles, period = 20, mult = 2) {
+  const upper = [];
+  const middle = [];
+  const lower = [];
+
+  for (let i = period - 1; i < candles.length; i++) {
+    const slice = candles.slice(i - period + 1, i + 1).map((c) => c.close);
+    const mean = slice.reduce((acc, v) => acc + v, 0) / period;
+    const variance =
+      slice.reduce((acc, v) => acc + Math.pow(v - mean, 2), 0) / period;
+    const stdDev = Math.sqrt(variance);
+
+    const time = candles[i].time;
+    middle.push({ time, value: Number(mean.toFixed(2)) });
+    upper.push({ time, value: Number((mean + mult * stdDev).toFixed(2)) });
+    lower.push({ time, value: Number((mean - mult * stdDev).toFixed(2)) });
+  }
+
+  return { upper, middle, lower };
+}
+
+function applyBollingerVisibility() {
+  const visible = Boolean(document.getElementById("toggleBollinger")?.checked);
+  bbUpperSeries.applyOptions({ visible });
+  bbMiddleSeries.applyOptions({ visible });
+  bbLowerSeries.applyOptions({ visible });
+}
+
       tvChart.subscribeClick((param) => {
         if (activeDrawTool === 'none' || !param || !param.point || !candleSeries) return;
         const price = candleSeries.coordinateToPrice(param.point.y);
@@ -1743,6 +1790,12 @@
         deriveAssetMetricsFromCandles(ticker, asset, candles);
         const latest = candles[candles.length - 1];
         candleSeries.setData(candles);
+        const bb = calcBollingerBands(candles, 20, 2);
+bbUpperSeries.setData(bb.upper);
+bbMiddleSeries.setData(bb.middle);
+bbLowerSeries.setData(bb.lower);
+applyBollingerVisibility();
+
         const ma50 = calculateSMA(candles, 50), ma100 = calculateSMA(candles, 100), ma200d = calculateSMA(candles, 200);
         const ma200w = candles.map((c, idx) => ({ time: c.time, value: (asset.sthCostBasis || c.close) * (0.85 + (idx / candles.length) * 0.1) }));
         const plSeries = ticker === 'BTC' ? candles.map(c => ({ time: c.time, value: calcPowerLawValue(c.time) })) : [];
