@@ -266,6 +266,28 @@
         </div>
 
         <!-- Custom Horizontal & Diagonal Drawing Toolbar -->
+      <div id="tvChartWrapper" style="width: 100%; background: #151b22; border: 1px solid #2b3440; border-radius: 8px; padding: 12px; margin-bottom: 14px;">
+  <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px;">
+    <div id="tvIntervalBar" style="display: flex; gap: 6px; flex-wrap: wrap;">
+      <button type="button" data-interval="1h" class="tv-tf-btn">1H</button>
+      <button type="button" data-interval="4h" class="tv-tf-btn">4H</button>
+      <button type="button" data-interval="1d" class="tv-tf-btn active">1D</button>
+      <button type="button" data-interval="1w" class="tv-tf-btn">1W</button>
+    </div>
+
+    <div id="tvMaToggles" style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 0.85rem;">
+      <label><input type="checkbox" id="toggleMa50" checked /> 50 MA</label>
+      <label><input type="checkbox" id="toggleMa100" checked /> 100 MA</label>
+      <label><input type="checkbox" id="toggleMa200" checked /> 200 MA</label>
+      <label><input type="checkbox" id="toggleMa200w" /> 200W MA</label>
+    </div>
+  </div>
+
+  <!-- Explicit height + width prevents zero-height collapse on mobile/flex layouts -->
+  <div id="tvChartContainer" style="position: relative; width: 100%; height: 380px; min-height: 320px;"></div>
+  <div id="tvChartStatus" style="margin-top: 8px; font-size: 0.82rem; color: #8b949e;">Initializing chart...</div>
+</div>
+
         <div class="p-3 rounded-lg bg-[#131722] border border-[#2a2e39] space-y-2 text-[11px] font-mono">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div class="flex flex-wrap items-center gap-1.5">
