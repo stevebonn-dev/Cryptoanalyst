@@ -1,11 +1,3 @@
-I have merged the backup, 24-hour daily localStorage snapshot, verification checks, and "Start Fresh" flow into your full index.html dashboard and verified the markup structure (145,780 characters / 2,058 lines, 11 <section> pairs, 194 <div> pairs, and 3 <script> pairs).
-What Was Merged & Verified
- * Backup, Daily Snapshot & Start Fresh Controls (#dashboardBackupCard): Added to the main dashboard tab with ⬇ Export Full JSON, ⬆ Import JSON, ♻ Restore Daily Snapshot, and ✨ Start Fresh buttons, plus a live status readout (#backupStatusMessage).
- * 24-Hour Daily localStorage Snapshot (saveDailySnapshotToLocalStorage / runDailyBackupCheck): Checks on load (DOMContentLoaded) whether 24 hours have passed since the last daily snapshot, writes to cryptoanalyst_daily_backup_v1 without forcing file downloads (ideal for iPad/iPhone browsers), and runs a read-back verification check.
- * Verified Export & Import (exportDashboardBackup / importDashboardBackupFromFile): Exports all localStorage keys (excluding the daily snapshot key) with byte/key verification and status feedback, and validates imported JSON before restoring and verifying keys.
- * Guided "Start Fresh" Prompt (#freshStartPrompt / startFreshDashboard): Appears when no prior dashboard state or daily snapshot is found, allowing you to initialize clean defaults, anchor the portfolio baseline, and verify a fresh daily snapshot—or import an existing JSON backup instead.
- * Preserved Full Dashboard: All 11 tabs, TradingView Lightweight Charts candlestick & indicator overlays, custom horizontal/diagonal drawing tools, Quant Z/VD charts, STH MVRV/SOPR & Power Law views, X feed, Macro calendar, and Signal & Portfolio Tracker remain intact.
-Full Merged Code (index-merged-full.html)
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -35,6 +27,153 @@ Full Merged Code (index-merged-full.html)
     }
   </style>
 </head>
+  <script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
+<script>
+(function () {
+  const container = document.getElementById("tvChartContainer");
+  const statusEl = document.getElementById("tvChartStatus");
+  if (!container) return;
+
+  function setChartStatus(msg) {
+    if (statusEl) statusEl.textContent = msg;
+  }
+
+  if (typeof LightweightCharts === "undefined") {
+    setChartStatus("Chart library failed to load (check network/CDN or ad/script blocker).");
+    return;
+  }
+
+  const width = Math.max(container.clientWidth || container.parentElement?.clientWidth || 320, 280);
+  const height = Math.max(container.clientHeight || 380, 320);
+
+  const chart = LightweightCharts.createChart(container, {
+    width,
+    height,
+    layout: {
+      background: { color: "#0b0e14" },
+      textColor: "#c9d1d9",
+    },
+    grid: {
+      vertLines: { color: "rgba(255, 255, 255, 0.05)" },
+      horzLines: { color: "rgba(255, 255, 255, 0.05)" },
+    },
+    rightPriceScale: {
+      borderColor: "#30363d",
+    },
+    timeScale: {
+      borderColor: "#30363d",
+      timeVisible: true,
+    },
+  });
+
+  const candleSeries = chart.addCandlestickSeries({
+    upColor: "#26a69a",
+    downColor: "#ef5350",
+    borderVisible: false,
+    wickUpColor: "#26a69a",
+    wickDownColor: "#ef5350",
+  });
+
+  const ma50Series = chart.addLineSeries({ color: "#00d2ff", lineWidth: 1.5, title: "50 MA" });
+  const ma100Series = chart.addLineSeries({ color: "#f59e0b", lineWidth: 1.5, title: "100 MA" });
+  const ma200Series = chart.addLineSeries({ color: "#a855f7", lineWidth: 2, title: "200 MA" });
+  const ma200wSeries = chart.addLineSeries({ color: "#ec4899", lineWidth: 2, lineStyle: 2, title: "200W MA" });
+
+  function calcSMA(candles, period) {
+    const out = [];
+    for (let i = period - 1; i < candles.length; i++) {
+      let sum = 0;
+      for (let j = i - period + 1; j <= i; j++) {
+        sum += candles[j].close;
+      }
+      out.push({ time: candles[i].time, value: Number((sum / period).toFixed(2)) });
+    }
+    return out;
+  }
+
+  function buildFallbackCandles(basePrice = 63762, count = 240, stepSec = 86400) {
+    const nowSec = Math.floor(Date.now() / 1000);
+    const startSec = nowSec - (count - 1) * stepSec;
+    let price = basePrice * 0.92;
+    const candles = [];
+    for (let i = 0; i < count; i++) {
+      const t = startSec + i * stepSec;
+      const wave = Math.sin(i / 14) * (basePrice * 0.03) + Math.cos(i / 37) * (basePrice * 0.04);
+      const open = Number(price.toFixed(2));
+      const close = Number(Math.max(100, basePrice * 0.85 + wave + (i / count) * (basePrice * 0.12)).toFixed(2));
+      const high = Number((Math.max(open, close) * 1.015).toFixed(2));
+      const low = Number((Math.min(open, close) * 0.985).toFixed(2));
+      candles.push({ time: t, open, high, low, close });
+      price = close;
+    }
+    return candles;
+  }
+
+  async function fetchKlines(symbol = "BTCUSDT", interval = "1d") {
+    const stepMap = { "1h": 3600, "4h": 14400, "1d": 86400, "1w": 604800 };
+    try {
+      const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=300`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const rows = await res.json();
+      if (!Array.isArray(rows) || rows.length === 0) throw new Error("Empty klines");
+      const candles = rows.map((r) => ({
+        time: Math.floor(Number(r[0]) / 1000),
+        open: Number(r[1]),
+        high: Number(r[2]),
+        low: Number(r[3]),
+        close: Number(r[4]),
+      }));
+      return { candles, source: `Binance (${symbol} ${interval})` };
+    } catch (_) {
+      const candles = buildFallbackCandles(63762, 260, stepMap[interval] || 86400);
+      return { candles, source: `Fallback series (${symbol} ${interval})` };
+    }
+  }
+
+  function applyMaVisibility() {
+    ma50Series.applyOptions({ visible: Boolean(document.getElementById("toggleMa50")?.checked) });
+    ma100Series.applyOptions({ visible: Boolean(document.getElementById("toggleMa100")?.checked) });
+    ma200Series.applyOptions({ visible: Boolean(document.getElementById("toggleMa200")?.checked) });
+    ma200wSeries.applyOptions({ visible: Boolean(document.getElementById("toggleMa200w")?.checked) });
+  }
+
+  let currentInterval = "1d";
+  async function loadChart(symbol = "BTCUSDT", interval = currentInterval) {
+    currentInterval = interval;
+    const { candles, source } = await fetchKlines(symbol, interval);
+    candleSeries.setData(candles);
+    ma50Series.setData(calcSMA(candles, 50));
+    ma100Series.setData(calcSMA(candles, 100));
+    ma200Series.setData(calcSMA(candles, 200));
+    ma200wSeries.setData(calcSMA(candles, Math.min(200, Math.max(20, Math.floor(candles.length / 2)))));
+    applyMaVisibility();
+    chart.timeScale().fitContent();
+    setChartStatus(`Loaded ${candles.length} candles via ${source}`);
+  }
+
+  document.querySelectorAll(".tv-tf-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tv-tf-btn").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      loadChart("BTCUSDT", btn.dataset.interval || "1d");
+    });
+  });
+
+  ["toggleMa50", "toggleMa100", "toggleMa200", "toggleMa200w"].forEach((id) => {
+    document.getElementById(id)?.addEventListener("change", applyMaVisibility);
+  });
+
+  window.addEventListener("resize", () => {
+    const nextW = Math.max(container.clientWidth || container.parentElement?.clientWidth || 320, 280);
+    const nextH = Math.max(container.clientHeight || 380, 320);
+    chart.resize(nextW, nextH);
+  });
+
+  loadChart("BTCUSDT", currentInterval);
+})();
+</script>
+
 <body class="min-h-screen flex flex-col">
 
   <!-- Header -->
