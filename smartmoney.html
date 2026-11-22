@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smart Money Flow Monitor — Large-Player Footprint & Self-Improving Signals</title>
+<script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+<style>
+:root{--bg:#06090f;--s1:#0c111c;--s2:#121a2a;--s3:#182236;--line:#233047;--line2:#2e3d58;
+--ink:#e6edf7;--mut:#8b98ad;--dim:#5b6779;--amber:#f5a524;--green:#22c55e;--red:#ef4444;
+--sky:#38bdf8;--purple:#a855f7;--pink:#ec4899;--orange:#fb923c;--teal:#14b8a6;--indigo:#6366f1;
+--mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;--disp:'Space Grotesk',system-ui,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--disp);font-size:14px;line-height:1.45;
+background-image:radial-gradient(900px 480px at 8% -6%,rgba(99,102,241,.16),transparent 60%),radial-gradient(800px 420px at 96% 4%,rgba(168,85,247,.12),transparent 60%);background-attachment:fixed}
+.wrap{max-width:1280px;margin:0 auto;padding:0 16px}
+header{position:sticky;top:0;z-index:50;background:rgba(6,9,15,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.topbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:10px 0}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px}
+.logo{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-size:18px;background:linear-gradient(135deg,var(--indigo),var(--purple) 55%,var(--pink));box-shadow:0 0 18px rgba(139,92,246,.45)}
+.brand small{color:var(--mut);font-weight:500;font-size:11px;display:block;letter-spacing:.12em;text-transform:uppercase}
+main{padding:16px 0 40px}
+.card{background:linear-gradient(160deg,var(--s1),var(--s2));border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.35);margin-bottom:14px}
+.card h3{margin:0 0 4px;font-size:14px;font-weight:700}
+.sub{color:var(--mut);font-size:11.5px;margin:0 0 10px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.spread{justify-content:space-between}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.grid6{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+@media(max-width:980px){.grid6{grid-template-columns:repeat(3,1fr)}.grid2{grid-template-columns:1fr}}
+@media(max-width:640px){.grid6{grid-template-columns:repeat(2,1fr)}.grid3{grid-template-columns:1fr}}
+.btn{font-family:var(--disp);font-weight:700;font-size:12px;border-radius:9px;padding:7px 12px;cursor:pointer;border:1px solid var(--line2);background:var(--s3);color:var(--ink);transition:.16s}
+.btn:hover{border-color:var(--indigo);box-shadow:0 4px 14px rgba(99,102,241,.25)}
+.btn-amber{background:linear-gradient(135deg,var(--amber),#f97316);color:#160f02;border-color:transparent}
+.btn-green{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.5);color:#86efac}
+.btn-red{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.5);color:#fca5a5}
+.btn-sm{padding:4px 9px;font-size:11px}
+.chip{font-family:var(--mono);font-size:11px;padding:4px 9px;border-radius:999px;border:1px solid var(--line2);background:var(--s3);color:var(--mut)}
+.chip.ok{color:#86efac;border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.1)}
+.chip.bad{color:#fca5a5;border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.1)}
+.chip.sync{color:#93c5fd;border-color:rgba(59,130,246,.5);background:rgba(59,130,246,.1)}
+.inp,select.inp{font-family:var(--mono);font-size:12px;background:#0a0f1a;border:1px solid var(--line2);color:var(--ink);border-radius:9px;padding:7px 10px;outline:none}
+.inp:focus{border-color:var(--amber)}
+.lbl{font-size:11px;color:var(--mut);font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table.tbl{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11.5px;min-width:620px}
+.tbl th{background:var(--s3);color:var(--mut);text-align:left;padding:8px 10px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--line2)}
+.tbl td{padding:8px 10px;border-bottom:1px solid var(--line)}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tbody tr:hover{background:rgba(99,102,241,.07)}
+.pos{color:#4ade80}.neg{color:#f87171}.warn{color:#fcd34d}.info{color:#7dd3fc}.mut{color:var(--mut)}
+.badge{font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px}
+.b-bull{background:rgba(34,197,94,.16);color:#4ade80;border:1px solid rgba(34,197,94,.5)}
+.b-bear{background:rgba(239,68,68,.16);color:#f87171;border:1px solid rgba(239,68,68,.5)}
+.b-emg{background:rgba(245,165,36,.16);color:#fcd34d;border:1px solid rgba(245,165,36,.5)}
+.b-neu{background:rgba(139,152,173,.14);color:#aab6c8;border:1px solid rgba(139,152,173,.4)}
+.b-open{background:rgba(59,130,246,.14);color:#93c5fd;border:1px solid rgba(59,130,246,.45)}
+.kpi{background:linear-gradient(150deg,var(--s2),var(--s3));border:1px solid var(--line);border-left:3px solid var(--kc,var(--indigo));border-radius:10px;padding:10px 12px;font-family:var(--mono)}
+.kpi .k{font-size:10px;color:var(--mut);letter-spacing:.1em;text-transform:uppercase}
+.kpi .v{font-size:16px;font-weight:700;margin:3px 0 1px;color:var(--kc,var(--ink))}
+.kpi .s{font-size:10.5px;color:var(--mut)}
+.chartbox{position:relative;width:100%;background:#0a0f1a;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.c420{height:420px}.c220{height:220px}.c260{height:260px}
+.note{font-size:11px;color:var(--dim)}
+.banner{border:1px solid rgba(239,68,68,.5);background:rgba(239,68,68,.08);border-radius:10px;padding:12px;margin-bottom:12px}
+.hidden{display:none!important}
+.alert{border:1px solid var(--line);border-left:3px solid var(--indigo);border-radius:10px;padding:9px 12px;background:var(--s2);margin-bottom:8px;font-size:12.5px}
+.alert.bull{border-left-color:var(--green)}.alert.bear{border-left-color:var(--red)}.alert.warn{border-left-color:var(--amber)}
+.alert .m{font-family:var(--mono);font-size:10px;color:var(--dim)}
+#toasts{position:fixed;right:16px;bottom:16px;z-index:100;display:flex;flex-direction:column;gap:8px;max-width:340px}
+.toast{background:rgba(12,17,28,.95);border:1px solid var(--line2);border-left:3px solid var(--indigo);border-radius:10px;padding:10px 12px;font-size:12px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.toast.ok{border-left-color:var(--green)}.toast.err{border-left-color:var(--red)}.toast.warn{border-left-color:var(--amber)}
+input[type=range]{accent-color:var(--amber)}
+footer{border-top:1px solid var(--line);padding:16px 0 26px;color:var(--dim);font-size:11px}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="topbar">
+  <div class="brand"><div class="logo">🐋</div><div>Smart Money Flow Monitor<small>Large-player footprint · self-improving signals · 24-month walk-forward</small></div></div>
+  <div class="row">
+    <select id="assetSel" class="inp"><option value="BTC">BTCUSDT</option><option value="ETH">ETHUSDT</option><option value="SOL">SOLUSDT</option></select>
+    <button id="btnRefresh" class="btn btn-amber">🔄 Refresh &amp; Evaluate</button>
+    <button id="btnWF" class="btn">🧪 Run 24-Month Walk-Forward</button>
+    <button id="btnTest" class="btn btn-sm">🔔 Test Alert</button>
+  </div>
+</div></div></header>
+<main class="wrap">
+
+<div class="card">
+  <div class="row spread">
+    <div><h3>📡 Data Sources (public, no API keys)</h3><p class="sub">Market makers are delta-neutral and internally invisible — this monitors the observable footprint of large players, not named MM wallets.</p></div>
+    <div class="row" id="srcChips"></div>
+  </div>
+</div>
+
+<div id="driftBanner" class="banner hidden">
+  <b>⚠️ Model drift detected:</b> recent Brier score is worse than the naive baseline. Learned weights may be stale for this regime.
+  <div class="row" style="margin-top:8px"><button id="btnResetW" class="btn btn-sm btn-red">Reset weights to equal priors</button><button id="btnDriftWF" class="btn btn-sm">Re-run walk-forward instead</button></div>
+</div>
+
+<div class="grid6" id="kpis" style="margin-bottom:14px"></div>
+
+<div class="card">
+  <div class="row spread"><div><h3>🧭 Composite Large-Player Pressure &amp; Trend State</h3><p class="sub">Daily close basis · zones: ±0.15 emerging, ±0.35 confirmed · alerts fire on state transitions</p></div>
+  <span id="zoneBadge" class="badge b-neu">SYNCING</span></div>
+  <div class="chartbox c260"><div id="compChart" class="c260"></div></div>
+</div>
+
+<div class="card"><h3>💹 Price + Cumulative Volume Delta (taker aggression)</h3><p class="sub">Candles = price (right scale) · line = CVD from taker-buy volume (left scale) · rising CVD vs falling price = absorption/accumulation</p><div class="chartbox c420"><div id="priceChart" class="c420"></div></div></div>
+
+<div class="grid2">
+  <div class="card"><h3>💸 Funding Rate (daily avg, 8h rate)</h3><p class="sub">Extreme positive = crowded longs (bearish contrarian) · negative + stable price = squeeze fuel</p><div class="chartbox c220"><div id="fundChart" class="c220"></div></div></div>
+  <div class="card"><h3>🇺🇸 Coinbase Premium vs Binance (%)</h3><p class="sub">Sustained positive = US institutional bid (ETF/OTC footprint)</p><div class="chartbox c220"><div id="premChart" class="c220"></div></div></div>
+</div>
+
+<div class="card"><h3>🏦 Stablecoin Total Supply (DefiLlama, $B)</h3><p class="sub">Rising supply = dry powder entering the market · falling = liquidity leaving</p><div class="chartbox c220"><div id="stbChart" class="c220"></div></div></div>
+
+<div class="card">
+  <div class="row spread"><div><h3>🧠 Self-Improving Loop — Feature Weights &amp; Reliability</h3><p class="sub">Hedge/multiplicative-weights update on matured 7-day calls · 4 regime buckets (trend/range × hi/lo vol) · quarantine below 45% hit-rate (n≥40) · shrinkage to priors prevents drift</p></div>
+  <div class="row"><button id="btnExport" class="btn btn-sm">⬇ Export State</button><button id="btnImport" class="btn btn-sm">⬆ Import</button><input type="file" id="importFile" accept=".json" class="hidden"></div></div>
+  <div class="tblwrap"><table class="tbl"><thead><tr><th>Feature</th><th>Global Weight</th><th>Active-Bucket Weight</th><th>Hit-Rate (n)</th><th>Status</th></tr></thead><tbody id="weightsBody"></tbody></table></div>
+</div>
+
+<div class="card"><h3>🧪 Walk-Forward Results (24 months, no look-ahead)</h3><p class="sub">Weights start equal and only learn from calls that matured before each step — this is the honest historical audit of the flow proxies.</p>
+  <div class="grid6" id="wfStats"></div>
+  <div class="chartbox c260" style="margin-top:10px"><div id="wfChart" class="c260"></div></div>
+  <div class="row" style="margin-top:10px"><button id="btnAdopt" class="btn btn-green hidden">✅ Adopt walk-forward weights for live signals</button><span id="wfNote" class="note">Not run yet.</span></div>
+</div>
+
+<div class="card"><h3>📜 Daily Predictions &amp; Evaluated Outcomes</h3><p class="sub">One snapshot per UTC day per horizon (7d / 30d) · WIN/LOSS threshold ±1.5% · these matured calls drive the weight updates</p>
+  <div class="tblwrap"><table class="tbl"><thead><tr><th>Day</th><th>Asset</th><th>H</th><th>Composite</th><th>P(up)</th><th>Entry</th><th>Move %</th><th>Outcome</th></tr></thead><tbody id="predsBody"></tbody></table></div>
+</div>
+
+<div class="card"><h3>🔔 Signal &amp; Meta-Alerts Log</h3><div id="alertsList"></div></div>
+
+<div class="card">
+  <h3>⚙️ Alert Channels &amp; Manual MM Bias</h3>
+  <p class="sub">Push works while the tab is open. On iPhone, browser notifications need an installed PWA — Telegram/Discord webhooks are the reliable mobile push path.</p>
+  <div class="grid3">
+    <div><label class="lbl">Discord / generic webhook URL</label><br><input id="setWebhook" class="inp" style="width:100%" placeholder="https://discord.com/api/webhooks/…"></div>
+    <div><label class="lbl">Telegram bot token</label><br><input id="setTgToken" class="inp" style="width:100%" placeholder="123456:ABC…"></div>
+    <div><label class="lbl">Telegram chat id</label><br><input id="setTgChat" class="inp" style="width:100%" placeholder="-100123… or 12345"></div>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <label class="row" style="gap:5px;font-size:12px;color:var(--mut)"><input type="checkbox" id="setNotify"> Browser notifications</label>
+    <span class="lbl">Manual MM/whale bias (from Arkham/Lookonchain posts): <b id="biasVal" class="warn">0</b></span>
+    <input type="range" id="setBias" min="-2" max="2" step="0.5" value="0" style="width:160px">
+    <span class="note">−2 = heavy distribution … +2 = heavy accumulation · fixed weight 0.5, not auto-learned</span>
+  </div>
+</div>
+
+<div class="card">
+  <h3>📖 Methodology &amp; Honest Limitations</h3>
+  <p class="sub" style="line-height:1.6">
+  <b>What this is:</b> a composite of observable large-player footprints — taker CVD &amp; taker ratio (Binance klines field 9), funding regime, Coinbase premium, stablecoin supply momentum, CFTC COT asset-manager net (CME BTC, weekly), plus 30-day OI/top-trader positioning. Each feature maps to [−1,+1]; the composite is a learned weighted average; zones ±0.15/±0.35 define emerging/confirmed pressure and transitions fire alerts.<br>
+  <b>What this is NOT:</b> identification of actual market-maker inventory (Wintermute, Jump, Cumberland… are delta-neutral and internally invisible; labeled-wallet data is paid and exchange-internal flow never appears on-chain). COT leveraged-fund shorts are largely hedged basis trades — that's why the asset-manager leg is used. Binance OI/top-trader history is limited to 30 days, so those features are recent-only and the composite renormalizes when a source is missing.<br>
+  <b>Self-improvement:</b> online Hedge updates (η=0.06) on matured 7-day calls, per-regime buckets with n≥30 gate, weight clamps [0.25×,3×], 3% shrinkage to priors, feature quarantine, Brier-drift alarm, and a no-look-ahead walk-forward. With ~700 daily samples and overlapping horizons, effective sample size is small — expect modest edges, not magic. Nothing here is financial advice.</p>
+</div>
+
+</main>
+<footer><div class="wrap">Smart Money Flow Monitor · browser-only · public data (Binance, Coinbase, DefiLlama, CFTC) · all learning state persists in localStorage · estimates, not financial advice.</div></footer>
+<div id="toasts"></div>
+
+<script>
+'use strict';
+/* ---------- helpers ---------- */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const tanh=Math.tanh, sign=Math.sign;
+const DAY=86400;
+const dayOf=t=>Math.floor(t/DAY)*DAY;
+const fmtD=t=>new Date(t*1000).toISOString().slice(0,10);
+const fmtP=v=>!Number.isFinite(v)?'--':v.toLocaleString('en-US',{maximumFractionDigits:Math.abs(v)>=1000?0:Math.abs(v)>=1?2:5});
+const fmtPct=v=>Number.isFinite(v)?(v>=0?'+':'')+v.toFixed(2)+'%':'--';
+function toast(msg,type){const t=document.createElement('div');t.className='toast '+(type||'');t.textContent=msg;$('toasts').appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .4s';setTimeout(()=>t.remove(),420);},4200);}
+function loadLS(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
+function saveLS(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function pearson(pairs){const n=pairs.length;if(n<8)return null;let sx=0,sy=0,sxx=0,syy=0,sxy=0;pairs.forEach(p=>{sx+=p.c;sy+=p.r;sxx+=p.c*p.c;syy+=p.r*p.r;sxy+=p.c*p.r;});const den=Math.sqrt((n*sxx-sx*sx)*(n*syy-sy*sy));return den>0?(n*sxy-sx*sy)/den:null;}
+
+/* ---------- config & state ---------- */
+const FEATS=[
+ {k:'cvd', label:'Taker CVD 20d slope + divergence'},
+ {k:'taker',label:'Taker buy ratio 7d'},
+ {k:'fund', label:'Funding regime (contrarian)'},
+ {k:'prem', label:'Coinbase premium 7d'},
+ {k:'stb', label:'Stablecoin supply 30d momentum'},
+ {k:'cot', label:'COT asset-manager net Δ4w (BTC)'},
+ {k:'oi',  label:'OI×price confirmation (30d only)'},
+ {k:'top', label:'Top-trader positioning Δ7d (30d only)'}
+];
+const BUCKETS=['trend_hi','trend_lo','range_hi','range_lo'];
+const LS='sm_monitor_v1';
+function freshWeights(){const w={};FEATS.forEach(f=>w[f.k]=1);return w;}
+let S=loadLS(LS,null);
+if(!S||!S.weights){
+  S={asset:'BTC',weights:freshWeights(),buckets:{},featStats:{},q:{},preds:[],brier:[],ic:[],alerts:[],
+     lastZone:'neutral',lastAlertTs:0,lastDriftDay:0,
+     settings:{webhook:'',tgToken:'',tgChat:'',notify:false,bias:0}};
+  BUCKETS.forEach(b=>S.buckets[b]={weights:freshWeights(),n:0});
+  FEATS.forEach(f=>S.featStats[f.k]={n:0,ok:0});
+}
+function save(){saveLS(LS,S);}
+let D=null, WF=null, SRC={};
+const HAS=typeof LightweightCharts!=='undefined';
+const CH={},SR={};
+
+/* ---------- data fetchers ---------- */
+const HOSTS=['https://api.binance.com','https://api1.binance.com','https://data-api.binance.vision'];
+async function fetchDaily(sym){
+  for(const h of HOSTS){try{
+    const r=await fetch(h+'/api/v3/klines?symbol='+sym+'USDT&interval=1d&limit=1000');
+    if(!r.ok)continue;const j=await r.json();if(!Array.isArray(j)||j.length<150)continue;
+    return j.map(k=>({t:Math.floor(k[0]/1000),o:+k[1],h:+k[2],l:+k[3],c:+k[4],v:+k[5],tb:+k[9]})).filter(b=>Number.isFinite(b.c)&&b.c>0).slice(-730);
+  }catch(e){}}
+  return null;
+}
+async function fetchFunding(sym){
+  try{
+    const end=Date.now(),start=end-730*DAY*1000;let out=[],cur=start;
+    for(let k=0;k<3;k++){
+      const r=await fetch('https://fapi.binance.com/fapi/v1/fundingRate?symbol='+sym+'USDT&startTime='+cur+'&endTime='+end+'&limit=1000');
+      if(!r.ok)break;const j=await r.json();if(!Array.isArray(j)||!j.length)break;
+      out=out.concat(j);if(j.length<1000)break;cur=j[j.length-1].fundingTime+1;
+    }
+    const m=new Map();out.forEach(x=>{const d=dayOf(Math.floor(x.fundingTime/1000));const a=m.get(d)||{s:0,n:0};a.s+=+x.fundingRate;a.n++;m.set(d,a);});
+    const res=new Map();m.forEach((a,d)=>res.set(d,a.s/a.n));return res.size?res:null;
+  }catch(e){return null;}
+}
+async function fetchCB(prod){
+  try{
+    const end=Math.floor(Date.now()/1000),start=end-730*DAY;const m=new Map();
+    for(let s=start;s<end;s+=300*DAY){
+      const e=Math.min(s+300*DAY,end);
+      const u='https://api.exchange.coinbase.com/products/'+prod+'/candles?granularity=86400&start='+new Date(s*1000).toISOString()+'&end='+new Date(e*1000).toISOString();
+      const r=await fetch(u);if(!r.ok)continue;const j=await r.json();
+      if(Array.isArray(j))j.forEach(c=>{if(Number.isFinite(c[4]))m.set(dayOf(c[0]),c[4]);});
+    }
+    return m.size?m:null;
+  }catch(e){return null;}
+}
+async function fetchStb(){
+  try{
+    const r=await fetch('https://stablecoins.llama.fi/stablecoincharts/all');if(!r.ok)return null;
+    const j=await r.json();if(!Array.isArray(j))return null;
+    const m=new Map();
+    j.forEach(x=>{const o=x.totalCirculatingUSD;if(!o)return;let s=0;Object.keys(o).forEach(k=>{if(Number.isFinite(o[k]))s+=o[k];});if(s>0)m.set(dayOf(+x.date),s);});
+    return m.size?m:null;
+  }catch(e){return null;}
+}
+async function fetchCOT(){
+  const ids=[['gpe5-46if','tff'],['6dca-aqww','legacy']];
+  for(const [id,kind] of ids){try{
+    const u='https://publicreporting.cftc.gov/resource/'+id+".json?$where=cftc_contract_market_code='133741'&$order=report_date_as_yyyy_mm_dd%20DESC&$limit=120";
+    const r=await fetch(u);if(!r.ok)continue;const j=await r.json();if(!Array.isArray(j)||!j.length)continue;
+    const out=[];
+    j.forEach(x=>{
+      const t=Math.floor(new Date(x.report_date_as_yyyy_mm_dd).getTime()/1000);if(!Number.isFinite(t))return;
+      const oi=+x.open_interest_all;if(!(oi>0))return;
+      let net=null;
+      if(kind==='tff'){const l=+x.asset_mgr_positions_long,s=+x.asset_mgr_positions_short;if(Number.isFinite(l)&&Number.isFinite(s))net=(l-s)/oi;}
+      else{const l=+x.noncomm_positions_long_all,s=+x.noncomm_positions_short_all;if(Number.isFinite(l)&&Number.isFinite(s))net=(l-s)/oi;}
+      if(net!==null)out.push({t:dayOf(t),net});
+    });
+    if(out.length)return{arr:out.sort((a,b)=>a.t-b.t),kind};
+  }catch(e){}}
+  return null;
+}
+async function fetchFut(path,sym){
+  try{
+    const r=await fetch('https://fapi.binance.com/futures/data/'+path+'?symbol='+sym+'USDT&period=1d&limit=30');
+    if(!r.ok)return null;const j=await r.json();if(!Array.isArray(j)||!j.length)return null;
+    const m=new Map();j.forEach(x=>m.set(dayOf(Math.floor(x.timestamp/1000)),x));return m;
+  }catch(e){return null;}
+}
+
+/* ---------- spine ---------- */
+function buildSpine(bars,fund,cb,stb,cot,oiM,topM){
+  const N=bars.length;
+  const cvd=new Array(N);let acc=0;
+  for(let i=0;i<N;i++){acc+=2*bars[i].tb-bars[i].v;cvd[i]=acc;}
+  const fA=new Array(N).fill(null),pA=new Array(N).fill(null),sA=new Array(N).fill(null),cA=new Array(N).fill(null),cAge=new Array(N).fill(999),oA=new Array(N).fill(null),tA=new Array(N).fill(null);
+  for(let i=0;i<N;i++){const d=dayOf(bars[i].t);
+    if(fund&&fund.has(d))fA[i]=fund.get(d);
+    if(cb&&cb.has(d))pA[i]=(cb.get(d)/bars[i].c-1)*100;
+    if(oiM&&oiM.has(d))oA[i]=+oiM.get(d).sumOpenInterest;
+    if(topM&&topM.has(d))tA[i]=+topM.get(d).longShortRatio;
+  }
+  if(stb){const keys=[...stb.keys()].sort((a,b)=>a-b);let j=0,last=null;
+    for(let i=0;i<N;i++){const d=dayOf(bars[i].t);while(j<keys.length&&keys[j]<=d){last=stb.get(keys[j]);j++;}sA[i]=last;}}
+  if(cot&&cot.arr.length){let j=0,last=null,lastT=null;
+    for(let i=0;i<N;i++){const d=dayOf(bars[i].t);while(j<cot.arr.length&&cot.arr[j].t<=d){last=cot.arr[j].net;lastT=cot.arr[j].t;j++;}
+      if(last!==null){cA[i]=last;cAge[i]=Math.round((d-lastT)/DAY);}}}
+  return{bars,cvd,fA,pA,sA,cA,cAge,oA,tA,N};
+}
+
+/* ---------- features (only data ≤ i) ---------- */
+function featsAt(d,i){
+  const f={cvd:null,taker:null,fund:null,prem:null,stb:null,cot:null,oi:null,top:null};
+  const b=d.bars;
+  if(i>=20){
+    let vs=0;for(let j=i-19;j<=i;j++)vs+=b[j].v;
+    if(vs>0){const slope=(d.cvd[i]-d.cvd[i-20])/vs;let s=tanh(slope*8);
+      const pc=b[i].c/b[i-20].c-1;
+      if(pc<-0.03&&slope>0.02)s+=0.25;
+      if(pc>0.03&&slope<-0.02)s-=0.25;
+      f.cvd=clamp(s,-1,1);}
+  }
+  if(i>=7){
+    let tb=0,v=0;for(let j=i-6;j<=i;j++){tb+=b[j].tb;v+=b[j].v;}
+    if(v>0)f.taker=tanh((tb/v-0.5)*40);
+  }
+  if(i>=7){
+    let s=0,n=0;for(let j=i-6;j<=i;j++){if(d.fA[j]!==null){s+=d.fA[j];n++;}}
+    if(n>=5){const avg=s/n;let v=-tanh(avg*3000);
+      if(avg<-0.00005&&b[i].c>=b[i-6].c)v+=0.2;
+      f.fund=clamp(v,-1,1);}
+  }
+  if(i>=7){
+    let s=0,n=0;for(let j=i-6;j<=i;j++){if(d.pA[j]!==null){s+=d.pA[j];n++;}}
+    if(n>=5)f.prem=tanh((s/n)*25);
+  }
+  if(i>=30&&d.sA[i]!==null&&d.sA[i-30]!==null&&d.sA[i-30]>0){
+    f.stb=tanh(((d.sA[i]/d.sA[i-30])-1)*100*0.8);
+  }
+  if(i>=28&&d.cA[i]!==null&&d.cA[i-28]!==null&&d.cAge[i]<=12){
+    f.cot=tanh((d.cA[i]-d.cA[i-28])*8);
+  }
+  if(i>=7&&d.oA[i]!==null&&d.oA[i-7]!==null&&d.oA[i-7]>0){
+    const chg=(d.oA[i]/d.oA[i-7]-1)*100;const ps=sign(b[i].c/b[i-7].c-1);
+    if(ps!==0)f.oi=tanh(chg*0.25*ps);
+  }
+  if(i>=7&&d.tA[i]!==null&&d.tA[i-7]!==null&&d.tA[i]>0&&d.tA[i-7]>0){
+    const n1=(d.tA[i]-1)/(d.tA[i]+1),n0=(d.tA[i-7]-1)/(d.tA[i-7]+1);
+    f.top=tanh((n1-n0)*6);
+  }
+  return f;
+}
+function bucketAt(d,i){
+  if(i<140)return'trend_lo';
+  const b=d.bars;
+  const ma=k=>{let s=0;for(let j=k-19;j<=k;j++)s+=b[j].c;return s/20;};
+  const trend=Math.abs(ma(i)/ma(i-10)-1)>0.02?'trend':'range';
+  const atrPct=k=>{let s=0;for(let j=k-13;j<=k;j++){const pc=b[j-1].c;s+=Math.max(b[j].h-b[j].l,Math.abs(b[j].h-pc),Math.abs(b[j].l-pc));}return s/14/b[k].c;};
+  const cur=atrPct(i);let above=0;
+  for(let k=i-119;k<=i;k++)if(atrPct(k)>cur)above++;
+  return trend+'_'+(above/120<0.4?'hi':'lo');
+}
+function composite(f,w,bias){
+  let num=0,den=0,avail=0;
+  FEATS.forEach(x=>{const v=f[x.k];if(v!==null&&Number.isFinite(v)){const wt=w[x.k]||1;num+=wt*v;den+=wt;avail++;}});
+  if(bias){num+=0.5*(bias/2);den+=0.5;}
+  const comp=den>0?clamp(num/den,-1,1):0;
+  return{comp,p:1/(1+Math.exp(-3*comp)),avail};
+}
+function zoneOf(c){return c>=0.35?'bull':c>=0.15?'bullEmerging':c<=-0.35?'bear':c<=-0.15?'bearEmerging':'neutral';}
+const ZONE_META={bull:['UPTREND CONFIRMED','b-bull','bull'],bullEmerging:['UPTREND EMERGING','b-emg','bull'],neutral:['NEUTRAL / BALANCED','b-neu',''],bearEmerging:['DOWNTREND EMERGING','b-emg','bear'],bear:['DOWNTREND CONFIRMED','b-bear','bear']};
+function activeWeights(bucket){return S.buckets[bucket]&&S.buckets[bucket].n>=30?S.buckets[bucket].weights:S.weights;}
+function sigIndex(){const today=dayOf(Math.floor(Date.now()/1000));return D.bars[D.N-1].t>=today?D.N-2:D.N-1;}
+
+/* ---------- learning ---------- */
+function hedgeUpdate(w,f,r){
+  const rn=clamp(r/0.05,-1,1);
+  FEATS.forEach(x=>{const v=f[x.k];if(v===null||Math.abs(v)<0.05)return;
+    let nw=(w[x.k]||1)*Math.exp(0.06*v*rn);
+    nw=clamp(nw,0.25,3);nw=0.97*nw+0.03;
+    if(S.q[x.k])nw=Math.min(nw,0.3);
+    w[x.k]=nw;});
+}
+function evaluate(){
+  const now=Math.floor(Date.now()/1000);
+  S.preds.forEach(pr=>{
+    if(pr.done||pr.asset!==S.asset)return;
+    const target=pr.day+pr.h*DAY;
+    if(now<target)return;
+    let idx=-1;for(let i=0;i<D.N;i++){if(D.bars[i].t>=target){idx=i;break;}}
+    if(idx<0)return;
+    const r=D.bars[idx].c/pr.entry-1;
+    pr.done=true;pr.move=r*100;
+    pr.outcome=Math.abs(r)<=0.015?'FLAT':(r>0)===(pr.comp>0)?'WIN':'LOSS';
+    const y=r>0?1:0;
+    S.brier.push({ts:now,b:(pr.p-y)*(pr.p-y)});if(S.brier.length>300)S.brier.shift();
+    if(pr.h===30){S.ic.push({c:pr.comp,r});if(S.ic.length>200)S.ic.shift();}
+    FEATS.forEach(x=>{const v=pr.feats[x.k];if(v===null||Math.abs(v)<0.05||Math.abs(r)<=0.015)return;
+      const st=S.featStats[x.k];st.n++;if(sign(v)===sign(r))st.ok++;});
+    if(pr.h===7){
+      hedgeUpdate(S.weights,pr.feats,r);
+      const bk=S.buckets[pr.bucket];if(bk){bk.n++;hedgeUpdate(bk.weights,pr.feats,r);}
+    }
+  });
+  FEATS.forEach(x=>{const st=S.featStats[x.k];if(st.n<40)return;const hit=st.ok/st.n;
+    if(hit<0.45&&!S.q[x.k]){S.q[x.k]=true;S.weights[x.k]=Math.min(S.weights[x.k],0.3);
+      pushAlert('🧠 Meta: feature "'+x.label+'" quarantined (hit-rate '+(hit*100).toFixed(0)+'% over n='+st.n+'). Weight floored.','warn',false);}
+    else if(hit>=0.5&&S.q[x.k]){delete S.q[x.k];S.weights[x.k]=Math.max(S.weights[x.k],0.8);
+      pushAlert('🧠 Meta: feature "'+x.label+'" rehabilitated (hit-rate '+(hit*100).toFixed(0)+'%).','warn',false);}});
+  if(S.preds.length>420)S.preds=S.preds.slice(-420);
+}
+function driftCheck(){
+  const recent=S.brier.slice(-30);
+  const bad=recent.length>=20&&recent.reduce((a,x)=>a+x.b,0)/recent.length>0.28;
+  $('driftBanner').classList.toggle('hidden',!bad);
+  const today=dayOf(Math.floor(Date.now()/1000));
+  if(bad&&S.lastDriftDay!==today){S.lastDriftDay=today;
+    pushAlert('⚠️ Meta: Brier drift — recent calibration worse than naive baseline. Consider reset or walk-forward re-fit.','warn',true);}
+  return bad;
+}
+
+/* ---------- alerts ---------- */
+function pushAlert(msg,type,push){
+  S.alerts.unshift({ts:Date.now(),msg,type:type||''});if(S.alerts.length>60)S.alerts.pop();
+  renderAlerts();save();
+  if(!push)return;
+  if(S.settings.notify&&typeof Notification!=='undefined'&&Notification.permission==='granted'){
+    try{new Notification('🐋 Smart Money Monitor',{body:msg});}catch(e){}}
+  if(S.settings.webhook){fetch(S.settings.webhook,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:'🐋 '+msg})}).catch(()=>{});}
+  if(S.settings.tgToken&&S.settings.tgChat){fetch('https://api.telegram.org/bot'+S.settings.tgToken+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:S.settings.tgChat,text:'🐋 '+msg})}).catch(()=>{});}
+}
+function topDrivers(f,w){
+  return FEATS.map(x=>({l:x.k,v:f[x.k]===null?0:(w[x.k]||1)*f[x.k]})).filter(x=>Math.abs(x.v)>0.03)
+    .sort((a,b)=>Math.abs(b.v)-Math.abs(a.v)).slice(0,3).map(x=>x.l+' '+(x.v>=0?'+':'')+x.v.toFixed(2)).join(', ');
+}
+
+/* ---------- daily run ---------- */
+function dailyRun(){
+  if(!D||D.N<160){toast('Not enough history loaded for signals.','err');return;}
+  evaluate();
+  const i=sigIndex();const f=featsAt(D,i);const bucket=bucketAt(D,i);const w=activeWeights(bucket);
+  const{comp,p,avail}=composite(f,w,+S.settings.bias||0);
+  const zone=zoneOf(comp);const meta=ZONE_META[zone];
+  const zb=$('zoneBadge');zb.textContent=S.asset+' · '+meta[0];zb.className='badge '+meta[1];
+  const day=D.bars[i].t;
+  if(avail>=3){
+    [7,30].forEach(h=>{
+      if(!S.preds.some(x=>x.asset===S.asset&&x.day===day&&x.h===h)){
+        S.preds.push({asset:S.asset,day,h,comp,p,feats:{...f},bucket,entry:D.bars[i].c,done:false,move:null,outcome:'OPEN'});
+      }});
+    if(zone!==S.lastZone){
+      const now=Date.now();
+      if(now-S.lastAlertTs>6*3600*1000){
+        S.lastAlertTs=now;
+        pushAlert(S.asset+' '+meta[0]+' · composite '+(comp>=0?'+':'')+comp.toFixed(2)+' · P(up) '+(p*100).toFixed(0)+'% · drivers: '+topDrivers(f,w),meta[2]||'warn',true);
+      }
+      S.lastZone=zone;
+    }
+  } else {
+    pushAlert('⚠️ Only '+avail+' data features available — signals suppressed until ≥3 sources recover.','warn',false);
+  }
+  const bad=driftCheck();
+  renderKPIs(comp,p,avail,bucket,bad);renderWeights(bucket);renderPreds();renderCharts(comp);
+  save();
+}
+function renderKPIs(comp,p,avail,bucket,bad){
+  const recent=S.brier.slice(-30);
+  const brier=recent.length?recent.reduce((a,x)=>a+x.b,0)/recent.length:null;
+  const ic=pearson(S.ic);
+  const k=(kk,v,s,c)=>'<div class="kpi" style="--kc:'+c+'"><div class="k">'+kk+'</div><div class="v">'+v+'</div><div class="s">'+s+'</div></div>';
+  $('kpis').innerHTML=
+    k('Composite',(comp>=0?'+':'')+comp.toFixed(2),'zones ±0.15 / ±0.35',comp>=0.15?'#22c55e':comp<=-0.15?'#ef4444':'#8b98ad')+
+    k('P(up 7–30d)',(p*100).toFixed(0)+'%','logistic map of composite','#6366f1')+
+    k('Brier (30 calls)',brier===null?'—':brier.toFixed(3),'baseline 0.250 · lower=better',bad?'#ef4444':'#38bdf8')+
+    k('Info Coefficient',ic===null?'—':ic.toFixed(2),'corr(composite, 30d fwd return)',ic!==null&&ic>0.1?'#22c55e':'#f5a524')+
+    k('Active Features',avail+' / '+FEATS.length,'missing sources renormalize','#a855f7')+
+    k('Regime Bucket',bucket.replace('_',' / '),'n='+(S.buckets[bucket]?S.buckets[bucket].n:0)+(S.buckets[bucket]&&S.buckets[bucket].n>=30?' · bucket weights live':' · global weights'),'#14b8a6');
+}
+function renderWeights(bucket){
+  const bw=activeWeights(bucket);const tb=$('weightsBody');tb.innerHTML='';
+  FEATS.forEach(x=>{
+    const st=S.featStats[x.k];const hit=st.n?(st.ok/st.n*100).toFixed(0)+'% ('+st.n+')':'— (0)';
+    const status=S.q[x.k]?'<span class="badge b-bear">QUARANTINED</span>':st.n>=40?'<span class="badge b-bull">LEARNING</span>':'<span class="badge b-open">WARMING UP</span>';
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td>'+esc(x.label)+'</td><td class="warn">'+S.weights[x.k].toFixed(2)+'</td><td>'+bw[x.k].toFixed(2)+'</td><td>'+hit+'</td><td>'+status+'</td>';
+    tb.appendChild(tr);});
+}
+function renderPreds(){
+  const tb=$('predsBody');tb.innerHTML='';
+  const rows=S.preds.filter(x=>x.asset===S.asset).slice(-16).reverse();
+  if(!rows.length){tb.innerHTML='<tr><td colspan="8" class="mut">No predictions yet.</td></tr>';return;}
+  rows.forEach(pr=>{
+    const cls=pr.outcome==='WIN'?'b-bull':pr.outcome==='LOSS'?'b-bear':pr.outcome==='FLAT'?'b-neu':'b-open';
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td>'+fmtD(pr.day)+'</td><td>'+esc(pr.asset)+'</td><td>'+pr.h+'d</td>'+
+      '<td class="'+(pr.comp>=0?'pos':'neg')+'">'+(pr.comp>=0?'+':'')+pr.comp.toFixed(2)+'</td>'+
+      '<td>'+(pr.p*100).toFixed(0)+'%</td><td>'+fmtP(pr.entry)+'</td>'+
+      '<td class="'+(pr.move===null?'mut':pr.move>=0?'pos':'neg')+'">'+(pr.move===null?'—':fmtPct(pr.move))+'</td>'+
+      '<td><span class="badge '+cls+'">'+pr.outcome+'</span></td>';
+    tb.appendChild(tr);});
+}
+function renderAlerts(){
+  const box=$('alertsList');box.innerHTML='';
+  if(!S.alerts.length){box.innerHTML='<span class="note">No alerts yet — state transitions will appear here and push to your channels.</span>';return;}
+  S.alerts.slice(0,20).forEach(a=>{
+    const d=document.createElement('div');d.className='alert '+a.type;
+    d.innerHTML='<div class="m">'+new Date(a.ts).toLocaleString()+'</div>'+esc(a.msg);
+    box.appendChild(d);});
+}
+function renderSources(){
+  const box=$('srcChips');box.innerHTML='';
+  const items=[['Binance klines/CVD','bin'],['Funding','fund'],['Coinbase premium','cb'],['Stablecoins','stb'],['CFTC COT','cot'],['OI 30d','oi'],['Top traders 30d','top']];
+  items.forEach(([l,k])=>{const s=SRC[k];const c=document.createElement('span');
+    c.className='chip '+(s==='ok'?'ok':s==='sync'?'sync':'bad');
+    c.textContent=l+': '+(s==='ok'?'LIVE':s==='sync'?'…':'unavailable');box.appendChild(c);});
+}
+
+/* ---------- charts ---------- */
+function mk(id,h){if(!HAS)return null;const el=$(id);
+  return LightweightCharts.createChart(el,{width:el.clientWidth||900,height:h,
+    layout:{background:{type:'solid',color:'#0a0f1a'},textColor:'#8b98ad',fontSize:10,attributionLogo:false},
+    grid:{vertLines:{color:'rgba(35,48,71,.45)'},horzLines:{color:'rgba(35,48,71,.45)'}},
+    rightPriceScale:{borderColor:'#233047'},leftPriceScale:{borderColor:'#233047',visible:false},
+    timeScale:{borderColor:'#233047'},crosshair:{mode:0}});}
+function ln(ch,o){return ch.addLineSeries(Object.assign({priceLineVisible:false,lastValueVisible:false},o));}
+function initCharts(){
+  if(!HAS)return;
+  CH.price=mk('priceChart',420);
+  if(CH.price){CH.price.applyOptions({leftPriceScale:{visible:true}});
+    SR.candles=CH.price.addCandlestickSeries({upColor:'#22c55e',downColor:'#ef4444',borderVisible:false,wickUpColor:'#22c55e',wickDownColor:'#ef4444'});
+    SR.cvd=ln(CH.price,{color:'#38bdf8',lineWidth:2,priceScaleId:'left',title:'CVD'});
+    SR.ma20=ln(CH.price,{color:'#f5a524',lineWidth:1.5,title:'20 MA'});}
+  CH.comp=mk('compChart',260);
+  if(CH.comp){SR.comp=CH.comp.addAreaSeries({lineColor:'#6366f1',topColor:'rgba(99,102,241,.35)',bottomColor:'rgba(99,102,241,.05)',lineWidth:2,priceLineVisible:false});
+    SR.thU=ln(CH.comp,{color:'#22c55e',lineWidth:1,lineStyle:2});SR.thUE=ln(CH.comp,{color:'#22c55e',lineWidth:1,lineStyle:1});
+    SR.thD=ln(CH.comp,{color:'#ef4444',lineWidth:1,lineStyle:2});SR.thDE=ln(CH.comp,{color:'#ef4444',lineWidth:1,lineStyle:1});}
+  CH.fund=mk('fundChart',220);if(CH.fund)SR.fund=CH.fund.addHistogramSeries({priceLineVisible:false});
+  CH.prem=mk('premChart',220);if(CH.prem)SR.prem=ln(CH.prem,{color:'#38bdf8',lineWidth:2});
+  CH.stb=mk('stbChart',220);if(CH.stb)SR.stb=CH.stb.addAreaSeries({lineColor:'#14b8a6',topColor:'rgba(20,184,166,.3)',bottomColor:'rgba(20,184,166,.05)',lineWidth:2,priceLineVisible:false});
+  CH.wf=mk('wfChart',260);if(CH.wf){SR.wfS=ln(CH.wf,{color:'#6366f1',lineWidth:2,title:'Strategy'});SR.wfB=ln(CH.wf,{color:'#8b98ad',lineWidth:1.5,title:'Buy & Hold'});}
+  window.addEventListener('resize',()=>{[['priceChart','price',420],['compChart','comp',260],['fundChart','fund',220],['premChart','prem',220],['stbChart','stb',220],['wfChart','wf',260]].forEach(([id,k,h])=>{const el=$(id);if(CH[k]&&el&&el.clientWidth>0)CH[k].applyOptions({width:el.clientWidth,height:h});});});
+}
+function renderCharts(){
+  if(!HAS||!D)return;
+  const b=D.bars;
+  SR.candles.setData(b.map(x=>({time:x.t,open:x.o,high:x.h,low:x.l,close:x.c})));
+  SR.cvd.setData(b.map((x,i)=>({time:x.t,value:D.cvd[i]})));
+  const ma=[];for(let i=19;i<D.N;i++){let s=0;for(let j=i-19;j<=i;j++)s+=b[j].c;ma.push({time:b[i].t,value:s/20});}
+  SR.ma20.setData(ma);
+  const w=S.weights;const compSeries=[];
+  for(let i=140;i<D.N;i++){const f=featsAt(D,i);compSeries.push({time:b[i].t,value:composite(f,w,0).comp});}
+  SR.comp.setData(compSeries);
+  const ts=compSeries.map(x=>x.time);
+  SR.thU.setData(ts.map(t=>({time:t,value:0.35})));SR.thUE.setData(ts.map(t=>({time:t,value:0.15})));
+  SR.thD.setData(ts.map(t=>({time:t,value:-0.35})));SR.thDE.setData(ts.map(t=>({time:t,value:-0.15})));
+  SR.fund.setData(b.map((x,i)=>D.fA[i]===null?null:{time:x.t,value:D.fA[i]*100,color:D.fA[i]>=0?'rgba(239,68,68,.7)':'rgba(34,197,94,.7)'}).filter(Boolean));
+  SR.prem.setData(b.map((x,i)=>D.pA[i]===null?null:{time:x.t,value:D.pA[i]}).filter(Boolean));
+  SR.stb.setData(b.map((x,i)=>D.sA[i]===null?null:{time:x.t,value:D.sA[i]/1e9}).filter(Boolean));
+  Object.keys(CH).forEach(k=>{try{CH[k].timeScale().fitContent();}catch(e){}});
+}
+
+/* ---------- walk-forward ---------- */
+function walkForward(){
+  if(!D||D.N<320){toast('Need ≥320 daily bars for walk-forward.','err');return;}
+  const w=freshWeights();const b=D.bars;
+  let pos=0,eq=1,bh=1,peak=1,maxDD=0;
+  const hits={n:0,ok:0};const queue=[];const eqS=[],eqB=[];const icPairs=[];
+  for(let i=260;i<D.N-1;i++){
+    const f=featsAt(D,i);const{comp,p}=composite(f,w,0);
+    const target=comp>=0.35?1:comp<=-0.35?-1:0;
+    const ret=b[i+1].c/b[i].c-1;
+    eq*=(1+pos*ret-(target!==pos?0.0005:0));bh*=(1+ret);
+    pos=target;peak=Math.max(peak,eq);maxDD=Math.max(maxDD,(peak-eq)/peak*100);
+    eqS.push({time:b[i].t,value:eq});eqB.push({time:b[i].t,value:bh});
+    queue.push({i,day:b[i].t,comp,feats:{...f}});
+    for(let q=queue.length-1;q>=0;q--){const pr=queue[q];
+      if(b[i].t>=pr.day+7*DAY){const r=b[i].c/b[pr.i].c-1;
+        if(Math.abs(r)>0.015){hits.n++;if(sign(pr.comp)===sign(r))hits.ok++;}
+        hedgeUpdate(w,pr.feats,r);queue.splice(q,1);}}
+    if(i+30<D.N)icPairs.push({c:comp,r:b[i+30].c/b[i].c-1});
+  }
+  const ic=pearson(icPairs);
+  WF={w,strat:(eq-1)*100,bh:(bh-1)*100,maxDD,hit:hits.n?hits.ok/hits.n*100:null,n:hits.n,ic};
+  const k=(kk,v,s,c)=>'<div class="kpi" style="--kc:'+c+'"><div class="k">'+kk+'</div><div class="v">'+v+'</div><div class="s">'+s+'</div></div>';
+  $('wfStats').innerHTML=
+    k('Strategy Return',fmtPct(WF.strat),'±0.35 zones · 0.05% switch fee',WF.strat>=0?'#22c55e':'#ef4444')+
+    k('Buy & Hold',fmtPct(WF.bh),'same window',WF.bh>=0?'#22c55e':'#ef4444')+
+    k('Max Drawdown','-'+WF.maxDD.toFixed(1)+'%','strategy equity','#fb923c')+
+    k('7d Hit-Rate',WF.hit===null?'—':WF.hit.toFixed(0)+'%','n='+WF.n+' matured calls',WF.hit!==null&&WF.hit>52?'#22c55e':'#f5a524')+
+    k('Info Coefficient',ic===null?'—':ic.toFixed(2),'composite vs 30d fwd',ic!==null&&ic>0.1?'#22c55e':'#f5a524')+
+    k('Edge vs B&H',fmtPct(WF.strat-WF.bh),'honest, no look-ahead',WF.strat>=WF.bh?'#22c55e':'#ef4444');
+  if(CH.wf){SR.wfS.setData(eqS);SR.wfB.setData(eqB);try{CH.wf.timeScale().fitContent();}catch(e){}}
+  $('btnAdopt').classList.remove('hidden');
+  $('wfNote').textContent='Walk-forward complete · '+(D.N-261)+' trading steps · weights learned online from matured 7d calls only.';
+  toast('Walk-forward finished — review stats before adopting weights.','ok');
+}
+
+/* ---------- load pipeline ---------- */
+async function loadAll(){
+  const sym=S.asset;
+  SRC={bin:'sync',fund:'sync',cb:'sync',stb:'sync',cot:'sync',oi:'sync',top:'sync'};renderSources();
+  const prod=sym+'-USD';
+  const[bar,fund,cb,stb,cot,oi,top]=await Promise.all([
+    fetchDaily(sym),fetchFunding(sym),fetchCB(prod),fetchStb(),
+    sym==='BTC'?fetchCOT():Promise.resolve(null),
+    fetchFut('openInterestHist',sym),fetchFut('topLongShortPositionRatio',sym)
+  ]);
+  SRC.bin=bar?'ok':'bad';SRC.fund=fund?'ok':'bad';SRC.cb=cb?'ok':'bad';SRC.stb=stb?'ok':'bad';
+  SRC.cot=sym==='BTC'?(cot?'ok':'bad'):'bad';SRC.oi=oi?'ok':'bad';SRC.top=top?'ok':'bad';
+  renderSources();
+  if(!bar){toast('Binance daily klines unreachable — cannot build spine. Retry later.','err');return;}
+  D=buildSpine(bar,fund,cb,stb,cot,oi,top);
+  dailyRun();
+}
+
+/* ---------- settings & events ---------- */
+function bind(){
+  $('assetSel').value=S.asset;
+  $('assetSel').onchange=e=>{S.asset=e.target.value;S.lastZone='neutral';save();loadAll();};
+  $('btnRefresh').onclick=()=>loadAll();
+  $('btnWF').onclick=walkForward;
+  $('btnDriftWF').onclick=walkForward;
+  $('btnTest').onclick=()=>pushAlert('Test alert · composite channels working · '+new Date().toLocaleTimeString(),'warn',true);
+  $('btnResetW').onclick=()=>{S.weights=freshWeights();S.q={};BUCKETS.forEach(b=>S.buckets[b]={weights:freshWeights(),n:0});save();dailyRun();toast('Weights reset to equal priors.','ok');};
+  $('btnAdopt').onclick=()=>{if(!WF)return;S.weights={...WF.w};S.q={};BUCKETS.forEach(b=>S.buckets[b]={weights:{...WF.w},n:0});save();dailyRun();toast('Walk-forward weights adopted for live signals.','ok');};
+  $('btnExport').onclick=()=>{const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='smartmoney_state.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);};
+  $('btnImport').onclick=()=>$('importFile').click();
+  $('importFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+    r.onload=()=>{try{const j=JSON.parse(r.result);if(!j.weights||!j.preds)throw new Error('not a monitor state file');S=j;save();bindValues();loadAll();toast('State imported.','ok');}catch(err){toast('Import failed: '+err.message,'err');}};
+    r.readAsText(f);e.target.value='';};
+  $('setWebhook').onchange=e=>{S.settings.webhook=e.target.value.trim();save();};
+  $('setTgToken').onchange=e=>{S.settings.tgToken=e.target.value.trim();save();};
+  $('setTgChat').onchange=e=>{S.settings.tgChat=e.target.value.trim();save();};
+  $('setNotify').onchange=e=>{S.settings.notify=e.target.checked;save();
+    if(e.target.checked&&typeof Notification!=='undefined'&&Notification.permission!=='granted')Notification.requestPermission();};
+  $('setBias').oninput=e=>{S.settings.bias=+e.target.value;$('biasVal').textContent=e.target.value;save();if(D)dailyRun();};
+}
+function bindValues(){
+  $('assetSel').value=S.asset;
+  $('setWebhook').value=S.settings.webhook||'';
+  $('setTgToken').value=S.settings.tgToken||'';
+  $('setTgChat').value=S.settings.tgChat||'';
+  $('setNotify').checked=!!S.settings.notify;
+  $('setBias').value=S.settings.bias||0;$('biasVal').textContent=S.settings.bias||0;
+}
+/* ---------- init ---------- */
+initCharts();bind();bindValues();renderAlerts();renderSources();
+loadAll();
+setInterval(()=>loadAll(),15*60*1000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadAll();});
+</script>
+</body>
+</html>
