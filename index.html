@@ -64,6 +64,9 @@ section.tab.active{display:block;animation:fadeUp .45s both}
 .btn:active{transform:translateY(0)}
 .btn-amber{background:linear-gradient(135deg,var(--amber),#f97316);color:#160f02;border-color:transparent}
 .btn-amber:hover{box-shadow:0 4px 18px rgba(245,165,36,.45);border-color:transparent}
+.btn-link{display:inline-block;text-decoration:none;background:linear-gradient(135deg,var(--indigo),var(--purple) 60%,var(--pink));
+  color:#fff;border-color:transparent;box-shadow:0 0 16px rgba(139,92,246,.35)}
+.btn-link:hover{box-shadow:0 4px 22px rgba(168,85,247,.55);border-color:transparent;color:#fff}
 .btn-red{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.5);color:#fca5a5}
 .btn-green{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.5);color:#86efac}
 .btn-sm{padding:4px 9px;font-size:11px}
@@ -134,7 +137,14 @@ table.tbl{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:
 .rep{border:1px solid var(--line);border-top:3px solid var(--rc,var(--indigo));border-radius:12px;padding:12px;background:linear-gradient(160deg,var(--s1),var(--s2))}
 .rep h4{margin:0;font-size:14px}
 .rep .line{font-family:var(--mono);font-size:11px;color:var(--mut);margin-top:5px}
-.rep .out{font-size:12px;color:#cbd5e1;margin-top:8px;border-top:1px dashed var(--line2);padding-top:8px}
+.hrec{border:1px solid var(--line);border-left:3px solid var(--hc,var(--indigo));border-radius:9px;padding:8px 10px;margin-top:8px;background:rgba(10,15,26,.55)}
+.hrec .hl{font-family:var(--mono);font-size:11px;color:#cbd5e1;margin-top:4px}
+.hrec .note{margin-top:4px}
+.confbar{height:5px;border-radius:4px;background:var(--s3);border:1px solid var(--line);margin-top:6px;overflow:hidden}
+.confbar i{display:block;height:100%;background:linear-gradient(90deg,var(--hc,var(--indigo)),color-mix(in srgb,var(--hc,var(--indigo)) 55%,#fff));border-radius:4px}
+.bandpanel{border:1px solid var(--line);border-radius:11px;padding:12px;background:linear-gradient(160deg,var(--s2),var(--s3))}
+.bandpanel .big{font-family:var(--mono);font-size:12.5px;color:#dbe4f0;margin-top:6px}
+.bandpanel .lvls{font-family:var(--mono);font-size:11.5px;margin-top:6px;color:var(--mut)}
 #toasts{position:fixed;right:16px;bottom:16px;z-index:100;display:flex;flex-direction:column;gap:8px;max-width:340px}
 .toast{background:rgba(12,17,28,.95);border:1px solid var(--line2);border-left:3px solid var(--indigo);border-radius:10px;
   padding:10px 12px;font-size:12px;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:fadeUp .25s both;display:flex;gap:10px;align-items:center}
@@ -158,6 +168,8 @@ input[type=range]{accent-color:var(--amber)}
       <div class="brand"><div class="logo">📈</div><div>CryptoAnalyst<small>Live Market Terminal · Signal Tracker · Portfolio</small></div></div>
       <div class="row">
         <span id="feedStatus" class="chip sync">Feed: Syncing Binance…</span>
+        <a id="smartLink" class="btn btn-link" href="smartmoney.html" target="_blank" rel="noopener"
+           title="Opens smartmoney.html from the same folder / GitHub repo (large-player flow monitor & self-improving signals)">🐋 Smart Money Monitor ↗</a>
         <button id="btnLogTop" class="btn btn-green">💾 Log Signals Now</button>
         <button id="btnRefreshTop" class="btn btn-amber">🔄 Refresh Data &amp; Signals</button>
       </div>
@@ -227,6 +239,22 @@ input[type=range]{accent-color:var(--amber)}
 
   <div class="card">
     <div class="row spread">
+      <div><h3>📊 Bollinger &amp; 🪄 Magic Bands — Clear Read &amp; Recommendation</h3>
+      <p class="sub">Bollinger reads the selected chart interval · Magic Bands read Weekly or Monthly anchors (AlgoAffe: “Kein Trading, keine Lower Frames”)</p></div>
+      <div class="row">
+        <span class="lbl">Magic basis:</span>
+        <button id="magicTfW" class="tf active">Weekly</button>
+        <button id="magicTfM" class="tf">Monthly</button>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="bandpanel" id="bbPanel"><span class="mut mono">Computing Bollinger read…</span></div>
+      <div class="bandpanel" id="magicPanel"><span class="mut mono">Computing Magic Bands read…</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row spread">
       <div><h3>🎯 Dynamic Candle Levels &amp; Volatility Liquidity Bands (Live Computed)</h3><p class="sub" id="levelsMeta">Syncing live spot &amp; rolling structure levels…</p></div>
       <div class="row"><button id="btnPlotSwings" class="btn btn-sm btn-amber">Plot Swing Levels on Chart</button><button id="btnClearSwings" class="btn btn-sm">Clear Swing Levels</button></div>
     </div>
@@ -258,11 +286,11 @@ input[type=range]{accent-color:var(--amber)}
 
   <div class="card">
     <div class="row spread">
-      <div><h3>💼 Sample Portfolio ($100,000 Model) &amp; Live/Reference Win Rates</h3><p class="sub">Live tracked value vs. baseline entry + reference ST/MT/LT win estimates. Open the Signal &amp; Portfolio Tracker for the full audit log.</p></div>
+      <div><h3>💼 Sample Portfolio ($100,000 Model) &amp; Live/Reference Win Rates</h3><p class="sub">Live tracked value vs. baseline entry + reference ST/MT/LT win estimates and the recommendation engine’s realized per-horizon success rates.</p></div>
       <div><label class="lbl" for="horizonSelect">Highlight Horizon</label><br>
       <select id="horizonSelect" class="inp"><option value="all">All Horizons (ST / MT / LT)</option><option value="st">Short-Term (1–7 Days)</option><option value="mt">Medium-Term (1–4 Weeks)</option><option value="lt">Long-Term (1–6 Months+)</option></select></div>
     </div>
-    <div class="tblwrap"><table class="tbl"><thead><tr><th>Asset</th><th>Target Alloc ($100k)</th><th>Live Model Value &amp; Return</th><th>Active Signal &amp; Tracked Win</th><th>Ref ST / MT / LT Win %</th></tr></thead><tbody id="overviewBody"></tbody></table></div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>Asset</th><th>Target Alloc ($100k)</th><th>Live Model Value &amp; Return</th><th>Active Signal &amp; Tracked Win</th><th>Ref ST / MT / LT Win % · Engine Rates</th></tr></thead><tbody id="overviewBody"></tbody></table></div>
   </div>
 
   <div class="card">
@@ -284,6 +312,20 @@ input[type=range]{accent-color:var(--amber)}
       <button id="btnClearLog" class="btn btn-red">🗑 Clear Log</button>
     </div>
   </div>
+
+  <div class="card">
+    <div class="row spread">
+      <div><h3>🧠 Horizon Recommendation Engine — Continuously Checked &amp; Success-Rate Calibrated</h3>
+      <p class="sub">Auto-logs one ST/MT/LT recommendation per asset per day, checks target/stop against every daily candle, and re-weights confidence by realized win rate (Bayesian shrinkage to a 55% prior). Weak horizons (&lt;45% over n≥10) demand stronger confluence before calling direction.</p></div>
+      <div class="row">
+        <span id="engineMeta" class="chip">Engine: waiting…</span>
+        <button id="btnLogRecs" class="btn btn-sm btn-green">+ Log Horizon Recs Now</button>
+        <button id="btnResetCal" class="btn btn-sm btn-red">↺ Reset Calibration</button>
+      </div>
+    </div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>Asset</th><th>ST 1–7d Rate (W/L)</th><th>MT 1–4w Rate (W/L)</th><th>LT 1–6m Rate (W/L)</th><th>Open Recs</th><th>Calibration</th></tr></thead><tbody id="engineBody"></tbody></table></div>
+  </div>
+
   <div class="card">
     <div class="row spread"><h3>💼 Sample $100,000 Portfolio — Baseline vs. Live Spot Performance</h3><span id="portfolioTotal" class="chip">--</span></div>
     <div class="tblwrap"><table class="tbl"><thead><tr><th>Asset</th><th>Weight</th><th>Baseline Entry</th><th>Live Spot</th><th>Target Alloc</th><th>Live Value</th><th>Return % / P&amp;L</th></tr></thead><tbody id="portfolioBody"></tbody></table></div>
@@ -336,9 +378,10 @@ input[type=range]{accent-color:var(--amber)}
 
 <section id="report" class="tab">
   <div class="card">
-    <div class="row spread"><div><h3>🏛️ Director’s Desk // Full Market Analyst Report (All Assets)</h3><p class="sub">Live spot &amp; candle-derived Quant Z/VD, dynamic zones, modeled MVRV/liquidation bands &amp; horizon outlooks.</p></div>
-    <button id="btnReportRefresh" class="btn btn-amber">🔄 Refresh Recommendations</button></div>
-    <p class="note">Data provenance: spot prices, candle MAs, dynamic Buy/Sell zones, PVSRA volume spread and rolling Quant Z/VD are computed from live Binance market data (seeded fallback when offline). Every signal snapshot and the $100,000 sample baseline persists in localStorage and is exportable as JSON.</p>
+    <div class="row spread"><div><h3>🏛️ Director’s Desk // Full Market Analyst Report (All Assets)</h3>
+    <p class="sub">Clear ST / MT / LT recommendations with entry zones, target ranges &amp; invalidation — auto-logged daily, checked against every candle, and confidence-calibrated by realized success rates.</p></div>
+    <div class="row"><span id="reportEngineNote" class="chip">Engine: waiting…</span><button id="btnReportRefresh" class="btn btn-amber">🔄 Refresh Recommendations</button></div></div>
+    <p class="note">Data provenance: spot, MAs, zones, PVSRA and Quant Z/VD from live Binance candles (seeded fallback offline). Horizon ranges are ATR/structure/model-based estimates; the engine’s tracked W/L per asset &amp; horizon continuously re-weights the confidence shown. Not financial advice.</p>
   </div>
   <div class="grid2" id="reportGrid"></div>
 </section>
@@ -404,7 +447,7 @@ input[type=range]{accent-color:var(--amber)}
 </section>
 
 </main>
-<footer><div class="wrap">CryptoAnalyst · browser-only terminal · live Binance data with deterministic seeded fallback · models are estimates, not financial advice · all state persists locally in your browser.</div></footer>
+<footer><div class="wrap">CryptoAnalyst · browser-only terminal · live Binance data with deterministic seeded fallback · 🐋 Smart Money Monitor opens <span class="mono">smartmoney.html</span> from the same folder/repo · models are estimates, not financial advice · all state persists locally in your browser.</div></footer>
 <div id="toasts"></div>
 
 <script>
@@ -413,6 +456,7 @@ input[type=range]{accent-color:var(--amber)}
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const dayOf=t=>Math.floor(t/86400)*86400;
 function fmtP(v){if(!Number.isFinite(v))return'--';const a=Math.abs(v);const d=a>=1000?0:a>=100?1:a>=1?2:a>=0.01?4:6;return v.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});}
 const fmtU=v=>Number.isFinite(v)?'$'+Math.round(v).toLocaleString('en-US'):'--';
 const fmtPct=v=>Number.isFinite(v)?(v>=0?'+':'')+v.toFixed(2)+'%':'--';
@@ -429,8 +473,8 @@ function download(name,obj){const blob=new Blob([JSON.stringify(obj,null,2)],{ty
 const lastVal=a=>a&&a.length?a[a.length-1].value:0;
 
 /* ================= CONFIG & STATE ================= */
-const IVS={'15m':900,'1h':3600,'4h':14400,'1d':86400,'1w':604800,'1M':2592000};
-const IV_LABEL={'15m':'15m','1h':'1H','4h':'4H','1d':'Daily','1w':'Weekly','1M':'Monthly'};
+const IVS={'15m':900,'1h':3600,'4h':14400,'1d':86400,'1w':604800,'1M':2592000,'1y':31536000};
+const IV_LABEL={'15m':'15m','1h':'1H','4h':'4H','1d':'Daily','1w':'Weekly','1M':'Monthly','1y':'Yearly'};
 const BASE_ASSETS=[
  {sym:'BTCUSDT',name:'Bitcoin',w:.40,p:80500,vol:.028,bv:28000,win:[68,76,84],strat:'Live Quant VD/Z + Power Law + STH + PVSRA'},
  {sym:'ETHUSDT',name:'Ethereum',w:.20,p:2650,vol:.034,bv:190000,win:[64,72,80],strat:'Live Quant VD/Z + Swing + PVSRA'},
@@ -444,9 +488,10 @@ const BASE_ASSETS=[
 ];
 const TABS=[['dashboard','🎯','Pro Charting, PVSRA & Portfolio'],['tracker','📊','Signal & Portfolio Tracker'],['quant','🧮','Quant Indicators'],['sthmodel','📉','STH MVRV & SOPR'],['powerlaw','📐','Power Law Model'],['report','🏛️','Market Analyst Report'],['xfeed','🐦','X Feed & Key Posts'],['macro','📅','Macro & Fed Calendar'],['glossary','📖','Glossary & Acronyms'],['backtest','🧪','Strategy Backtest & ROI'],['manager','🧩','Asset Manager']];
 const INDS=[['ma50','● 50 MA','#3b82f6'],['ma100','● 100 MA','#f59e0b'],['ma200d','● 200D MA','#ec4899'],['ma200w','● 200W MA','#a855f7'],['zones','● Dyn Buy/Sell','#22c55e'],['liq','💥 Est Liq Bands','#fb923c'],['sth','📉 Est STH Bands','#38bdf8'],['quant','🧮 Quant VD/Z','#f472b6'],['sfp','🎯 SFP Trap','#ef4444'],['pvsra','🔮 PVSRA Climax','#e879f9'],['pl','📐 Power Law','#14b8a6'],['bb','📊 Bollinger (20,2)','#38bdf8'],['magic','🪄 Magic Bands (W/M)','#818cf8']];
-const LS_KEY='cryptoanalyst_v3';
+const HORIZONS=[{k:'st',label:'ST',span:'1–7 days',days:7},{k:'mt',label:'MT',span:'1–4 weeks',days:28},{k:'lt',label:'LT',span:'1–6 months+',days:150}];
+const LS_KEY='cryptoanalyst_v4';
 let ASSETS={};
-let S={ticker:'BTCUSDT',interval:'1d',miniIv:'1d',horizon:'all',log:[],baseline:{},xposts:null,custom:[],lines:{},regime:'',
+let S={ticker:'BTCUSDT',interval:'1d',miniIv:'1d',magicTf:'w',horizon:'all',log:[],recs:[],baseline:{},xposts:null,custom:[],lines:{},regime:'',lastEval:0,
   vis:{ma50:true,ma100:true,ma200d:true,ma200w:true,zones:true,liq:true,sth:true,quant:true,sfp:true,pvsra:true,pl:true,bb:true,magic:true}};
 const C={};   // candle cache: sym_iv -> {bars,live}
 const AN={};  // daily analysis per symbol
@@ -455,13 +500,27 @@ let VIEW=null;
 let MAGIC=null;
 
 function buildAssets(){ASSETS={};BASE_ASSETS.forEach(a=>ASSETS[a.sym]={...a});S.custom.forEach(a=>ASSETS[a.sym]={...a,custom:true});}
-function loadState(){const s=loadLS(LS_KEY,null);if(s){S.ticker=s.ticker||S.ticker;S.interval=s.interval||S.interval;S.miniIv=s.miniIv||S.miniIv;S.horizon=s.horizon||'all';S.log=Array.isArray(s.log)?s.log:[];S.baseline=s.baseline||{};S.xposts=Array.isArray(s.xposts)?s.xposts:null;S.custom=Array.isArray(s.custom)?s.custom:[];S.lines=s.lines||{};S.regime=s.regime||'';if(s.vis)Object.assign(S.vis,s.vis);}if(!S.xposts)S.xposts=DEFAULT_POSTS.map(p=>({...p}));}
-function save(){saveLS(LS_KEY,{ticker:S.ticker,interval:S.interval,miniIv:S.miniIv,horizon:S.horizon,log:S.log,baseline:S.baseline,xposts:S.xposts,custom:S.custom,lines:S.lines,regime:S.regime,vis:S.vis});}
+function loadState(){const s=loadLS(LS_KEY,null)||loadLS('cryptoanalyst_v3',null);
+  if(s){S.ticker=s.ticker||S.ticker;S.interval=IVS[s.interval]?s.interval:S.interval;S.miniIv=s.miniIv||S.miniIv;S.magicTf=s.magicTf==='1M'?'1M':'w';
+    S.horizon=s.horizon||'all';S.log=Array.isArray(s.log)?s.log:[];S.recs=Array.isArray(s.recs)?s.recs:[];S.baseline=s.baseline||{};
+    S.xposts=Array.isArray(s.xposts)?s.xposts:null;S.custom=Array.isArray(s.custom)?s.custom:[];S.lines=s.lines||{};S.regime=s.regime||'';S.lastEval=s.lastEval||0;
+    if(s.vis)Object.assign(S.vis,s.vis);}
+  if(!S.xposts)S.xposts=DEFAULT_POSTS.map(p=>({...p}));}
+function save(){saveLS(LS_KEY,{ticker:S.ticker,interval:S.interval,miniIv:S.miniIv,magicTf:S.magicTf,horizon:S.horizon,log:S.log,recs:S.recs,baseline:S.baseline,xposts:S.xposts,custom:S.custom,lines:S.lines,regime:S.regime,lastEval:S.lastEval,vis:S.vis});}
 
 /* ================= SEEDED CANDLES & LIVE FETCH ================= */
-function bucketTime(iv,ts){if(iv==='1M'){const d=new Date(ts*1000);return Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),1)/1000;}return Math.floor(ts/IVS[iv])*IVS[iv];}
-function stepBack(iv,t,k){if(iv==='1M'){const d=new Date(t*1000);return Date.UTC(d.getUTCFullYear(),d.getUTCMonth()-k,1)/1000;}return t-k*IVS[iv];}
-function genCandles(sym,iv,n){n=n||500;const a=ASSETS[sym];const r=rng(hash(sym+iv));const end=bucketTime(iv,Math.floor(Date.now()/1000));
+function bucketTime(iv,ts){const d=new Date(ts*1000);
+  if(iv==='1M')return Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),1)/1000;
+  if(iv==='1y')return Date.UTC(d.getUTCFullYear(),0,1)/1000;
+  return Math.floor(ts/IVS[iv])*IVS[iv];}
+function stepBack(iv,t,k){const d=new Date(t*1000);
+  if(iv==='1M')return Date.UTC(d.getUTCFullYear(),d.getUTCMonth()-k,1)/1000;
+  if(iv==='1y')return Date.UTC(d.getUTCFullYear()-k,0,1)/1000;
+  return t-k*IVS[iv];}
+function genCandles(sym,iv,n){
+  if(iv==='1y')return aggBars(genCandles(sym,'1M',150),'Y');
+  n=n||500;if(iv==='1M')n=Math.min(n,180);
+  const a=ASSETS[sym];const r=rng(hash(sym+iv));const end=bucketTime(iv,Math.floor(Date.now()/1000));
   const times=[];for(let i=n-1;i>=0;i--)times.push(stepBack(iv,end,i));
   let p=a.p*(0.5+0.3*r());const ph=r()*6.283,ph2=r()*6.283;const raw=[];
   for(let i=0;i<n;i++){const cyc=Math.sin(i/34+ph)*0.006+Math.sin(i/120+ph2)*0.004;const shock=(r()-0.5)*a.vol;
@@ -476,10 +535,13 @@ const HOSTS=['https://api.binance.com','https://api1.binance.com','https://data-
 async function fetchK(sym,iv,limit){limit=limit||500;
   for(const h of HOSTS){try{const ctl=new AbortController();const to=setTimeout(()=>ctl.abort(),6000);
     const res=await fetch(h+'/api/v3/klines?symbol='+sym+'&interval='+iv+'&limit='+limit,{signal:ctl.signal});clearTimeout(to);
-    if(!res.ok)continue;const raw=await res.json();if(!Array.isArray(raw)||raw.length<30)continue;
+    if(!res.ok)continue;const raw=await res.json();if(!Array.isArray(raw)||raw.length<10)continue;
     return raw.map(k=>({time:Math.floor(k[0]/1000),open:+k[1],high:+k[2],low:+k[3],close:+k[4],volume:+k[5]})).filter(b=>Number.isFinite(b.close)&&b.close>0);
   }catch(e){}}
   return null;}
+async function fetchView(sym,iv){
+  if(iv==='1y'){const m=await fetchK(sym,'1M',1000);return m?aggBars(m,'Y'):null;}
+  return fetchK(sym,iv,iv==='1M'?1000:500);}
 function seedInstant(){Object.keys(ASSETS).forEach(s=>{C[s+'_1d']={bars:genCandles(s,'1d'),live:false};});
   const vk=S.ticker+'_'+S.interval;if(!C[vk])C[vk]={bars:genCandles(S.ticker,S.interval),live:false};
   const mk='BTCUSDT_'+S.miniIv;if(!C[mk])C[mk]={bars:genCandles('BTCUSDT',S.miniIv,400),live:false};}
@@ -534,11 +596,12 @@ function plSeries(bars){return bars.map(b=>({time:b.time,value:plFair(b.time)}))
 function aggBars(bars,mode){const out=[];let key=null,cur=null;
   for(const b of bars){const d=new Date(b.time*1000);let k,t;
     if(mode==='M'){k=d.getUTCFullYear()*12+d.getUTCMonth();t=Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),1)/1000;}
+    else if(mode==='Y'){k=d.getUTCFullYear();t=Date.UTC(k,0,1)/1000;}
     else{const day=d.getUTCDay();const bt=b.time-((day+6)%7)*86400;t=Math.floor(bt/86400)*86400;k=t;}
     if(k!==key){if(cur)out.push(cur);key=k;cur={time:t,open:b.open,high:b.high,low:b.low,close:b.close,volume:b.volume};}
     else{cur.high=Math.max(cur.high,b.high);cur.low=Math.min(cur.low,b.low);cur.close=b.close;cur.volume+=b.volume;}}
   if(cur)out.push(cur);return out;}
-function magicAnchors(bars){const out={times:[],y:[],q:[],m:[],up:[],lo:[],prevY:null,prevQ:null,prevM:null,curY:null,curQ:null,curM:null};
+function magicAnchors(bars){const out={times:[],y:[],q:[],m:[],up:[],lo:[],prevY:null,prevQ:null,prevM:null,curY:null,curQ:null,curM:null,curUp:null,curLo:null};
   let cy=null,cq=null,cm=null,lY=null,lQ=null,lM=null;
   let ay={pv:0,v:0,pv2:0},aq={pv:0,v:0,pv2:0},am={pv:0,v:0,pv2:0};
   for(const b of bars){const d=new Date(b.time*1000);const yr=d.getUTCFullYear(),mo=d.getUTCMonth();
@@ -552,15 +615,19 @@ function magicAnchors(bars){const out={times:[],y:[],q:[],m:[],up:[],lo:[],prevY
     const sd=Math.sqrt(Math.max(ay.pv2/ay.v-yv*yv,0));
     out.times.push(b.time);out.y.push(yv);out.q.push(qv);out.m.push(mv);out.up.push(yv+2*sd);out.lo.push(Math.max(yv-2*sd,0));
     lY=yv;lQ=qv;lM=mv;}
-  out.curY=lY;out.curQ=lQ;out.curM=lM;return out;}
+  out.curY=lY;out.curQ=lQ;out.curM=lM;
+  out.curUp=out.up.length?out.up[out.up.length-1]:null;out.curLo=out.lo.length?out.lo[out.lo.length-1]:null;
+  return out;}
 function mapSeries(times,vals,bars){const pts=[];let j=0;if(!times.length)return pts;
   for(const b of bars){while(j+1<times.length&&times[j+1]<=b.time)j++;
     if(times[0]<=b.time&&Number.isFinite(vals[j]))pts.push({time:b.time,value:vals[j]});}
   return pts;}
-function weeklyMA(bars){if(S.interval==='1M')return[];
-  const wk=S.interval==='1w'?bars:aggBars(bars,'w');if(wk.length<12)return[];
+function weeklyMA(bars){
+  if(S.interval==='1y')return[];
+  if(S.interval==='1w')return sma(bars,Math.min(200,Math.max(10,bars.length-1)));
+  if(S.interval==='1M')return sma(bars,Math.min(46,Math.max(6,bars.length-1)));
+  const wk=aggBars(bars,'w');if(wk.length<12)return[];
   const p=Math.min(200,Math.max(10,wk.length-1));const ma=sma(wk,p);
-  if(S.interval==='1w')return ma;
   return mapSeries(ma.map(x=>x.time),ma.map(x=>x.value),bars);}
 function signalOf(o){let sc=0;const z=o.z,vd=o.vd;
   if(z<=-3)sc+=3;else if(z<=-1.58)sc+=2;else if(z>=1.58)sc-=2;
@@ -674,7 +741,7 @@ function renderMain(){const v=VIEW;if(!v)return;
     if(S.vis.sth){mkLine('sth',v.st.basis,'STH Basis','#38bdf8',2);mkLine('sth',v.st.zone[0],'STH Value Low','#60a5fa',1);mkLine('sth',v.st.zone[1],'STH Value High','#60a5fa',1);}
     applyVis();renderDrawLines();renderMagic(v);
     try{CH.main.timeScale().fitContent();}catch(e){}}
-  renderHUD(v);renderDecision(v);renderLevels(v);renderLinesChips();renderRegime();}
+  renderHUD(v);renderDecision(v);renderLevels(v);renderLinesChips();renderRegime();renderBandRecs();}
 function applyVis(){if(!CH.main)return;
   SR.ma50.applyOptions({visible:S.vis.ma50});SR.ma100.applyOptions({visible:S.vis.ma100});
   SR.ma200d.applyOptions({visible:S.vis.ma200d});SR.ma200w.applyOptions({visible:S.vis.ma200w});
@@ -683,14 +750,14 @@ function applyVis(){if(!CH.main)return;
   [SR.mY,SR.mQ,SR.mM,SR.mU,SR.mL].forEach(s=>s.applyOptions({visible:S.vis.magic}));}
 async function renderMagic(v){if(!CH.main)return;
   const hud=$('hudMagic');
-  if(!S.vis.magic){clearGroup('magic');if(hud)hud.textContent='🪄 Magic: off';return;}
-  const sym=S.ticker;const mode=S.interval==='1M'?'M':'w';const key=sym+'_'+mode;
+  if(!S.vis.magic){clearGroup('magic');if(hud)hud.textContent='🪄 Magic: off';renderBandRecs();return;}
+  const sym=S.ticker;const tf=S.magicTf;const mode=tf==='1M'?'M':'w';const key=sym+'_'+tf;
   let base=MC[key];
-  if(!base){const liv=await fetchK(sym,mode==='M'?'1M':'1w',1000);
+  if(!base){const liv=await fetchK(sym,tf,1000);
     base=liv||aggBars((C[sym+'_1d']||{bars:v.bars}).bars,mode);MC[key]=base;}
-  if(S.ticker!==sym)return;
-  if(!base||base.length<8){if(hud)hud.textContent='🪄 Magic: n/a';return;}
-  MAGIC=magicAnchors(base);
+  if(S.ticker!==sym||S.magicTf!==tf)return;
+  if(!base||base.length<8){if(hud)hud.textContent='🪄 Magic: n/a';renderBandRecs();return;}
+  MAGIC=Object.assign(magicAnchors(base),{sym,tf});
   SR.mY.setData(mapSeries(MAGIC.times,MAGIC.y,v.bars));
   SR.mQ.setData(mapSeries(MAGIC.times,MAGIC.q,v.bars));
   SR.mM.setData(mapSeries(MAGIC.times,MAGIC.m,v.bars));
@@ -701,7 +768,8 @@ async function renderMagic(v){if(!CH.main)return;
   mkLine('magic',MAGIC.prevQ,'Prev Q VWAP','#a855f7',2);
   mkLine('magic',MAGIC.prevM,'Prev M VWAP','#38bdf8',1);
   if(sym==='BTCUSDT'){mkLine('magic',81923.69,'MB L2 (ref)','#fb923c',3);mkLine('magic',55130,'MB L1 (ref)','#38bdf8',3);}
-  if(hud)hud.textContent='🪄 Magic Y/Q/M: '+fmtP(MAGIC.curY)+' / '+fmtP(MAGIC.curQ)+' / '+fmtP(MAGIC.curM);}
+  if(hud)hud.textContent='🪄 Magic('+(tf==='1M'?'M':'W')+') Y/Q/M: '+fmtP(MAGIC.curY)+' / '+fmtP(MAGIC.curQ)+' / '+fmtP(MAGIC.curM);
+  renderBandRecs();}
 function renderHUD(v){$('hudTicker').textContent=S.ticker;$('hudTf').textContent=IV_LABEL[S.interval];
   const sg=$('hudSignal');sg.textContent=v.sig.label;sg.className='badge '+v.sig.cls;
   setHudBar(v.last,lastVal(v.ma50),lastVal(v.ma100),lastVal(v.ma200),lastVal(weeklyMA(v.bars)));
@@ -720,14 +788,94 @@ function onCrosshair(param){if(!VIEW)return;
   const v=VIEW;setHudBar(v.last,lastVal(v.ma50),lastVal(v.ma100),lastVal(v.ma200),lastVal(weeklyMA(v.bars)));}
 function renderMini(){const key='BTCUSDT_'+S.miniIv;const c=C[key];if(!c)return;const bars=c.bars;
   if(CH.mini){SR.mc.setData(bars);SR.m50.setData(sma(bars,50));SR.m100.setData(sma(bars,100));SR.m200.setData(sma(bars,200));
-    const wk=aggBars(bars,'w');const p=Math.min(200,Math.max(10,wk.length-1));const wma=sma(wk,p);
-    SR.m200w.setData(mapSeries(wma.map(x=>x.time),wma.map(x=>x.value),bars));
+    let wma;
+    if(S.miniIv==='1w')wma=sma(bars,Math.min(200,Math.max(10,bars.length-1)));
+    else if(S.miniIv==='1M')wma=sma(bars,Math.min(46,Math.max(6,bars.length-1)));
+    else{const wk=aggBars(bars,'w');const p=Math.min(200,Math.max(10,wk.length-1));const ma=sma(wk,p);
+      wma=mapSeries(ma.map(x=>x.time),ma.map(x=>x.value),bars);}
+    SR.m200w.setData(wma);
     const bb=boll(bars);SR.mbbU.setData(bb.upper);SR.mbbM.setData(bb.middle);SR.mbbL.setData(bb.lower);
     SR.m50.applyOptions({visible:$('toggleMa50').checked});SR.m100.applyOptions({visible:$('toggleMa100').checked});
     SR.m200.applyOptions({visible:$('toggleMa200').checked});SR.m200w.applyOptions({visible:$('toggleMa200w').checked});
     const bv=$('toggleBollinger').checked;[SR.mbbU,SR.mbbM,SR.mbbL].forEach(s=>s.applyOptions({visible:bv}));
     try{CH.mini.timeScale().fitContent();}catch(e){}}
   $('miniStatus').textContent=(c.live?'Loaded '+bars.length+' candles via Binance':'Seeded fallback: '+bars.length+' candles')+' (BTCUSDT '+IV_LABEL[S.miniIv]+')';}
+
+/* ================= BOLLINGER & MAGIC CLEAR RECOMMENDATIONS ================= */
+function bbRead(){
+  const v=VIEW;if(!v)return null;
+  const bb=boll(v.bars);if(!bb.middle.length)return null;
+  const n=bb.middle.length;const c=v.last.close;
+  const u=bb.upper[n-1].value,m=bb.middle[n-1].value,l=bb.lower[n-1].value;
+  const pctB=(u-l)>0?(c-l)/(u-l):0.5;const bw=m>0?(u-l)/m:0;
+  const bws=[];for(let i=Math.max(0,n-120);i<n;i++){const mm=bb.middle[i].value;bws.push(mm>0?(bb.upper[i].value-bb.lower[i].value)/mm:0);}
+  const squeeze=bws.length>10&&(bws.filter(x=>x<=bw).length/bws.length)<=0.2;
+  const atrV=v.lq.atr||c*0.02;
+  let action,cls,text,levels;
+  if(pctB>1.02){action='TRIM / TAKE PROFIT';cls='b-trim';
+    text='Close is riding ABOVE the upper band — statistically overextended on this interval. Harvest strength; mean-reversion pull toward the 20-SMA is the base case.';
+    levels='Re-entry zone: '+fmtP(m)+' – '+fmtP(m+0.3*(u-m))+' · Stretch target: '+fmtP(u)+' · Invalidation (band-walk continuation): close > '+fmtP(u+0.5*atrV);}
+  else if(pctB<-0.02){action='ACCUMULATE (MEAN REVERSION)';cls='b-acc';
+    text='Close is BELOW the lower band — oversold flush. Scale in against the band with the 20-SMA as first magnet; confirm with PVSRA climax / SFP for higher quality.';
+    levels='Entry zone: '+fmtP(l-0.3*atrV)+' – '+fmtP(l)+' · Target 1: '+fmtP(m)+' · Target 2: '+fmtP(u)+' · Stop: '+fmtP(l-0.9*atrV);}
+  else if(squeeze){action='WAIT — SQUEEZE BREAKOUT';cls='b-hold';
+    text='Bandwidth is in the lowest 20% of the last 120 bars: compression precedes expansion. Do not pre-position; trade the confirmed break with volume.';
+    levels='Long trigger: close > '+fmtP(u)+' (target '+fmtP(u+(u-l))+') · Short trigger: close < '+fmtP(l)+' (target '+fmtP(l-(u-l))+')';}
+  else if(pctB>=0.8){action='HOLD — UPPER HALF';cls='b-hold';
+    text='Price holds the upper half of the envelope: trend-friendly but not fresh entry. Prefer adds on a tag of the mid-band.';
+    levels='Add zone: '+fmtP(m)+' · Upper reference: '+fmtP(u)+' · Loss of '+fmtP(m)+' flips the read neutral/bearish.';}
+  else if(pctB<=0.2){action='ACCUMULATE — LOWER HALF';cls='b-acc';
+    text='Price sits in the lower half of the envelope near value. Constructive add zone while the lower band holds.';
+    levels='Entry zone: '+fmtP(l)+' – '+fmtP(l+0.25*(u-l))+' · Target: '+fmtP(m)+' → '+fmtP(u)+' · Stop: '+fmtP(l-0.7*atrV);}
+  else{action='NEUTRAL — MID RANGE';cls='b-hold';
+    text='Price is mid-envelope with normal bandwidth: no Bollinger edge right now. Defer to Magic Bands / quant structure.';
+    levels='Range: '+fmtP(l)+' ↔ '+fmtP(u)+' · Mid pivot: '+fmtP(m);}
+  return{action,cls,text,levels,pctB,bw,squeeze,u,m,l};
+}
+function magicRead(){
+  if(!MAGIC||MAGIC.sym!==S.ticker||!VIEW)return null;
+  const c=VIEW.last.close;const M=MAGIC;
+  if(!Number.isFinite(M.curY)||!Number.isFinite(M.curQ)||!Number.isFinite(M.curM))return null;
+  const above=[M.curY,M.curQ,M.curM].filter(x=>c>x).length;
+  const dipBuy=Math.max(M.curQ,M.curM);const rallySell=Math.min(M.curQ,M.curM);
+  let action,cls,text,levels;
+  if(Number.isFinite(M.curUp)&&c>=M.curUp){action='TRIM — ABOVE +2σ YEAR BAND';cls='b-trim';
+    text='Price is above the yearly VWAP +2σ band on the '+(M.tf==='1M'?'Monthly':'Weekly')+' basis — cycle-stretched. Reduce into strength; the yearly VWAP is the reversion anchor.';
+    levels='Trim zone: '+fmtP(M.curUp)+'+ · Reversion anchor: '+fmtP(M.curY)+' · Trend resumes above '+fmtP(M.curUp);}
+  else if(Number.isFinite(M.curLo)&&c<=M.curLo){action='ACCUMULATE — BELOW −2σ YEAR BAND';cls='b-acc';
+    text='Price is below the yearly VWAP −2σ band — deep-value territory on the higher-timeframe basis. Historically strong accumulation zone; scale, do not chase.';
+    levels='Accumulation: '+fmtP(c)+' → '+fmtP(M.curLo)+' · First magnet: '+fmtP(rallySell)+' · Cycle anchor: '+fmtP(M.curY);}
+  else if(above===3){action='UPTREND SUPPORTED — BUY DIPS';cls='b-buy';
+    text='Price holds ABOVE all three anchored VWAPs (Year / Quarter / Month): large-timeframe buyers are in control. AlgoAffe basis: Weekly & Monthly only.';
+    levels='Dip-buy zone: '+fmtP(dipBuy)+' – '+fmtP(Math.min(M.curQ,M.curM))+' · Strength reference: '+fmtP(M.curUp||M.curY*1.2)+' · Read flips below '+fmtP(M.curY);}
+  else if(above===0){action='DOWNTREND PRESSURE — SELL RALLIES';cls='b-sell';
+    text='Price is BELOW all three anchored VWAPs: higher-timeframe distribution regime. Rallies into the Q/M VWAP cluster are supply until reclaimed.';
+    levels='Rally-sell zone: '+fmtP(rallySell)+' – '+fmtP(Math.max(M.curQ,M.curM))+' · Downside band: '+fmtP(M.curLo||M.curY*0.8)+' · Regime flips above '+fmtP(M.curY);}
+  else{action='TRANSITION — WATCH Q/M VWAP';cls='b-hold';
+    text='Price is between the anchors ('+above+'/3 reclaimed): regime transition. The quarter/month VWAP cluster is the decision line.';
+    levels='Bull reclaim: close > '+fmtP(Math.max(M.curQ,M.curM))+' · Bear loss: close < '+fmtP(Math.min(M.curQ,M.curM))+' · Year anchor: '+fmtP(M.curY);}
+  let ref='';
+  if(S.ticker==='BTCUSDT'){
+    if(Math.abs(c/81923.69-1)<=0.035)ref=' · At MB L2 reference 81,923.69 (balance/pivot)';
+    else if(Math.abs(c/55130-1)<=0.05)ref=' · Near MB L1 reference 55,130 (cycle value)';
+    else ref=' · Refs: L2 81,923.69 / L1 55,130';}
+  return{action,cls,text,levels:levels+ref,above,tf:M.tf};
+}
+function renderBandRecs(){
+  const bb=bbRead();const bp=$('bbPanel');
+  if(!bb){bp.innerHTML='<div class="row spread"><b>📊 Bollinger (20,2) · '+esc(IV_LABEL[S.interval])+'</b><span class="badge b-hold">N/A</span></div><div class="big mut">Not enough candles on '+esc(IV_LABEL[S.interval])+' for a 20-period band (Yearly view has ~10 bars). Switch to Monthly or lower for the Bollinger read.</div>';}
+  else{bp.innerHTML='<div class="row spread"><b>📊 Bollinger (20,2) · '+esc(IV_LABEL[S.interval])+'</b><span class="badge '+bb.cls+'">'+bb.action+'</span></div>'+
+    '<div class="big">'+esc(bb.text)+'</div>'+
+    '<div class="lvls">'+esc(bb.levels)+'</div>'+
+    '<div class="note mono" style="margin-top:6px">%B '+bb.pctB.toFixed(2)+' · bandwidth '+(bb.bw*100).toFixed(2)+'%'+(bb.squeeze?' · <span class="warn">SQUEEZE</span>':'')+' · U '+fmtP(bb.u)+' / M '+fmtP(bb.m)+' / L '+fmtP(bb.l)+'</div>';}
+  const mg=magicRead();const mp=$('magicPanel');
+  if(!S.vis.magic){mp.innerHTML='<div class="row spread"><b>🪄 Magic Bands</b><span class="badge b-hold">OFF</span></div><div class="big mut">Magic Bands toggle is off — enable 🪄 in the indicator bar to compute the Weekly/Monthly read.</div>';}
+  else if(!mg){mp.innerHTML='<div class="row spread"><b>🪄 Magic Bands · '+(S.magicTf==='1M'?'Monthly':'Weekly')+'</b><span class="badge b-open">LOADING</span></div><div class="big mut">Fetching '+(S.magicTf==='1M'?'monthly':'weekly')+' anchor bars… the read appears automatically.</div>';}
+  else{mp.innerHTML='<div class="row spread"><b>🪄 Magic Bands · '+(mg.tf==='1M'?'Monthly':'Weekly')+' basis</b><span class="badge '+mg.cls+'">'+mg.action+'</span></div>'+
+    '<div class="big">'+esc(mg.text)+'</div>'+
+    '<div class="lvls">'+esc(mg.levels)+'</div>'+
+    '<div class="note mono" style="margin-top:6px">Anchors reclaimed: '+mg.above+'/3 · Y '+fmtP(MAGIC.curY)+' / Q '+fmtP(MAGIC.curQ)+' / M '+fmtP(MAGIC.curM)+' · ±2σ '+fmtP(MAGIC.curLo)+' ↔ '+fmtP(MAGIC.curUp)+'</div>';}
+}
 
 /* ================= DRAWING TOOLS ================= */
 let tool='none',pendDiag=null;
@@ -811,14 +959,17 @@ function renderWatchlist(){const tb=$('watchlistBody');tb.innerHTML='';
     tr.onclick=()=>{setAsset(sym);switchTab('dashboard');};tb.appendChild(tr);});
   $('watchMeta').textContent=Object.keys(ASSETS).length+' assets · '+(Object.values(C).some(c=>c.live)?'live':'seeded')+' · updated '+new Date().toLocaleTimeString();}
 function ensureBaseline(){Object.keys(ASSETS).forEach(sym=>{if(!S.baseline[sym]){const a=AN[sym];S.baseline[sym]=a?+(a.last.close*0.88).toPrecision(6):ASSETS[sym].p*0.88;}});}
+function enginePct(sym,hk){const st=statsFor(sym,hk);return st.n?Math.round(st.rate*100)+'%':'—';}
 function renderOverview(){ensureBaseline();const tb=$('overviewBody');tb.innerHTML='';const h=S.horizon;
   Object.keys(ASSETS).forEach(sym=>{const A=ASSETS[sym],a=AN[sym];if(!a)return;
     const alloc=A.w*100000;const entry=S.baseline[sym];const val=alloc*(a.last.close/entry);const ret=(a.last.close/entry-1)*100;
     const wins=A.win.map((w,i)=>{const k=['st','mt','lt'][i];const on=h==='all'||h===k;return '<span class="'+(on?'warn':'mut')+'" style="'+(on&&h!=='all'?'font-weight:700':'')+'">'+w+'%</span>';}).join(' / ');
+    const eng='engine: '+enginePct(sym,'st')+' / '+enginePct(sym,'mt')+' / '+enginePct(sym,'lt');
     const tr=document.createElement('tr');
     tr.innerHTML='<td><b>'+esc(sym)+'</b></td><td>'+fmtU(alloc)+' <span class="mut">('+(A.w*100).toFixed(0)+'%)</span></td>'+
       '<td>'+fmtU(val)+' <span class="'+(ret>=0?'pos':'neg')+'">'+fmtPct(ret)+'</span></td>'+
-      '<td><span class="badge '+a.sig.cls+'">'+a.sig.label+'</span> <span class="mut">'+trackedWin(sym)+'</span></td><td>'+wins+'</td>';
+      '<td><span class="badge '+a.sig.cls+'">'+a.sig.label+'</span> <span class="mut">'+trackedWin(sym)+'</span></td>'+
+      '<td>'+wins+'<br><span class="mut" style="font-size:10px">'+eng+'</span></td>';
     tb.appendChild(tr);});}
 function renderPortfolio(){ensureBaseline();const tb=$('portfolioBody');tb.innerHTML='';let total=0,cost=0;
   Object.keys(ASSETS).forEach(sym=>{const A=ASSETS[sym],a=AN[sym];if(!a)return;
@@ -860,6 +1011,108 @@ function reanchor(){Object.keys(ASSETS).forEach(sym=>{const a=AN[sym];if(a)S.bas
 function clearLog(){if(!S.log.length)return;const copy=[...S.log];S.log=[];save();renderLog();renderOverview();
   toast('Signal log cleared ('+copy.length+').','warn',{label:'Undo',fn:()=>{S.log=copy;save();renderLog();renderOverview();}});}
 
+/* ================= HORIZON RECOMMENDATION ENGINE ================= */
+function statsFor(sym,hk){let w=0,l=0;
+  S.recs.forEach(r=>{if(r.ticker===sym&&r.h===hk){if(r.outcome==='WIN')w++;else if(r.outcome==='LOSS')l++;}});
+  const n=w+l;const raw=n?w/n:0.55;const rate=(w+5.5)/(n+10);
+  return{w,l,n,raw,rate};}
+function horizonRec(sym,hk){
+  const a=AN[sym];if(!a)return null;
+  const c=a.last.close;const atrV=a.lq.atr||c*0.02;
+  const z=lastVal(a.z),vd=lastVal(a.vd.sig);
+  const ma200=lastVal(a.ma200),ma50=lastVal(a.ma50);
+  const win250=a.bars.slice(-250);
+  const hi250=Math.max.apply(null,win250.map(b=>b.high));
+  const lo250=Math.min.apply(null,win250.map(b=>b.low));
+  let score=0,eLo,eHi,tLo,tHi,stop,why;
+  if(hk==='st'){
+    score=(z<=-1.58?2:z>=1.58?-2:0)+(vd>=0.5?1:vd<=-0.35?-1:0)
+      +(a.pv.regime==='PVSRA Climax'?(a.last.close<a.last.open?1:-1):0)
+      +(c<=a.zn.buy?1:c>=a.zn.sell?-1:0);
+    if(score>=2){eLo=c-0.6*atrV;eHi=c+0.2*atrV;tLo=c+0.9*atrV;tHi=c+2.2*atrV;stop=c-1.3*atrV;
+      why='Oversold flush + delta support — tactical rebound toward the ATR target band.';}
+    else if(score<=-2){eLo=c-0.2*atrV;eHi=c+0.6*atrV;tLo=c-2.2*atrV;tHi=c-0.9*atrV;stop=c+1.3*atrV;
+      why='Overextension + fading delta — tactical pullback toward the lower ATR band.';}
+    else{score=0;eLo=a.zn.buy;eHi=Math.min(c,a.zn.buy+0.8*atrV);tLo=a.zn.sell*0.98;tHi=a.zn.sell;stop=a.zn.buy-1.2*atrV;
+      why='Range regime — rotation from the dynamic buy zone toward the sell zone.';}
+  }else if(hk==='mt'){
+    score=(c<=a.zn.buy?2:0)+(c>=a.zn.sell?-2:0)+(z<=-1?1:z>=1.5?-1:0)+(ma50>ma200?1:-1)+(vd>0?0.5:-0.5);
+    if(score>=2){eLo=Math.max(a.zn.buy,c-1.6*atrV);eHi=c;tLo=a.zn.sell;tHi=a.zn.sell+2.5*atrV;stop=a.zn.buy-2*atrV;
+      why='Structure + trend aligned — swing accumulation toward the 120-bar supply shelf.';}
+    else if(score<=-2){eLo=c;eHi=Math.min(a.zn.sell,c+1.6*atrV);tLo=a.zn.buy-2.5*atrV;tHi=a.zn.buy;stop=a.zn.sell+2*atrV;
+      why='Supply shelf + trend pressure — swing distribution toward the demand shelf.';}
+    else{score=0;eLo=a.zn.buy;eHi=a.zn.buy+1.2*atrV;tLo=a.zn.sell*0.97;tHi=a.zn.sell;stop=a.zn.buy-2*atrV;
+      why='Balanced structure — range plan between the live quantile zones.';}
+  }else{
+    const trendUp=ma200>0&&c>ma200;
+    score=(trendUp?2:-2)
+      +(sym==='BTCUSDT'?(a.plDev<=-0.2?2:a.plDev>=0.8?-2:a.plDev<0.2?1:-1):(c<lo250*1.25?1:c>hi250*0.95?-1:0))
+      +(sym==='BTCUSDT'?(a.st.mvrv<1?1:a.st.mvrv>1.35?-1:0):0);
+    if(score>=2){eLo=c*0.9;eHi=c;tLo=Math.max(hi250,c*1.18);tHi=c*1.5;stop=Math.min(lo250*0.95,c*0.78);
+      why=(sym==='BTCUSDT'?'Power Law dev '+fmtPct(a.plDev*100)+' + MVRV '+a.st.mvrv.toFixed(2)+' + trend — cycle accumulation toward the 250-bar high and beyond.':'Above 200D trend + value position — cycle accumulation toward the yearly high shelf.');}
+    else if(score<=-2){eLo=c;eHi=c*1.08;tLo=c*0.62;tHi=Math.min(lo250*1.05,c*0.8);stop=Math.max(hi250*1.02,c*1.22);
+      why=(sym==='BTCUSDT'?'Stretched vs Power Law / overheated MVRV below trend — cycle distribution toward the lower value shelf.':'Below 200D trend + extended position — cycle distribution toward the yearly low shelf.');}
+    else{score=0;eLo=lo250*1.02;eHi=lo250*1.15;tLo=hi250*0.9;tHi=hi250;stop=lo250*0.9;
+      why='Mixed cycle signals — patient accumulation near the yearly value shelf, targets at the high shelf.';}
+  }
+  const st=statsFor(sym,hk);
+  const cautious=st.n>=10&&st.raw<0.45;
+  let dir=score>=2?1:score<=-2?-1:0;
+  if(cautious&&Math.abs(score)<3)dir=0;
+  const action=dir===0?'HOLD':score>=4?'BUY':score>=2?'ACCUMULATE':score<=-4?'SELL':'TRIM';
+  const strength=Math.min(Math.abs(score),6)/6;
+  const conf=Math.round(100*clamp(0.5*st.rate+0.5*(0.45+0.4*strength),0.3,0.92));
+  const nLo=Math.min(eLo,eHi),nHi=Math.max(eLo,eHi);
+  const rLo=Math.min(tLo,tHi),rHi=Math.max(tLo,tHi);
+  return{hk,action,dir,score,entryLo:nLo,entryHi:nHi,tLo:rLo,tHi:rHi,stop,conf,stats:st,cautious,why};
+}
+function evaluateRecs(){const now=Date.now();
+  S.recs.forEach(r=>{
+    const a=AN[r.ticker];if(!a)return;
+    r.move=(a.last.close/r.entry-1)*100;
+    if(r.outcome!=='OPEN')return;
+    let res=null;
+    for(const b of a.bars){if(b.time<=r.day)continue;
+      if(r.dir>0){if(b.low<=r.stop){res='LOSS';break;}if(b.high>=r.target){res='WIN';break;}}
+      else{if(b.high>=r.stop){res='LOSS';break;}if(b.low<=r.target){res='WIN';break;}}}
+    if(!res&&now>=r.ts+r.days*86400000){
+      const mv=(a.last.close/r.entry-1)*r.dir;
+      res=mv>0.01?'WIN':mv<-0.01?'LOSS':'FLAT';}
+    if(res){r.outcome=res;r.closedTs=now;}
+  });
+  if(S.recs.length>800)S.recs=S.recs.slice(-800);
+  S.lastEval=now;}
+function autoLogRecs(force){const day=dayOf(Math.floor(Date.now()/1000));let n=0;
+  Object.keys(ASSETS).forEach(sym=>{HORIZONS.forEach(h=>{
+    const rec=horizonRec(sym,h.k);if(!rec||rec.dir===0)return;
+    if(!force&&S.recs.some(r=>r.ticker===sym&&r.h===h.k&&r.day===day))return;
+    const a=AN[sym];if(!a)return;
+    S.recs.push({id:'r'+Date.now()+'_'+sym+'_'+h.k,ts:Date.now(),day,ticker:sym,h:h.k,days:h.days,
+      action:rec.action,dir:rec.dir,entry:a.last.close,target:(rec.tLo+rec.tHi)/2,stop:rec.stop,conf:rec.conf,outcome:'OPEN',move:0});
+    n++;});});
+  return n;}
+function engineTick(force){evaluateRecs();const n=autoLogRecs(force);save();
+  const open=S.recs.filter(r=>r.outcome==='OPEN').length;
+  const done=S.recs.filter(r=>r.outcome==='WIN'||r.outcome==='LOSS').length;
+  const meta='Engine: '+S.recs.length+' recs · '+open+' open · '+done+' evaluated · checked '+(S.lastEval?new Date(S.lastEval).toLocaleTimeString():'—');
+  $('engineMeta').textContent=meta;$('reportEngineNote').textContent=meta;
+  return n;}
+function renderEngine(){const tb=$('engineBody');tb.innerHTML='';
+  Object.keys(ASSETS).forEach(sym=>{
+    const cells=HORIZONS.map(h=>{const st=statsFor(sym,h.k);
+      if(!st.n)return '<span class="mut">— (0)</span>';
+      const pct=Math.round(st.rate*100);
+      const cls=pct>=55?'pos':pct>=45?'warn':'neg';
+      return '<span class="'+cls+'">'+pct+'%</span> <span class="mut">('+st.w+'W/'+st.l+'L)</span>';});
+    const open=S.recs.filter(r=>r.ticker===sym&&r.outcome==='OPEN').length;
+    const weak=HORIZONS.filter(h=>{const st=statsFor(sym,h.k);return st.n>=10&&st.raw<0.45;}).map(h=>h.label);
+    const cal=weak.length?'<span class="badge b-trim">CAUTIOUS: '+weak.join(', ')+'</span>':'<span class="badge b-win">NORMAL</span>';
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td><b>'+esc(sym)+'</b></td><td>'+cells[0]+'</td><td>'+cells[1]+'</td><td>'+cells[2]+'</td><td>'+open+'</td><td>'+cal+'</td>';
+    tb.appendChild(tr);});}
+function resetCal(){if(!S.recs.length)return;const copy=[...S.recs];S.recs=[];save();engineTick(false);renderEngine();renderReport();renderOverview();
+  toast('Calibration history cleared ('+copy.length+' recs).','warn',{label:'Undo',fn:()=>{S.recs=copy;save();engineTick(false);renderEngine();renderReport();renderOverview();}});}
+
 /* ================= QUANT / STH / PL ================= */
 function renderQuant(){const a=AN[S.ticker];if(!a)return;const z=lastVal(a.z),vd=lastVal(a.vd.sig);
   $('qzVal').textContent=z.toFixed(2);$('qzVal').style.color=z<=-1.58?'#4ade80':z>=1.58?'#f87171':'var(--pink)';
@@ -897,20 +1150,23 @@ function renderReport(){const grid=$('reportGrid');grid.innerHTML='';const h=S.h
   Object.keys(ASSETS).forEach(sym=>{const A=ASSETS[sym],a=AN[sym];if(!a)return;
     const rc=a.sig.score>=2?'#22c55e':a.sig.score<=-2?'#ef4444':'#6366f1';
     const z=lastVal(a.z),vd=lastVal(a.vd.sig);
-    const stOut=z<=-1.58?'Oversold flush — watch for reclaim of '+fmtP(a.zn.buy)+'.':z>=1.58?'Extended — momentum may cool toward '+fmtP(a.ma50.length?lastVal(a.ma50):a.last.close)+'.':'Balanced tape inside the range.';
-    const mtOut=a.last.close<a.zn.buy?'Accumulation zone active; structural support nearby.':'Range-bound until '+fmtP(a.zn.sell)+' breaks or '+fmtP(a.zn.buy)+' fails.';
-    const ltOut=sym==='BTCUSDT'?('Power Law deviation '+fmtPct(a.plDev*100)+' · modeled MVRV '+a.st.mvrv.toFixed(2)+' — '+a.st.bias+'.'):'Long-horizon bias follows BTC regime + own quant structure.';
-    const em=k=>h==='all'||h===k?'':'opacity:.45;';
     const card=document.createElement('div');card.className='rep';card.style.setProperty('--rc',rc);
-    card.innerHTML='<div class="row spread"><h4>'+esc(sym)+' <span class="mut">'+esc(A.name)+'</span></h4><span class="badge '+a.sig.cls+'">'+a.sig.label+'</span></div>'+
+    let html='<div class="row spread"><h4>'+esc(sym)+' <span class="mut">'+esc(A.name)+'</span></h4><span class="badge '+a.sig.cls+'">'+a.sig.label+'</span></div>'+
       '<div class="line">Strategy: '+esc(A.strat)+'</div>'+
-      '<div class="line">Quant factor: Z '+z.toFixed(2)+' · VD '+vd.toFixed(2)+' · PVSRA '+esc(a.pv.regime.replace('PVSRA ',''))+'</div>'+
-      '<div class="line">Liq bands: '+esc(a.lq.summary)+'</div>'+
-      '<div class="line">Period return: <span class="'+(a.ret>=0?'pos':'neg')+'">'+fmtPct(a.ret)+'</span> · spot '+fmtP(a.last.close)+'</div>'+
-      '<div class="out" style="'+em('st')+'"><b class="info">ST (1–7d):</b> '+stOut+'</div>'+
-      '<div class="out" style="'+em('mt')+'"><b class="warn">MT (1–4w):</b> '+mtOut+'</div>'+
-      '<div class="out" style="'+em('lt')+'"><b class="pos">LT (1–6m+):</b> '+ltOut+'</div>';
-    grid.appendChild(card);});}
+      '<div class="line">Quant: Z '+z.toFixed(2)+' · VD '+vd.toFixed(2)+' · PVSRA '+esc(a.pv.regime.replace('PVSRA ',''))+' · spot '+fmtP(a.last.close)+' · period <span class="'+(a.ret>=0?'pos':'neg')+'">'+fmtPct(a.ret)+'</span></div>'+
+      '<div class="line">Liq: '+esc(a.lq.summary)+'</div>';
+    HORIZONS.forEach(hz=>{
+      const rec=horizonRec(sym,hz.k);if(!rec)return;
+      const hc=rec.dir>0?'#22c55e':rec.dir<0?'#ef4444':'#8b98ad';
+      const dim=(h==='all'||h===hz.k)?'':'opacity:.45;';
+      const stTxt=rec.stats.n?(rec.stats.w+'W/'+rec.stats.l+'L · '+Math.round(rec.stats.rate*100)+'% calibrated'):'no matured history yet (55% prior)';
+      html+='<div class="hrec" style="--hc:'+hc+';'+dim+'">'+
+        '<div class="row spread"><b class="mono" style="font-size:11.5px">'+hz.label+' · '+hz.span+'</b><span class="badge '+sigCls(rec.action)+'">'+rec.action+'</span></div>'+
+        '<div class="hl">Entry <span class="info">'+fmtP(rec.entryLo)+' – '+fmtP(rec.entryHi)+'</span> → Target <span class="pos">'+fmtP(rec.tLo)+' – '+fmtP(rec.tHi)+'</span> · Stop <span class="neg">'+fmtP(rec.stop)+'</span></div>'+
+        '<div class="confbar"><i style="width:'+rec.conf+'%"></i></div>'+
+        '<div class="note">Confidence '+rec.conf+'% · tracked '+stTxt+(rec.cautious?' · <span class="warn">⚠ cautious calibration — weak realized win rate, stronger confluence required</span>':'')+'</div>'+
+        '<div class="note">'+esc(rec.why)+'</div></div>';});
+    card.innerHTML=html;grid.appendChild(card);});}
 
 /* ================= X FEED ================= */
 const DEFAULT_POSTS=[
@@ -970,14 +1226,17 @@ function renderMacro(){const tb=$('macroBody');tb.innerHTML='';const today=new D
   $('macroNote').textContent=next?('Next: '+next+' · Nov–Dec 2026'):'Nov–Dec 2026 schedule complete';}
 const GLOSS=[
  ['🎯 Tracked Signal Log & Outcome Rules','Logged signals evaluate against live spot: for Buy/Accumulate, reaching the sell zone marks WIN and dropping ≥4% below entry marks LOSS; for Trim/Sell, reaching the buy zone marks WIN and rising ≥4% above entry marks LOSS. Export/Import JSON preserves records across deployments.'],
- ['⭐ Live Quant Z-Score & VD Momentum','Z-Score measures close deviation from its 20-bar mean in standard deviations (±1.58 extremes, -4.27 deep washout). VD is a volume-weighted candle-direction proxy (+0.50 / -0.35 levels). Both are computed from real candles and elevated to a higher-weight factor when confirmed with PVSRA/zones.'],
- ['📉 Modeled STH Cost Basis, Value Zone & MVRV','Without an on-chain backend, the terminal derives a modeled short-term-holder cost basis from rolling multi-month averages and labels it as modeled. MVRV = spot / basis; SOPR bias is a scaled transform. The value zone spans ±8% around basis.'],
- ['🔮 PVSRA & ST / MT / LT Win %','PVSRA highlights climax (≥2× avg volume) and rising (≥1.5×) spread from live candles. ST/MT/LT percentages are reference horizon estimates shown alongside live evaluated win rates from your logged signals.'],
- ['🪄 Magic Bands (CryptoCon / AlgoAffe) — Weekly & Monthly','Cycle bands by CryptoCon: original on BLX (discontinued Aug 2025), V2 since Dec 2025 with diminishing returns — the top band steps one level lower each cycle (2013 +3, 2017 +2, 2021 +1, 2025 Level 3). Current context: Level 2 ≈ $80k, higher-low scenario ≈ $71k, yellow Level 1 ≈ $52k. AlgoAffe analyzes exclusively Weekly & Monthly: “Kein Trading, keine Lower Frames.” Because the V2 formula is proprietary, this terminal shows a documented replica: M/Q/Y anchored VWAPs (step lines, as in his “VWAP · M Q Y” chart) + ±2σ bands around the yearly VWAP from weekly/monthly klines, plus previous-period VWAPs and his screenshot reference levels (L2 81,923.69 / L1 55,130, Nov 2026) as dashed lines — manual references, not a live computation of the original bands.'],
- ['📐 Power Law Model','fair = 1.01174e-17 · days^5.82 since genesis (Jan 3, 2009). Corridor bands at 0.42× / 2.6× fair. A mathematical model of BTC’s long-term trajectory — deviation informs valuation regime, not timing.'],
+ ['🧠 Horizon Recommendation Engine (ST / MT / LT)','The report auto-logs one directional recommendation per asset per horizon per UTC day with entry zone, target range and stop. Every refresh checks each open rec against subsequent daily candles: stop touched first = LOSS, target touched first = WIN; at horizon expiry a ±1% move decides WIN/LOSS/FLAT. Per-asset/horizon win rates use Bayesian shrinkage to a 55% prior (n₀=10) and continuously re-weight the displayed confidence. Horizons below 45% realized win rate over n≥10 become “cautious” and require stronger confluence before calling direction. Reset Calibration (with undo) lives in the Tracker tab.'],
+ ['📊 Bollinger Band Read (20,2)','The recommendation panel converts the band position into a clear call: %B > 1 = trim/take-profit with mid-band re-entry; %B < 0 = mean-reversion accumulate with band stop; bandwidth in the lowest 20% of 120 bars = squeeze, wait for the confirmed break with measured-move targets; otherwise upper/lower-half or neutral guidance with explicit levels. Yearly view has too few bars for a 20-period band — the panel says so instead of inventing values.'],
+ ['🪄 Magic Bands (CryptoCon / AlgoAffe) — Weekly & Monthly','Cycle bands by CryptoCon: original on BLX (discontinued Aug 2025), V2 since Dec 2025 with diminishing returns — the top band steps one level lower each cycle (2013 +3, 2017 +2, 2021 +1, 2025 Level 3). Context: Level 2 ≈ $80k, higher-low ≈ $71k, yellow Level 1 ≈ $52k. AlgoAffe analyzes exclusively Weekly & Monthly: “Kein Trading, keine Lower Frames.” The V2 formula is proprietary, so this terminal computes a documented replica: M/Q/Y anchored VWAPs (step lines) + ±2σ yearly bands from weekly or monthly klines — switch the basis with the Weekly/Monthly buttons. The clear read: above all 3 anchors = uptrend supported (buy dips to Q/M cluster); below all 3 = distribution (sell rallies); beyond ±2σ = trim/accumulate; between = transition. BTC reference levels L2 81,923.69 / L1 55,130 are manual screenshot references, not live original bands.'],
+ ['⭐ Live Quant Z-Score & VD Momentum','Z-Score measures close deviation from its 20-bar mean in standard deviations (±1.58 extremes, -4.27 deep washout). VD is a volume-weighted candle-direction proxy (+0.50 / -0.35 levels). Both computed from real candles, elevated when confirmed with PVSRA/zones.'],
+ ['📉 Modeled STH Cost Basis, Value Zone & MVRV','Without an on-chain backend, a modeled short-term-holder cost basis derives from rolling multi-month averages and is labeled as modeled. MVRV = spot / basis; SOPR bias is a scaled transform. Value zone spans ±8% around basis.'],
+ ['🔮 PVSRA & ST / MT / LT Win %','PVSRA highlights climax (≥2× avg volume) and rising (≥1.5×) spread from live candles. Reference ST/MT/LT percentages sit alongside the engine’s realized, continuously updated per-horizon win rates.'],
+ ['📐 Power Law Model','fair = 1.01174e-17 · days^5.82 since genesis (Jan 3, 2009). Corridor bands at 0.42× / 2.6× fair. Deviation informs valuation regime, not timing.'],
+ ['🗓️ Interval Views incl. 15m, Monthly & Yearly','Main chart: 15m / 1H / 4H / Daily / Weekly / Monthly / Yearly. Yearly candles are aggregated from Binance monthly klines (Binance has no native 1y interval); Monthly fetches up to 1000 bars. On Monthly the 200W MA is approximated by a 46-month SMA; on Yearly, long MAs and BB(20,2) are unavailable by construction and the UI reports that honestly. Mini chart offers 1H / 4H / 1D / 1W / 1M.'],
  ['🎯 SFP Trap','Swing Failure Pattern: price pierces a prior pivot high/low but closes back inside — a liquidity trap. Marked with arrows when the SFP toggle is on.'],
- ['💥 Estimated Liquidation Bands','ATR(14)-scaled bands around spot approximating where leveraged long/short clusters may sit. Modeled estimate, not exchange liquidation data.'],
- ['🧮 200W MA note','On intraday/daily intervals the 200-week MA is approximated by aggregating loaded candles to weekly bars and applying the longest available weekly SMA (up to 200). Switch to Weekly for the exact series.']
+ ['💥 Estimated Liquidation Bands','ATR(14)-scaled bands around spot approximating leveraged long/short cluster zones. Modeled estimate, not exchange liquidation data.'],
+ ['🐋 Smart Money Monitor Link','The header button opens smartmoney.html from the same folder / GitHub repo (relative link — works on GitHub Pages and locally). It hosts the large-player flow monitor: taker CVD, funding, Coinbase premium, stablecoin supply, COT, and a self-improving signal loop with 24-month walk-forward.']
 ];
 function renderGlossary(){const g=$('glossaryGrid');g.innerHTML='';GLOSS.forEach(([t,b])=>{const d=document.createElement('div');d.className='gloss';
   d.innerHTML='<h4>'+t+'</h4><p>'+esc(b)+'</p>';g.appendChild(d);});}
@@ -990,7 +1249,7 @@ function runBT(){const v=VIEW;if(!v)return;const bars=v.bars;
   const m100=new Map(sma(bars,100).map(p=>[p.time,p.value]));
   const climax=new Set(v.pv.markers.filter(m=>m.text==='CLX').map(m=>m.time));
   let cash=cap,shares=0,entryP=0,entryT=0,prevFast=null,prevSlow=null;const trades=[],eq=[];let peak=cap,maxDD=0;
-  for(let i=1;i<bars.length;i++){const b=bars[i],pc=bars[i-1].close;
+  for(let i=1;i<bars.length;i++){const b=bars[i];
     const z=zMap.get(b.time)||0,f=m50.get(b.time),s=m100.get(b.time);
     let buy=false,exit=false;
     if(strat==='zmean'){buy=z<=-1.58;exit=z>=1.2||(shares>0&&b.close<=entryP*0.92);}
@@ -1036,7 +1295,7 @@ async function mgrAdd(){let sym=$('mgrSymbol').value.trim().toUpperCase();if(!sy
   S.custom.push(meta);ASSETS[sym]={...meta,custom:true};
   if(!C[sym+'_1d'])C[sym+'_1d']={bars:genCandles(sym,'1d'),live:false};
   AN[sym]=analyze(C[sym+'_1d'].bars,sym);ensureBaseline();
-  $('mgrSymbol').value='';save();buildSelects();renderAll();renderMgr();
+  $('mgrSymbol').value='';save();buildSelects();engineTick(false);renderAll();renderMgr();
   toast(sym+' onboarded into watchlist, report & portfolio.','ok');}
 function mgrRemove(sym){const i=S.custom.findIndex(a=>a.sym===sym);if(i<0)return;
   const copy=S.custom[i];S.custom.splice(i,1);delete ASSETS[sym];delete AN[sym];delete S.baseline[sym];delete S.lines[sym];
@@ -1051,14 +1310,14 @@ function renderMgr(){const box=$('mgrList');box.innerHTML='';
     chip.querySelector('b[data-s]').onclick=()=>mgrRemove(a.sym);box.appendChild(chip);});}
 
 /* ================= BACKUP / SNAPSHOT ================= */
-function fullState(){return{app:'cryptoanalyst',version:3,exportedAt:new Date().toISOString(),
-  state:{ticker:S.ticker,interval:S.interval,miniIv:S.miniIv,horizon:S.horizon,log:S.log,baseline:S.baseline,xposts:S.xposts,custom:S.custom,lines:S.lines,regime:S.regime,vis:S.vis}};}
+function fullState(){return{app:'cryptoanalyst',version:4,exportedAt:new Date().toISOString(),
+  state:{ticker:S.ticker,interval:S.interval,miniIv:S.miniIv,magicTf:S.magicTf,horizon:S.horizon,log:S.log,recs:S.recs,baseline:S.baseline,xposts:S.xposts,custom:S.custom,lines:S.lines,regime:S.regime,lastEval:S.lastEval,vis:S.vis}};}
 function applyState(st){if(!st||typeof st!=='object')throw new Error('bad state');
-  S.log=Array.isArray(st.log)?st.log:S.log;S.baseline=st.baseline||S.baseline;
+  S.log=Array.isArray(st.log)?st.log:S.log;S.recs=Array.isArray(st.recs)?st.recs:S.recs;S.baseline=st.baseline||S.baseline;
   S.xposts=Array.isArray(st.xposts)?st.xposts:S.xposts;S.custom=Array.isArray(st.custom)?st.custom:S.custom;
-  S.lines=st.lines||S.lines;S.regime=st.regime||'';if(st.vis)Object.assign(S.vis,st.vis);
-  S.ticker=st.ticker||S.ticker;S.interval=st.interval||S.interval;
-  buildAssets();seedInstant();recompute();ensureBaseline();save();buildSelects();renderAll();renderMgr();}
+  S.lines=st.lines||S.lines;S.regime=st.regime||'';S.lastEval=st.lastEval||0;if(st.vis)Object.assign(S.vis,st.vis);
+  S.ticker=st.ticker||S.ticker;S.interval=IVS[st.interval]?st.interval:S.interval;S.magicTf=st.magicTf==='1M'?'1M':'w';
+  buildAssets();seedInstant();recompute();ensureBaseline();save();buildSelects();buildMiniBar();syncMagicTfBtns();engineTick(false);renderAll();renderMgr();}
 function dailySnapshot(){const key='ca_snap_'+new Date().toISOString().slice(0,10);
   if(!localStorage.getItem(key)){saveLS(key,fullState());}
   $('backupStatus').textContent='Snapshot ✓ '+new Date().toLocaleTimeString()+' · auto every 24h';$('backupStatus').className='chip live';}
@@ -1068,18 +1327,18 @@ function restoreSnap(){const keys=Object.keys(localStorage).filter(k=>k.startsWi
   if(snap&&snap.state){applyState(snap.state);toast('Restored snapshot '+keys[keys.length-1].replace('ca_snap_','')+'.','ok');}
   else toast('Snapshot unreadable.','err');}
 function startFresh(){const backup=fullState();
-  S.log=[];S.baseline={};S.lines={};S.xposts=DEFAULT_POSTS.map(p=>({...p}));S.custom=[];S.regime='';
-  buildAssets();seedInstant();recompute();ensureBaseline();save();buildSelects();renderAll();renderMgr();dailySnapshot();
+  S.log=[];S.recs=[];S.baseline={};S.lines={};S.xposts=DEFAULT_POSTS.map(p=>({...p}));S.custom=[];S.regime='';
+  buildAssets();seedInstant();recompute();ensureBaseline();save();buildSelects();engineTick(false);renderAll();renderMgr();dailySnapshot();
   $('firstRun').classList.add('hidden');
   toast('Started fresh with clean defaults + verified snapshot.','warn',{label:'Undo',fn:()=>{applyState(backup.state);toast('Previous state restored.','ok');}});}
-function checkFirstRun(){if(!localStorage.getItem(LS_KEY))$('firstRun').classList.remove('hidden');}
+function checkFirstRun(){if(!localStorage.getItem(LS_KEY)&&!localStorage.getItem('cryptoanalyst_v3'))$('firstRun').classList.remove('hidden');}
 function importFull(file){const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);
   if(j.app!=='cryptoanalyst'||!j.state)throw new Error('not a CryptoAnalyst backup');
   applyState(j.state);$('firstRun').classList.add('hidden');toast('Full backup imported & verified.','ok');}
   catch(e){toast('Import failed: '+e.message,'err');}};r.readAsText(file);}
 function importLog(file){const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);
   const log=Array.isArray(j)?j:j.log;if(!Array.isArray(log))throw new Error('no log array found');
-  S.log=log;save();renderLog();renderOverview();toast('Imported '+log.length+' log entries.','ok');}
+  S.log=log;if(Array.isArray(j.recs))S.recs=j.recs;save();engineTick(false);renderLog();renderOverview();renderEngine();renderReport();toast('Imported '+log.length+' log entries.','ok');}
   catch(e){toast('Import failed: '+e.message,'err');}};r.readAsText(file);}
 
 /* ================= TABS / SELECTS / CONTROLS ================= */
@@ -1106,36 +1365,40 @@ function buildSelects(){const as=$('assetSelect');as.innerHTML='';
   iv.value=S.interval;
   $('horizonSelect').value=S.horizon;}
 function buildMiniBar(){const bar=$('miniIvBar');bar.innerHTML='';
-  ['1h','4h','1d','1w'].forEach(k=>{const b=document.createElement('button');b.className='tf'+(S.miniIv===k?' active':'');b.textContent=IV_LABEL[k];
+  ['1h','4h','1d','1w','1M'].forEach(k=>{const b=document.createElement('button');b.className='tf'+(S.miniIv===k?' active':'');b.textContent=IV_LABEL[k];
     b.onclick=async()=>{S.miniIv=k;save();[...bar.children].forEach(x=>x.classList.remove('active'));b.classList.add('active');
       const key='BTCUSDT_'+k;
-      if(!C[key]){const live=await fetchK('BTCUSDT',k,400);C[key]={bars:live||genCandles('BTCUSDT',k,400),live:!!live};}
+      if(!C[key]){const live=await fetchK('BTCUSDT',k,k==='1M'?1000:400);C[key]={bars:live||genCandles('BTCUSDT',k,400),live:!!live};}
       renderMini();};
     bar.appendChild(b);});}
-function setAsset(sym){if(!ASSETS[sym])return;S.ticker=sym;save();
+function syncMagicTfBtns(){$('magicTfW').classList.toggle('active',S.magicTf!=='1M');$('magicTfM').classList.toggle('active',S.magicTf==='1M');}
+function setMagicTf(tf){if(S.magicTf===tf)return;S.magicTf=tf;save();syncMagicTfBtns();if(VIEW)renderMagic(VIEW);renderBandRecs();}
+function setAsset(sym){if(!ASSETS[sym])return;S.ticker=sym;MAGIC=null;save();
   const key=sym+'_'+S.interval;
   if(!C[key]){C[key]={bars:genCandles(sym,S.interval),live:false};}
   recompute();renderMain();renderQuant();
-  fetchK(sym,S.interval,500).then(b=>{if(b&&S.ticker===sym){C[key]={bars:b,live:true};recompute();renderMain();renderQuant();}});}
+  fetchView(sym,S.interval).then(b=>{if(b&&S.ticker===sym){C[key]={bars:b,live:true};recompute();renderMain();renderQuant();}});}
 function setIntervalIv(iv){S.interval=iv;save();
   const key=S.ticker+'_'+iv;
   if(!C[key])C[key]={bars:genCandles(S.ticker,iv),live:false};
   recompute();renderMain();renderQuant();
-  fetchK(S.ticker,iv,500).then(b=>{if(b&&S.interval===iv){C[key]={bars:b,live:true};recompute();renderMain();renderQuant();}});}
+  fetchView(S.ticker,iv).then(b=>{if(b&&S.interval===iv){C[key]={bars:b,live:true};recompute();renderMain();renderQuant();}});}
 function setFeed(cls,text){const f=$('feedStatus');f.className='chip '+cls;f.textContent=text;}
 
 /* ================= RENDER ALL & REFRESH ================= */
 function renderAll(){renderMain();renderMini();renderQuant();renderSth();renderPL();
-  renderWatchlist();renderOverview();renderPortfolio();renderLog();renderReport();renderX();renderMacro();renderGlossary();renderMgr();}
+  renderWatchlist();renderOverview();renderPortfolio();renderLog();renderEngine();renderReport();renderX();renderMacro();renderGlossary();renderMgr();}
 async function refreshAll(manual){setFeed('sync','Feed: Syncing Binance…');
   const tasks=Object.keys(ASSETS).map(s=>fetchK(s,'1d',500).then(b=>{if(b)C[s+'_1d']={bars:b,live:true};}));
-  tasks.push(fetchK(S.ticker,S.interval,500).then(b=>{if(b)C[S.ticker+'_'+S.interval]={bars:b,live:true};}));
-  tasks.push(fetchK('BTCUSDT',S.miniIv,400).then(b=>{if(b)C['BTCUSDT_'+S.miniIv]={bars:b,live:true};}));
+  tasks.push(fetchView(S.ticker,S.interval).then(b=>{if(b)C[S.ticker+'_'+S.interval]={bars:b,live:true};}));
+  tasks.push(fetchK('BTCUSDT',S.miniIv,S.miniIv==='1M'?1000:400).then(b=>{if(b)C['BTCUSDT_'+S.miniIv]={bars:b,live:true};}));
   await Promise.allSettled(tasks);
   const anyLive=Object.values(C).some(c=>c.live);
   setFeed(anyLive?'live':'seed',anyLive?'Feed: LIVE · Binance spot & klines':'Feed: SEEDED fallback · offline');
-  recompute();ensureBaseline();renderAll();save();
-  if(manual)toast(anyLive?'Live data refreshed from Binance.':'Offline — deterministic seeded data in use.',anyLive?'ok':'warn');}
+  recompute();ensureBaseline();
+  const n=engineTick(false);
+  renderAll();save();
+  if(manual)toast((anyLive?'Live data refreshed.':'Offline — seeded data in use.')+(n?(' '+n+' new horizon recs auto-logged.'):''),anyLive?'ok':'warn');}
 
 /* ================= EVENTS & INIT ================= */
 function bindEvents(){
@@ -1144,6 +1407,8 @@ function bindEvents(){
   $('assetSelect').onchange=e=>setAsset(e.target.value);
   $('intervalSelect').onchange=e=>setIntervalIv(e.target.value);
   $('horizonSelect').onchange=e=>{S.horizon=e.target.value;save();renderOverview();renderReport();};
+  $('magicTfW').onclick=()=>setMagicTf('w');
+  $('magicTfM').onclick=()=>setMagicTf('1M');
   ['toggleMa50','toggleMa100','toggleMa200','toggleMa200w','toggleBollinger'].forEach(id=>$(id).onchange=renderMini);
   $('toolNone').onclick=()=>setTool('none');
   $('toolHoriz').onclick=()=>setTool('horiz');
@@ -1155,7 +1420,10 @@ function bindEvents(){
   $('btnSnapshot').onclick=snapshot;
   $('btnReanchor').onclick=reanchor;
   $('btnClearLog').onclick=clearLog;
-  $('btnExportLog').onclick=()=>download('cryptoanalyst_log.json',{log:S.log,baseline:S.baseline});
+  $('btnLogRecs').onclick=()=>{const n=engineTick(true);renderEngine();renderReport();renderOverview();
+    toast(n?('Logged '+n+' horizon recommendation(s).'):'No directional horizon calls right now (all HOLD / already logged today).',n?'ok':'warn');};
+  $('btnResetCal').onclick=resetCal;
+  $('btnExportLog').onclick=()=>download('cryptoanalyst_log.json',{log:S.log,recs:S.recs,baseline:S.baseline});
   $('btnImportLog').onclick=()=>$('importLogFile').click();
   $('importLogFile').onchange=e=>{if(e.target.files[0])importLog(e.target.files[0]);e.target.value='';};
   $('btnExport').onclick=()=>download('cryptoanalyst_backup.json',fullState());
@@ -1177,9 +1445,9 @@ function bindEvents(){
   $('btnMgrAdd').onclick=mgrAdd;
   $('mgrSymbol').addEventListener('keydown',e=>{if(e.key==='Enter')mgrAdd();});
   window.addEventListener('resize',()=>{resizeAll();});}
-function init(){loadState();buildAssets();buildTabs();buildIndicators();buildSelects();buildMiniBar();
+function init(){loadState();buildAssets();buildTabs();buildIndicators();buildSelects();buildMiniBar();syncMagicTfBtns();
   seedInstant();recompute();ensureBaseline();
-  initDashboardCharts();bindEvents();renderAll();setTool('none');
+  initDashboardCharts();bindEvents();engineTick(false);renderAll();setTool('none');
   dailySnapshot();checkFirstRun();
   refreshAll(false);
   setInterval(()=>refreshAll(false),120000);}
