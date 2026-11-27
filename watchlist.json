@@ -1,2 +1,116 @@
-active_watchlist = load_watchlist()
-asset_matrix = [compute_asset_matrix(ticker, regime) for ticker in active_watchlist]
+{
+  "meta": {
+    "version": 2,
+    "description": "Watchlist, self-improving indicator weights, axis scale bounds, and rolling accuracy history",
+    "exchanges": [
+      "binance",
+      "coinbase"
+    ],
+    "updated_at": null
+  },
+  "axis_scale": {
+    "x_min": -1.0,
+    "x_max": 1.0,
+    "y_min": 0.0,
+    "y_max": 1.0
+  },
+  "weights": {
+    "ma_trend": 0.3,
+    "rsi_mom": 0.25,
+    "vol_risk": 0.25,
+    "val_band": 0.2
+  },
+  "errors": {
+    "ma_trend": 0.14,
+    "rsi_mom": 0.16,
+    "vol_risk": 0.15,
+    "val_band": 0.13
+  },
+  "history": {
+    "epochs": [],
+    "hit_rate": [],
+    "mae": []
+  },
+  "assets": [
+    {
+      "symbol": "BTC",
+      "binance": "BTCUSDT",
+      "coinbase": "BTC-USD",
+      "last_price": null,
+      "last_x": null,
+      "last_y": null,
+      "last_score": null,
+      "last_action": null
+    },
+    {
+      "symbol": "ETH",
+      "binance": "ETHUSDT",
+      "coinbase": "ETH-USD",
+      "last_price": null,
+      "last_x": null,
+      "last_y": null,
+      "last_score": null,
+      "last_action": null
+    },
+    {
+      "symbol": "SOL",
+      "binance": "SOLUSDT",
+      "coinbase": "SOL-USD",
+      "last_price": null,
+      "last_x": null,
+      "last_y": null,
+      "last_score": null,
+      "last_action": null
+    },
+    {
+      "symbol": "XRP",
+      "binance": "XRPUSDT",
+      "coinbase": "XRP-USD",
+      "last_price": null,
+      "last_x": null,
+      "last_y": null,
+      "last_score": null,
+      "last_action": null
+    },
+    {
+      "symbol": "ONDO",
+      "binance": "ONDOUSDT",
+      "coinbase": "ONDO-USD",
+      "last_price": null,
+      "last_x": null,
+      "last_y": null,
+      "last_score": null,
+      "last_action": null
+    },
+    {
+      "symbol": "SUI",
+      "binance": "SUIUSDT",
+      "coinbase": "SUI-USD",
+      "last_price": null,
+      "last_x": null,
+      "last_y": null,
+      "last_score": null,
+      "last_action": null
+    },
+    {
+      "symbol": "HBAR",
+      "binance": "HBARUSDT",
+      "coinbase": "HBAR-USD",
+      "last_price": null,
+      "last_x": null,
+      "last_y": null,
+      "last_score": null,
+      "last_action": null
+    },
+    {
+      "symbol": "HYPE",
+      "binance": "HYPEUSDT",
+      "coinbase": "HYPE-USD",
+      "last_price": null,
+      "last_x": null,
+      "last_y": null,
+      "last_score": null,
+      "last_action": null
+    }
+  ]
+}
