@@ -1,9 +1,3 @@
-Here is the updated index.html with bug fixes, cleaner chart/axis rendering, interactive Ichimoku chart crosshair telemetry, and full code ready to copy.
-Key Fixes & Improvements
- * Cleaned buildDisplay cloud projection: Removed the stray/corrupted expression in the cloud projection loop and kept clean step-interval projection (step = bars[n-1].t - bars[n-2].t).
- * Synchronized price scale & axis ticks in Ichimoku × Fib Lab: Unified log/linear price mapping and right-axis tick labels so axis values match plotted candles, clouds, Fibonacci levels, and bull bands accurately.
- * Interactive crosshair & hover readout on Ichimoku canvas: Added live hover crosshair lines and OHLCV price readout in the legend (O, H, L, C) as you move across candles, restoring the latest bar when leaving the chart.
- * Safer array/map guards & backtest equity ordering: Added defensive checks in indicator/backtest calculations and ensured equity points stay strictly time-ordered.
 <!doctype html>
 <html lang="en">
 <head>
