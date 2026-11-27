@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CryptoAnalyst — Live Market Terminal, Quant Oscillators, Ichimoku × Fib Lab &amp; Portfolio</title>
+<title>CryptoAnalyst — Live Market Terminal, Action Zone Matrix, Quant Oscillators, Ichimoku × Fib Lab &amp; Portfolio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -56,9 +56,10 @@ section.tab.active{display:block;animation:fadeUp .4s both}
 .spread{justify-content:space-between}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
 .grid6{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
-@media(max-width:1100px){.grid6{grid-template-columns:repeat(3,1fr)}.grid2{grid-template-columns:1fr}}
-@media(max-width:640px){.grid6{grid-template-columns:repeat(2,1fr)}.grid3{grid-template-columns:1fr 1fr}}
+@media(max-width:1100px){.grid6,.grid5{grid-template-columns:repeat(3,1fr)}.grid2{grid-template-columns:1fr}}
+@media(max-width:640px){.grid6,.grid5{grid-template-columns:repeat(2,1fr)}.grid3{grid-template-columns:1fr 1fr}}
 .btn{font-family:var(--disp);font-weight:700;font-size:12px;border-radius:9px;padding:7px 12px;cursor:pointer;
   border:1px solid var(--line2);background:var(--s3);color:var(--ink);transition:.16s;letter-spacing:.02em;white-space:nowrap}
 .btn:hover{transform:translateY(-1px);border-color:var(--indigo);box-shadow:0 4px 14px rgba(99,102,241,.25)}
@@ -112,6 +113,10 @@ table.tbl{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:
 #quantZChartContainer,#quantVdChartContainer{height:240px}
 #sthChartContainer,#plChartContainer{height:420px}
 #btChartContainer{height:300px}
+.matrixwrap{position:relative;width:100%;height:370px;border-radius:10px;border:1px solid var(--line2);background:#070e14;overflow:hidden}
+.matrixwrap canvas{display:block;width:100%;height:100%;cursor:pointer}
+.zone-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:7px;font-family:var(--mono);font-size:10.5px;border:1px solid var(--line2);background:rgba(10,15,26,.75);margin:2px 4px 2px 0;cursor:pointer}
+.zone-pill:hover{border-color:var(--amber)}
 .chart-fallback{display:grid;place-items:center;height:100%;color:var(--mut);font-family:var(--mono);font-size:12px;padding:20px;text-align:center}
 .hud{position:absolute;top:10px;left:10px;z-index:20;background:rgba(12,17,28,.88);backdrop-filter:blur(8px);
   border:1px solid var(--line2);border-radius:10px;padding:9px 12px;font-family:var(--mono);font-size:11px;
@@ -269,7 +274,7 @@ pre.snip{font-family:var(--mono);font-size:10px;line-height:1.45;background:#060
 <header>
   <div class="wrap">
     <div class="topbar">
-      <div class="brand"><div class="logo">📈</div><div>CryptoAnalyst<small>Live Market Terminal · Ichimoku × Fib Lab · Signal Tracker · Portfolio</small></div></div>
+      <div class="brand"><div class="logo">📈</div><div>CryptoAnalyst<small>Live Market Terminal · Action Matrix · Ichimoku × Fib Lab · Portfolio</small></div></div>
       <div class="row">
         <span id="feedStatus" class="chip sync">Feed: Syncing Binance…</span>
         <span id="ichiActiveChip" class="chip hidden" title="Ichimoku × Fib Lab overlay active on BTCUSDT">☁️ Ichi Overlay Active</span>
@@ -403,6 +408,65 @@ pre.snip{font-family:var(--mono);font-size:10px;line-height:1.45;background:#060
   <div class="card">
     <div class="row spread"><h3>📊 Watchlist Matrix — Live Quant Oscillators, Power Law, PVSRA &amp; Signals</h3><span class="chip" id="watchMeta">Auto-updating on load &amp; refresh</span></div>
     <div class="tblwrap"><table class="tbl"><thead><tr><th>Asset</th><th>Live Spot</th><th>Period Return</th><th>Quant Z / VD</th><th>PVSRA Regime</th><th>Dyn Buy → Sell</th><th>PL Dev</th><th>Signal</th></tr></thead><tbody id="watchlistBody"></tbody></table></div>
+  </div>
+</section>
+
+<!-- ==================== ACTION ZONE MATRIX ==================== -->
+<section id="actionmatrix" class="tab">
+  <div class="card">
+    <div class="row spread">
+      <div>
+        <h3>🧭 Action Zone Matrix — Bottoming, Buy Zone, Hold, Break Out &amp; Sell Zone</h3>
+        <p class="sub" style="margin:0">Weighted &amp; continuously optimized across Z-Score, MA Trend, PVSRA/VD, SFP/Liquidation Skew, and Power Law / MVRV / Range cycle anchors.</p>
+      </div>
+      <div class="row">
+        <span id="matrixSourceChip" class="chip sync">Weights: initializing…</span>
+        <button id="btnMatrixTune" class="btn btn-sm btn-p">⚡ Calibrate Weights Now</button>
+        <button id="btnMatrixResetWeights" class="btn btn-sm">↺ Reset Weights</button>
+      </div>
+    </div>
+    <div class="row" id="matrixWeightBar" style="margin-top:10px"></div>
+  </div>
+
+  <div class="grid5" id="matrixZoneKpis" style="margin-bottom:14px"></div>
+
+  <div class="card">
+    <div class="row spread" style="margin-bottom:8px">
+      <div>
+        <h3>2D Regime &amp; Momentum Scatter Chart</h3>
+        <p class="sub" style="margin:0">X-axis: Weighted Composite Score (-100 to +100) across the 5 action zones · Y-axis: Breakout / Delta Momentum (-100 to +100). Click any asset node to inspect on Chart.</p>
+      </div>
+      <span id="matrixHoverRead" class="chip">Hover or click an asset node</span>
+    </div>
+    <div class="matrixwrap">
+      <canvas id="matrixCanvas"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row spread">
+      <div>
+        <h3>5-Zone Classification Breakdown &amp; Indicator Drivers</h3>
+        <p class="sub" style="margin:0">Every watchlist asset grouped by its active regime with weighted composite score, momentum vector, and top contributing indicators.</p>
+      </div>
+      <span id="matrixUpdatedAt" class="chip">—</span>
+    </div>
+    <div class="tblwrap" style="margin-top:10px">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Asset</th>
+            <th>Action Zone</th>
+            <th>Composite (-100..+100)</th>
+            <th>Momentum</th>
+            <th>Z / VD</th>
+            <th>Top Weighted Drivers</th>
+            <th>Terminal Signal</th>
+          </tr>
+        </thead>
+        <tbody id="matrixTableBody"></tbody>
+      </table>
+    </div>
   </div>
 </section>
 
@@ -884,7 +948,7 @@ pre.snip{font-family:var(--mono);font-size:10px;line-height:1.45;background:#060
 </section>
 
 </main>
-<footer><div class="wrap">CryptoAnalyst · unified browser-only terminal + Ichimoku × Fib Reliability Lab · live Binance/Bitfinex data with deterministic seeded fallback · 🐋 Smart Money Monitor opens <span class="mono">smartmoney.html</span> · models are estimates, not financial advice · all state persists locally.</div></footer>
+<footer><div class="wrap">CryptoAnalyst · unified browser-only terminal + Action Zone Matrix + Ichimoku × Fib Reliability Lab · live Binance/Bitfinex data with deterministic seeded fallback · 🐋 Smart Money Monitor opens <span class="mono">smartmoney.html</span> · models are estimates, not financial advice · all state persists locally.</div></footer>
 
 <!-- Event Dossier Drawer (Ichimoku Lab) -->
 <div id="scrim"></div>
@@ -935,7 +999,7 @@ const lastVal=a=>a&&a.length?a[a.length-1].value:0;
 const HOSTS=['https://api.binance.com','https://api1.binance.com','https://data-api.binance.vision'];
 
 /* ============================================================================
-   PART A · CRYPTOANALYST TERMINAL ENGINE
+   PART A · CRYPTOANALYST TERMINAL ENGINE + ACTION ZONE MATRIX
    ============================================================================ */
 const IVS={'15m':900,'1h':3600,'4h':14400,'1d':86400,'1w':604800,'1M':2592000,'1y':31536000};
 const IV_LABEL={'15m':'15m','1h':'1H','4h':'4H','1d':'Daily','1w':'Weekly','1M':'Monthly','1y':'Yearly'};
@@ -952,6 +1016,7 @@ const BASE_ASSETS=[
 ];
 const TABS=[
   ['dashboard','🎯','Pro Charting, PVSRA & Portfolio'],
+  ['actionmatrix','🧭','Action Zone Matrix'],
   ['ichilab','☁️','Ichimoku × Fib Lab'],
   ['tracker','📊','Signal & Portfolio Tracker'],
   ['quant','🧮','Quant Indicators'],
@@ -966,25 +1031,49 @@ const TABS=[
 ];
 const INDS=[['ma50','● 50 MA','#3b82f6'],['ma100','● 100 MA','#f59e0b'],['ma200d','● 200D MA','#ec4899'],['ma200w','● 200W MA','#a855f7'],['zones','● Dyn Buy/Sell','#22c55e'],['liq','💥 Est Liq Bands','#fb923c'],['sth','📉 Est STH Bands','#38bdf8'],['quant','🧮 Quant VD/Z','#f472b6'],['sfp','🎯 SFP Trap','#ef4444'],['pvsra','🔮 PVSRA Climax','#e879f9'],['pl','📐 Power Law','#14b8a6'],['bb','📊 Bollinger (20,2)','#38bdf8'],['magic','🪄 Magic Bands (W/M)','#818cf8']];
 const HORIZONS=[{k:'st',label:'ST',span:'1–7 days',days:7},{k:'mt',label:'MT',span:'1–4 weeks',days:28},{k:'lt',label:'LT',span:'1–6 months+',days:150}];
+const DEFAULT_WEIGHTS={z_score:0.24,trend_ma:0.22,pvsra_vd:0.20,sfp_liq:0.18,cycle_model:0.16};
+const ZONE_META={
+  'Bottoming':{color:'#14b8a6',cls:'b-acc',hint:'Capitulation / deep discount radar'},
+  'Buy Zone':{color:'#22c55e',cls:'b-buy',hint:'Discounted accumulation zone'},
+  'Hold':{color:'#8b98ad',cls:'b-hold',hint:'Balanced / neutral equilibrium'},
+  'Break Out':{color:'#f5a524',cls:'b-trim',hint:'Momentum expansion & breakout'},
+  'Sell Zone':{color:'#ef4444',cls:'b-sell',hint:'Overextended / distribution zone'}
+};
 const LS_KEY='cryptoanalyst_v4';
 const PUBLISH_KEY='cryptoanalyst_ichimoku_input_v1';
 let ASSETS={};
 let S={ticker:'BTCUSDT',interval:'1d',miniIv:'1d',magicTf:'w',horizon:'all',log:[],recs:[],baseline:{},xposts:null,custom:[],lines:{},regime:'',lastEval:0,
+  zoneWeights:Object.assign({},DEFAULT_WEIGHTS),
   vis:{ma50:true,ma100:true,ma200d:true,ma200w:true,zones:true,liq:true,sth:true,quant:true,sfp:true,pvsra:true,pl:true,bb:true,magic:true}};
 const C={};   // candle cache: sym_iv -> {bars,live}
 const AN={};  // daily analysis per symbol
 const MC={};  // magic base-bar cache
+let MATRIX_ROWS=[];
+let MATRIX_SOURCE='live-computed';
+let MATRIX_UPDATED='';
+let MATRIX_HIT_AREAS=[];
 let VIEW=null;
 let MAGIC=null;
 
+function normalizeZoneWeights(w){
+  const out={};let sum=0;
+  Object.keys(DEFAULT_WEIGHTS).forEach(k=>{
+    const v=clamp(Number.isFinite(+w[k])?+w[k]:DEFAULT_WEIGHTS[k],0.05,0.45);
+    out[k]=v;sum+=v;
+  });
+  if(sum<=0)return Object.assign({},DEFAULT_WEIGHTS);
+  Object.keys(out).forEach(k=>{out[k]=+(out[k]/sum).toFixed(4);});
+  return out;
+}
 function buildAssets(){ASSETS={};BASE_ASSETS.forEach(a=>ASSETS[a.sym]={...a});S.custom.forEach(a=>ASSETS[a.sym]={...a,custom:true});}
 function loadState(){const s=loadLS(LS_KEY,null)||loadLS('cryptoanalyst_v3',null);
   if(s){S.ticker=s.ticker||S.ticker;S.interval=IVS[s.interval]?s.interval:S.interval;S.miniIv=s.miniIv||S.miniIv;S.magicTf=s.magicTf==='1M'?'1M':'w';
     S.horizon=s.horizon||'all';S.log=Array.isArray(s.log)?s.log:[];S.recs=Array.isArray(s.recs)?s.recs:[];S.baseline=s.baseline||{};
     S.xposts=Array.isArray(s.xposts)?s.xposts:null;S.custom=Array.isArray(s.custom)?s.custom:[];S.lines=s.lines||{};S.regime=s.regime||'';S.lastEval=s.lastEval||0;
+    if(s.zoneWeights)S.zoneWeights=normalizeZoneWeights(s.zoneWeights);
     if(s.vis)Object.assign(S.vis,s.vis);}
   if(!S.xposts)S.xposts=DEFAULT_POSTS.map(p=>({...p}));}
-function save(){saveLS(LS_KEY,{ticker:S.ticker,interval:S.interval,miniIv:S.miniIv,magicTf:S.magicTf,horizon:S.horizon,log:S.log,recs:S.recs,baseline:S.baseline,xposts:S.xposts,custom:S.custom,lines:S.lines,regime:S.regime,lastEval:S.lastEval,vis:S.vis});}
+function save(){saveLS(LS_KEY,{ticker:S.ticker,interval:S.interval,miniIv:S.miniIv,magicTf:S.magicTf,horizon:S.horizon,log:S.log,recs:S.recs,baseline:S.baseline,xposts:S.xposts,custom:S.custom,lines:S.lines,regime:S.regime,lastEval:S.lastEval,zoneWeights:S.zoneWeights,vis:S.vis});}
 
 function bucketTime(iv,ts){const d=new Date(ts*1000);
   if(iv==='1M')return Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),1)/1000;
@@ -1018,6 +1107,15 @@ async function fetchK(sym,iv,limit){limit=limit||500;
 async function fetchView(sym,iv){
   if(iv==='1y'){const m=await fetchK(sym,'1M',1000);return m?aggBars(m,'Y'):null;}
   return fetchK(sym,iv,iv==='1M'?1000:500);}
+async function fetchRepoMatrixState(){
+  try{
+    const res=await fetch('state/action_matrix.json?_='+Date.now(),{cache:'no-store'});
+    if(!res.ok)return null;
+    const j=await res.json();
+    if(j&&j.zoneWeights){S.zoneWeights=normalizeZoneWeights(j.zoneWeights);save();}
+    return j;
+  }catch(e){return null;}
+}
 function seedInstant(){Object.keys(ASSETS).forEach(s=>{C[s+'_1d']={bars:genCandles(s,'1d'),live:false};});
   const vk=S.ticker+'_'+S.interval;if(!C[vk])C[vk]={bars:genCandles(S.ticker,S.interval),live:false};
   const mk='BTCUSDT_'+S.miniIv;if(!C[mk])C[mk]={bars:genCandles('BTCUSDT',S.miniIv,400),live:false};}
@@ -1125,6 +1223,98 @@ function analyze(bars,sym){const last=bars[bars.length-1];
   const sig=signalOf({z:lastVal(z),vd:lastVal(vd.sig),pv,zn,last,plDev});
   return{bars,last,ma50,ma100,ma200,z,vd,pv,sf,zn,lq,st,pl,plDev,ret,sig};}
 
+function classifyActionZone(score,momentum,zScore,pvsraClimax,sfpBullish){
+  if(score<=-65&&(zScore<=-2.5||pvsraClimax||sfpBullish))return'Bottoming';
+  if(score<=-25)return'Buy Zone';
+  if(score>=70)return'Sell Zone';
+  if(score>=30&&momentum>=25)return'Break Out';
+  return'Hold';
+}
+function computeActionMatrix(){
+  const w=normalizeZoneWeights(S.zoneWeights);
+  S.zoneWeights=w;
+  const rows=[];
+  Object.keys(ASSETS).forEach(sym=>{
+    const a=AN[sym];if(!a)return;
+    const c=a.last.close;
+    const z=lastVal(a.z);
+    const vd=lastVal(a.vd.sig);
+    const m50=lastVal(a.ma50)||c;
+    const m200=lastVal(a.ma200)||c;
+    const ma50Dist=m50>0?((c-m50)/m50)*100:0;
+    const ma200Dist=m200>0?((c-m200)/m200)*100:0;
+    const pvsraClimax=a.pv.regime==='PVSRA Climax';
+    const pvsraRising=a.pv.regime==='PVSRA Rising Volume';
+    const recentSfp=a.sf.slice(-3);
+    const sfpBull=recentSfp.some(m=>m.position==='belowBar');
+    const sfpBear=recentSfp.some(m=>m.position==='aboveBar');
+    const span=Math.max(a.zn.sell-a.zn.buy,1e-8);
+    const rangePos=clamp(((c-a.zn.buy)/span)*2-1,-1,1);
+
+    let zComp=0;
+    if(z<=-4.27)zComp=-1;
+    else if(z<=-1.58)zComp=-1+((z+4.27)/(-1.58+4.27))*0.45;
+    else if(z>=1.58)zComp=0.55+clamp((z-1.58)/2.42,0,1)*0.45;
+    else zComp=clamp((z/1.58)*0.55,-0.55,0.55);
+
+    const maComp=clamp(0.6*(ma200Dist/25)+0.4*(ma50Dist/12),-1,1);
+    const vdNorm=clamp(vd/1.2,-1,1);
+    const pvsraAdj=pvsraClimax?(vdNorm<0?-0.35:0.35):(pvsraRising?0.15*Math.sign(vdNorm):0);
+    const pvsraVdComp=clamp(0.75*vdNorm+pvsraAdj,-1,1);
+    const liqSkew=clamp((c-(a.lq.longLow+a.lq.shortHigh)/2)/Math.max(a.lq.atr*2,1e-6),-1,1);
+    const sfpAdj=(sfpBull?-0.45:0)+(sfpBear?0.45:0);
+    const sfpLiqComp=clamp(0.6*liqSkew+sfpAdj,-1,1);
+
+    let cycleComp=rangePos;
+    if(sym==='BTCUSDT'){
+      const plComp=clamp((a.plDev*100)/60,-1,1);
+      const mvrvComp=clamp((a.st.mvrv-1)/0.6,-1,1);
+      cycleComp=clamp(0.6*plComp+0.4*mvrvComp,-1,1);
+    }
+
+    const comps={
+      z_score:+zComp.toFixed(3),
+      trend_ma:+maComp.toFixed(3),
+      pvsra_vd:+pvsraVdComp.toFixed(3),
+      sfp_liq:+sfpLiqComp.toFixed(3),
+      cycle_model:+cycleComp.toFixed(3)
+    };
+    const weightedNorm=Object.keys(DEFAULT_WEIGHTS).reduce((acc,k)=>acc+w[k]*comps[k],0);
+    const compositeScore=+clamp(weightedNorm*100,-100,100).toFixed(1);
+    const momentum=+clamp(45*vdNorm+35*clamp(ma50Dist/10,-1,1)+(pvsraClimax||pvsraRising?20:0),-100,100).toFixed(1);
+    const zone=classifyActionZone(compositeScore,momentum,z,pvsraClimax,sfpBull);
+
+    const ranked=Object.keys(DEFAULT_WEIGHTS).sort((x,y)=>Math.abs(w[y]*comps[y])-Math.abs(w[x]*comps[x]));
+    const topDrivers=ranked.slice(0,3).map(k=>k+' ('+(comps[k]>=0?'+':'')+comps[k].toFixed(2)+')');
+
+    rows.push({
+      sym,name:ASSETS[sym].name,price:c,z,vd,compositeScore,momentum,zone,
+      comps,topDrivers,sig:a.sig
+    });
+  });
+  MATRIX_ROWS=rows;
+  MATRIX_UPDATED=new Date().toLocaleTimeString();
+}
+function calibrateZoneWeightsFromMarket(){
+  const next=Object.assign({},S.zoneWeights);
+  Object.keys(DEFAULT_WEIGHTS).forEach(k=>{
+    const avgAxis=MATRIX_ROWS.length
+      ?MATRIX_ROWS.reduce((s,r)=>s+Math.abs(r.comps[k]||0),0)/MATRIX_ROWS.length
+      :0.5;
+    next[k]=next[k]*(0.92+0.16*clamp(avgAxis,0,1));
+  });
+  S.zoneWeights=normalizeZoneWeights(next);
+  MATRIX_SOURCE='self-calibrated';
+  save();computeActionMatrix();renderActionMatrix();
+  toast('Action Matrix weights calibrated across active indicator conviction.','ok');
+}
+function resetZoneWeights(){
+  S.zoneWeights=Object.assign({},DEFAULT_WEIGHTS);
+  MATRIX_SOURCE='default-weights';
+  save();computeActionMatrix();renderActionMatrix();
+  toast('Action Matrix weights reset to defaults.','ok');
+}
+
 function applyIchimokuOverlay(){
   const chip=$('ichiActiveChip');
   const hud=$('hudIchi');
@@ -1154,10 +1344,172 @@ function applyIchimokuOverlay(){
 function recompute(){
   Object.keys(ASSETS).forEach(s=>{const c=C[s+'_1d'];if(c)AN[s]=analyze(c.bars,s);});
   applyIchimokuOverlay();
+  computeActionMatrix();
   const vc=C[S.ticker+'_'+S.interval];if(vc)VIEW=analyze(vc.bars,S.ticker);
   if(VIEW&&AN[S.ticker]&&AN[S.ticker].ichimoku&&S.ticker===AN[S.ticker].ichimoku.symbol){
     VIEW.ichimoku=AN[S.ticker].ichimoku;
   }
+}
+
+/* ================= ACTION ZONE MATRIX RENDERER & CANVAS ================= */
+function renderActionMatrix(){
+  if(!MATRIX_ROWS.length)computeActionMatrix();
+  const w=S.zoneWeights;
+  const sc=$('matrixSourceChip');
+  if(sc){
+    sc.className='chip live';
+    sc.textContent='Mode: '+MATRIX_SOURCE+' · w(Z/MA/PV/SFP/CYC)='+
+      [w.z_score,w.trend_ma,w.pvsra_vd,w.sfp_liq,w.cycle_model].map(v=>Math.round(v*100)+'%').join('/');
+  }
+  const wb=$('matrixWeightBar');
+  if(wb){
+    const labels={z_score:'Z-Score',trend_ma:'MA Trend',pvsra_vd:'PVSRA/VD',sfp_liq:'SFP/Liq',cycle_model:'Cycle/Val'};
+    wb.innerHTML=Object.keys(DEFAULT_WEIGHTS).map(k=>
+      '<span class="chip"><b>'+esc(labels[k])+':</b> '+Math.round(w[k]*100)+'%</span>'
+    ).join('');
+  }
+  const order=['Bottoming','Buy Zone','Hold','Break Out','Sell Zone'];
+  const kpiBox=$('matrixZoneKpis');
+  if(kpiBox){
+    kpiBox.innerHTML=order.map(z=>{
+      const list=MATRIX_ROWS.filter(r=>r.zone===z);
+      const m=ZONE_META[z];
+      const pills=list.length
+        ?list.map(r=>'<span class="zone-pill" data-sym="'+esc(r.sym)+'"><b>'+esc(r.sym)+'</b> <span>'+(r.compositeScore>=0?'+':'')+r.compositeScore+'</span></span>').join('')
+        :'<span class="mut" style="font-size:10.5px">No assets</span>';
+      return '<div class="kpi" style="--kc:'+m.color+'"><div class="k">'+esc(z)+' ('+list.length+')</div><div class="v">'+list.length+'</div><div class="s">'+esc(m.hint)+'</div><div style="margin-top:6px">'+pills+'</div></div>';
+    }).join('');
+    [...kpiBox.querySelectorAll('.zone-pill[data-sym]')].forEach(p=>{
+      p.onclick=()=>{setAsset(p.dataset.sym);switchTab('dashboard');};
+    });
+  }
+  const tb=$('matrixTableBody');
+  if(tb){
+    const sorted=[...MATRIX_ROWS].sort((a,b)=>a.compositeScore-b.compositeScore);
+    tb.innerHTML=sorted.map(r=>{
+      const zm=ZONE_META[r.zone]||ZONE_META['Hold'];
+      const sCol=r.compositeScore<=-25?'pos':r.compositeScore>=30?'warn':'mut';
+      const mCol=r.momentum>=25?'pos':r.momentum<=-25?'neg':'mut';
+      return '<tr data-sym="'+esc(r.sym)+'" style="cursor:pointer">'+
+        '<td><b>'+esc(r.sym)+'</b> <span class="mut">'+esc(r.name)+'</span><br><span class="mut">'+fmtP(r.price)+'</span></td>'+
+        '<td><span class="badge '+zm.cls+'">'+esc(r.zone)+'</span></td>'+
+        '<td class="'+sCol+'"><b>'+(r.compositeScore>=0?'+':'')+r.compositeScore.toFixed(1)+'</b></td>'+
+        '<td class="'+mCol+'">'+(r.momentum>=0?'+':'')+r.momentum.toFixed(1)+'</td>'+
+        '<td>'+r.z.toFixed(2)+' / '+r.vd.toFixed(2)+'</td>'+
+        '<td class="mut">'+esc(r.topDrivers.join(' · '))+'</td>'+
+        '<td><span class="badge '+r.sig.cls+'">'+esc(r.sig.label)+'</span></td>'+
+        '</tr>';
+    }).join('');
+    [...tb.querySelectorAll('tr[data-sym]')].forEach(tr=>{
+      tr.onclick=()=>{setAsset(tr.dataset.sym);switchTab('dashboard');};
+    });
+  }
+  const up=$('matrixUpdatedAt');
+  if(up)up.textContent='Updated '+ (MATRIX_UPDATED||'just now') +' · '+MATRIX_ROWS.length+' assets';
+  drawActionMatrix();
+}
+
+function drawActionMatrix(){
+  const cv=$('matrixCanvas');if(!cv)return;
+  const wrap=cv.parentElement,r=wrap.getBoundingClientRect();
+  if(r.width<=0||r.height<=0)return;
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);
+  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+  const w=r.width,h=r.height;
+  const padL=48,padR=18,padT=24,padB=34;
+  const pw=Math.max(80,w-padL-padR),ph=Math.max(80,h-padT-padB);
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle='#070e14';ctx.fillRect(0,0,w,h);
+
+  const scoreToX=s=>padL+clamp((s+100)/200,0,1)*pw;
+  const momToY=m=>padT+ph-clamp((m+100)/200,0,1)*ph;
+
+  // Vertical zone bands across score axis (-100..+100)
+  const bands=[
+    {a:-100,b:-65,col:'rgba(20,184,166,.12)',label:'BOTTOMING'},
+    {a:-65,b:-25,col:'rgba(34,197,94,.08)',label:'BUY ZONE'},
+    {a:-25,b:30,col:'rgba(139,152,173,.05)',label:'HOLD'},
+    {a:30,b:70,col:'rgba(245,165,36,.09)',label:'BREAK OUT'},
+    {a:70,b:100,col:'rgba(239,68,68,.11)',label:'SELL ZONE'}
+  ];
+  bands.forEach(bd=>{
+    const x0=scoreToX(bd.a),x1=scoreToX(bd.b);
+    ctx.fillStyle=bd.col;ctx.fillRect(x0,padT,x1-x0,ph);
+    ctx.strokeStyle='rgba(46,61,88,.45)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(x0,padT);ctx.lineTo(x0,padT+ph);ctx.stroke();
+    ctx.fillStyle='rgba(203,213,225,.75)';
+    ctx.font="600 9.5px 'IBM Plex Mono',monospace";
+    ctx.textAlign='center';ctx.textBaseline='top';
+    ctx.fillText(bd.label,(x0+x1)/2,padT+5);
+  });
+
+  // Zero momentum line & threshold markers
+  const yZero=momToY(0),yBreak=momToY(25);
+  ctx.save();ctx.setLineDash([4,4]);ctx.strokeStyle='rgba(148,163,184,.45)';
+  ctx.beginPath();ctx.moveTo(padL,yZero);ctx.lineTo(padL+pw,yZero);ctx.stroke();
+  ctx.strokeStyle='rgba(245,165,36,.4)';
+  ctx.beginPath();ctx.moveTo(scoreToX(30),yBreak);ctx.lineTo(scoreToX(70),yBreak);ctx.stroke();
+  ctx.restore();
+
+  // Axes ticks
+  ctx.font="500 9.5px 'IBM Plex Mono',monospace";ctx.fillStyle='rgba(139,152,173,.85)';
+  ctx.textAlign='center';ctx.textBaseline='top';
+  [-100,-65,-25,0,30,70,100].forEach(sc=>{
+    const x=scoreToX(sc);ctx.fillText(String(sc),x,padT+ph+7);
+  });
+  ctx.textAlign='right';ctx.textBaseline='middle';
+  [-100,-50,0,25,50,100].forEach(mv=>{
+    const y=momToY(mv);ctx.fillText((mv>0?'+':'')+mv,padL-7,y);
+  });
+
+  // Plot asset nodes
+  MATRIX_HIT_AREAS=[];
+  MATRIX_ROWS.forEach(item=>{
+    const x=scoreToX(item.compositeScore);
+    const y=momToY(item.momentum);
+    const zm=ZONE_META[item.zone]||ZONE_META['Hold'];
+    const radius=item.sym==='BTCUSDT'?11:8.5;
+
+    ctx.beginPath();ctx.arc(x,y,radius+4,0,Math.PI*2);
+    ctx.fillStyle=zm.color+'28';ctx.fill();
+
+    ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);
+    ctx.fillStyle=zm.color;ctx.fill();
+    ctx.lineWidth=1.8;ctx.strokeStyle='#06090f';ctx.stroke();
+
+    ctx.fillStyle='#f8fafc';
+    ctx.font="700 10px 'IBM Plex Mono',monospace";
+    ctx.textAlign='center';ctx.textBaseline='bottom';
+    ctx.fillText(item.sym.replace('USDT',''),x,y-radius-3);
+
+    MATRIX_HIT_AREAS.push({x,y,r:radius+6,item});
+  });
+}
+
+function bindMatrixEvents(){
+  const cv=$('matrixCanvas');if(!cv)return;
+  cv.addEventListener('mousemove',e=>{
+    const rect=cv.getBoundingClientRect();
+    const mx=e.clientX-rect.left,my=e.clientY-rect.top;
+    const hit=MATRIX_HIT_AREAS.find(a=>Math.hypot(a.x-mx,a.y-my)<=a.r);
+    const read=$('matrixHoverRead');
+    if(hit){
+      cv.style.cursor='pointer';
+      if(read)read.textContent=hit.item.sym+' · '+hit.item.zone+' · Score '+(hit.item.compositeScore>=0?'+':'')+hit.item.compositeScore+' · Mom '+(hit.item.momentum>=0?'+':'')+hit.item.momentum+' (click to open chart)';
+    }else{
+      cv.style.cursor='default';
+      if(read)read.textContent='Hover or click an asset node';
+    }
+  });
+  cv.addEventListener('click',e=>{
+    const rect=cv.getBoundingClientRect();
+    const mx=e.clientX-rect.left,my=e.clientY-rect.top;
+    const hit=MATRIX_HIT_AREAS.find(a=>Math.hypot(a.x-mx,a.y-my)<=a.r);
+    if(hit){setAsset(hit.item.sym);switchTab('dashboard');}
+  });
+  on('btnMatrixTune','click',calibrateZoneWeightsFromMarket);
+  on('btnMatrixResetWeights','click',resetZoneWeights);
 }
 
 /* ================= TERMINAL CHARTS ================= */
@@ -1205,6 +1557,9 @@ function initDashboardCharts(){
     SR.mbbL=line(CH.mini,{color:'#38bdf8',lineWidth:1,lineStyle:2});
   }}
 function ensureTabCharts(id){
+  if(id==='actionmatrix'){
+    requestAnimationFrame(()=>{renderActionMatrix();});
+  }
   if(id==='quant'&&!CH.qz){
     CH.qz=mkChart($('quantZChartContainer'),240);
     if(CH.qz){SR.qzA=CH.qz.addAreaSeries({lineColor:'#ec4899',topColor:'rgba(236,72,153,.35)',bottomColor:'rgba(131,24,67,.08)',lineWidth:2,priceLineVisible:false});
@@ -1229,7 +1584,7 @@ function ensureTabCharts(id){
   if(id==='ichilab'){
     requestAnimationFrame(()=>{ichiResize();drawLevels();drawPath();drawBias();});
   }}
-function resizeAll(){CHART_DEFS.forEach(([k,id,h])=>{const ch=CH[k],el=$(id);if(ch&&el&&el.clientWidth>0)ch.applyOptions({width:el.clientWidth,height:h});});ichiResize();}
+function resizeAll(){CHART_DEFS.forEach(([k,id,h])=>{const ch=CH[k],el=$(id);if(ch&&el&&el.clientWidth>0)ch.applyOptions({width:el.clientWidth,height:h});});drawActionMatrix();ichiResize();}
 function fitAll(){Object.values(CH).forEach(ch=>{if(ch)try{ch.timeScale().fitContent();}catch(e){}});}
 function clearGroup(g){if(SR.candles)PLINES[g].forEach(h=>{try{SR.candles.removePriceLine(h);}catch(e){}});PLINES[g]=[];}
 function mkLine(g,price,title,color,style){if(!SR.candles||!Number.isFinite(price)||price<=0)return;
@@ -1741,6 +2096,7 @@ function renderMacro(){const tb=$('macroBody');tb.innerHTML='';const today=new D
     tb.appendChild(tr);});
   $('macroNote').textContent=next?('Next: '+next+' · Nov–Dec 2026'):'Nov–Dec 2026 schedule complete';}
 const GLOSS=[
+ ['🧭 Action Zone Matrix (5 Regimes)','Classifies each asset into Bottoming, Buy Zone, Hold, Break Out, or Sell Zone using a weighted composite score (-100..+100) and momentum (-100..+100) across Z-Score, MA Trend, PVSRA/VD, SFP/Liquidation Skew, and Power Law / MVRV / Range cycle anchors. Weights normalize to 100% and can be calibrated or synced from run.py.'],
  ['☁️ Ichimoku × Fib Reliability Lab','Integrated walk-forward audit testing Ichimoku Cloud + Fibonacci retracement + Bull Support Band confluence across historical candles. Computes Wilson 95% confidence intervals, block-bootstrap edge vs. regime-matched baseline, chronological 60/40 out-of-sample split, and hindsight inflation checks. Publishing sends a calibrated weight and stop level directly into the terminal’s BTCUSDT scoring engine.'],
  ['🎯 Tracked Signal Log & Outcome Rules','Logged signals evaluate against live spot: for Buy/Accumulate, reaching the sell zone marks WIN and dropping ≥4% below entry marks LOSS; for Trim/Sell, reaching the buy zone marks WIN and rising ≥4% above entry marks LOSS. Export/Import JSON preserves records across deployments.'],
  ['🧠 Horizon Recommendation Engine (ST / MT / LT)','The report auto-logs one directional recommendation per asset per horizon per UTC day with entry zone, target range and stop. Every refresh checks each open rec against subsequent daily candles: stop touched first = LOSS, target touched first = WIN; at horizon expiry a ±1% move decides WIN/LOSS/FLAT. Per-asset/horizon win rates use Bayesian shrinkage to a 55% prior (n₀=10) and continuously re-weight the displayed confidence.'],
@@ -1825,11 +2181,13 @@ function renderMgr(){const box=$('mgrList');box.innerHTML='';
 
 /* ================= BACKUP / SNAPSHOT ================= */
 function fullState(){return{app:'cryptoanalyst',version:4,exportedAt:new Date().toISOString(),
-  state:{ticker:S.ticker,interval:S.interval,miniIv:S.miniIv,magicTf:S.magicTf,horizon:S.horizon,log:S.log,recs:S.recs,baseline:S.baseline,xposts:S.xposts,custom:S.custom,lines:S.lines,regime:S.regime,lastEval:S.lastEval,vis:S.vis}};}
+  state:{ticker:S.ticker,interval:S.interval,miniIv:S.miniIv,magicTf:S.magicTf,horizon:S.horizon,log:S.log,recs:S.recs,baseline:S.baseline,xposts:S.xposts,custom:S.custom,lines:S.lines,regime:S.regime,lastEval:S.lastEval,zoneWeights:S.zoneWeights,vis:S.vis}};}
 function applyState(st){if(!st||typeof st!=='object')throw new Error('bad state');
   S.log=Array.isArray(st.log)?st.log:S.log;S.recs=Array.isArray(st.recs)?st.recs:S.recs;S.baseline=st.baseline||S.baseline;
   S.xposts=Array.isArray(st.xposts)?st.xposts:S.xposts;S.custom=Array.isArray(st.custom)?st.custom:S.custom;
-  S.lines=st.lines||S.lines;S.regime=st.regime||'';S.lastEval=st.lastEval||0;if(st.vis)Object.assign(S.vis,st.vis);
+  S.lines=st.lines||S.lines;S.regime=st.regime||'';S.lastEval=st.lastEval||0;
+  if(st.zoneWeights)S.zoneWeights=normalizeZoneWeights(st.zoneWeights);
+  if(st.vis)Object.assign(S.vis,st.vis);
   S.ticker=st.ticker||S.ticker;S.interval=IVS[st.interval]?st.interval:S.interval;S.magicTf=st.magicTf==='1M'?'1M':'w';
   buildAssets();seedInstant();recompute();ensureBaseline();save();buildSelects();buildMiniBar();syncMagicTfBtns();engineTick(false);renderAll();renderMgr();}
 function dailySnapshot(){const key='ca_snap_'+new Date().toISOString().slice(0,10);
@@ -1841,7 +2199,7 @@ function restoreSnap(){const keys=Object.keys(localStorage).filter(k=>k.startsWi
   if(snap&&snap.state){applyState(snap.state);toast('Restored snapshot '+keys[keys.length-1].replace('ca_snap_','')+'.','ok');}
   else toast('Snapshot unreadable.','err');}
 function startFresh(){const backup=fullState();
-  S.log=[];S.recs=[];S.baseline={};S.lines={};S.xposts=DEFAULT_POSTS.map(p=>({...p}));S.custom=[];S.regime='';
+  S.log=[];S.recs=[];S.baseline={};S.lines={};S.xposts=DEFAULT_POSTS.map(p=>({...p}));S.custom=[];S.regime='';S.zoneWeights=Object.assign({},DEFAULT_WEIGHTS);
   buildAssets();seedInstant();recompute();ensureBaseline();save();buildSelects();engineTick(false);renderAll();renderMgr();dailySnapshot();
   $('firstRun').classList.add('hidden');
   toast('Started fresh with clean defaults + verified snapshot.','warn',{label:'Undo',fn:()=>{applyState(backup.state);toast('Previous state restored.','ok');}});}
@@ -1899,12 +2257,13 @@ function setIntervalIv(iv){S.interval=iv;save();
   fetchView(S.ticker,iv).then(b=>{if(b&&S.interval===iv){C[key]={bars:b,live:true};recompute();renderMain();renderQuant();}});}
 function setFeed(cls,text){const f=$('feedStatus');f.className='chip '+cls;f.textContent=text;}
 
-function renderAll(){renderMain();renderMini();renderQuant();renderSth();renderPL();
+function renderAll(){renderMain();renderMini();renderActionMatrix();renderQuant();renderSth();renderPL();
   renderWatchlist();renderOverview();renderPortfolio();renderLog();renderEngine();renderReport();renderX();renderMacro();renderGlossary();renderMgr();}
 async function refreshAll(manual){setFeed('sync','Feed: Syncing Binance…');
   const tasks=Object.keys(ASSETS).map(s=>fetchK(s,'1d',500).then(b=>{if(b)C[s+'_1d']={bars:b,live:true};}));
   tasks.push(fetchView(S.ticker,S.interval).then(b=>{if(b)C[S.ticker+'_'+S.interval]={bars:b,live:true};}));
   tasks.push(fetchK('BTCUSDT',S.miniIv,S.miniIv==='1M'?1000:400).then(b=>{if(b)C['BTCUSDT_'+S.miniIv]={bars:b,live:true};}));
+  tasks.push(fetchRepoMatrixState().then(m=>{if(m&&m.zoneWeights){MATRIX_SOURCE='repo-state';}}));
   await Promise.allSettled(tasks);
   const anyLive=Object.values(C).some(c=>c.live);
   setFeed(anyLive?'live':'seed',anyLive?'Feed: LIVE · Binance spot & klines':'Feed: SEEDED fallback · offline');
@@ -1956,6 +2315,7 @@ function bindEvents(){
   $('btFee').oninput=e=>{$('btFeeVal').textContent=(+e.target.value).toFixed(2)+'%';runBT();};
   $('btnMgrAdd').onclick=mgrAdd;
   $('mgrSymbol').addEventListener('keydown',e=>{if(e.key==='Enter')mgrAdd();});
+  bindMatrixEvents();
   window.addEventListener('resize',()=>{resizeAll();});}
 
 /* ============================================================================
@@ -2084,1214 +2444,907 @@ function setIchiSource(kind,n){
   else{chip.className='chip seed';chip.textContent='Reconstructed history · '+n+' bars';}
   const lg=$('lgSrc');if(lg)lg.textContent=kind==='seed'?'reconstructed':kind;
 }
-async function loadIchiTF(tf,silent){
-  if(!RAW[tf])RAW[tf]={bars:seedBars(tf),source:'seed'};
-  BARS=RAW[tf].bars;setIchiSource(RAW[tf].source,BARS.length);
-  ichiRecompute();ichiRenderAll();
-  if(RAW[tf].source!=='seed')return;
-  if(!silent)setIchiSource('sync',BARS.length);
-  let bars=await fetchBinanceIchi(tf),src='binance';
-  if(!bars){bars=await fetchBitfinexIchi(tf);src='bitfinex';}
-  if(bars&&bars.length>120){
-    RAW[tf]={bars,source:src};
-    if(P.tf===tf){BARS=bars;setIchiSource(src,bars.length);ichiRecompute();ichiRenderAll();if(!silent)toast('Ichimoku Lab: live history loaded ('+bars.length+' '+tf.toUpperCase()+' bars).','ok');}
-  }else if(P.tf===tf){
-    setIchiSource('seed',BARS.length);
-  }
+async function loadIchiTf(tf,force){
+  if(!force&&RAW[tf]){BARS=RAW[tf].bars;setIchiSource(RAW[tf].src,BARS.length);needsCompute=true;dirty=true;return;}
+  if(!RAW[tf]){BARS=seedBars(tf);setIchiSource('seed',BARS.length);needsCompute=true;dirty=true;}
+  else setIchiSource('sync',BARS.length);
+  const b=await fetchBinanceIchi(tf);
+  if(b){RAW[tf]={bars:b,src:'binance'};if(P.tf===tf){BARS=b;setIchiSource('binance',b.length);needsCompute=true;dirty=true;}return;}
+  const f=await fetchBitfinexIchi(tf);
+  if(f){RAW[tf]={bars:f,src:'bitfinex'};if(P.tf===tf){BARS=f;setIchiSource('bitfinex',f.length);needsCompute=true;dirty=true;}return;}
+  if(!RAW[tf])RAW[tf]={bars:BARS,src:'seed'};
+  if(P.tf===tf)setIchiSource('seed',BARS.length);
 }
 
-function donchianMid(bars,p){
-  const out=new Array(bars.length).fill(null);
-  for(let i=p-1;i<bars.length;i++){
-    let hh=-Infinity,ll=Infinity;
-    for(let j=i-p+1;j<=i;j++){if(bars[j].h>hh)hh=bars[j].h;if(bars[j].l<ll)ll=bars[j].l;}
-    out[i]=(hh+ll)/2;
+function donchianMid(bars,endIdx,len){
+  const start=Math.max(0,endIdx-len+1);
+  let hi=-Infinity,lo=Infinity;
+  for(let i=start;i<=endIdx;i++){if(bars[i].h>hi)hi=bars[i].h;if(bars[i].l<lo)lo=bars[i].l;}
+  return(hi+lo)/2;
+}
+function smaArr(vals,len){
+  const out=new Array(vals.length).fill(NaN);
+  let sum=0,cnt=0;
+  for(let i=0;i<vals.length;i++){
+    if(Number.isFinite(vals[i])){sum+=vals[i];cnt++;}
+    if(i>=len&&Number.isFinite(vals[i-len])){sum-=vals[i-len];cnt--;}
+    if(i>=len-1&&cnt===len)out[i]=sum/len;
   }
   return out;
 }
-function smaArr(vals,p){
-  const out=new Array(vals.length).fill(null);let s=0;
-  for(let i=0;i<vals.length;i++){s+=vals[i];if(i>=p)s-=vals[i-p];if(i>=p-1)out[i]=s/p;}
+function emaArr(vals,len){
+  const out=new Array(vals.length).fill(NaN);
+  const k=2/(len+1);let prev=NaN;
+  for(let i=0;i<vals.length;i++){
+    if(!Number.isFinite(vals[i]))continue;
+    prev=Number.isFinite(prev)?(vals[i]-prev)*k+prev:vals[i];
+    out[i]=prev;
+  }
   return out;
 }
-function emaArr(vals,p){
-  const out=new Array(vals.length).fill(null);const k=2/(p+1);let e=null;
-  for(let i=0;i<vals.length;i++){e=e===null?vals[i]:vals[i]*k+e*(1-k);out[i]=i>=p-1?e:null;}
-  return out;
-}
-function ichiAggregate(bars,mode){
-  const out=[];let key=null,cur=null;
-  for(const b of bars){
-    const d=new Date(b.t*1000);let k,t;
-    if(mode==='Q'){k=d.getUTCFullYear()*4+Math.floor(d.getUTCMonth()/3);t=Date.UTC(d.getUTCFullYear(),Math.floor(d.getUTCMonth()/3)*3,1)/1000;}
-    else{k=d.getUTCFullYear()*12+d.getUTCMonth();t=Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),1)/1000;}
-    if(k!==key){if(cur)out.push(cur);key=k;cur={t,o:b.o,h:b.h,l:b.l,c:b.c,v:b.v};}
-    else{cur.h=Math.max(cur.h,b.h);cur.l=Math.min(cur.l,b.l);cur.c=b.c;cur.v+=b.v;}
+function buildQuarterSeries(bars){
+  const buckets=[];let cur=null;
+  for(let i=0;i<bars.length;i++){
+    const d=new Date(bars[i].t*1000);
+    const key=d.getUTCFullYear()+'-'+Math.floor(d.getUTCMonth()/3);
+    if(!cur||cur.key!==key){cur={key,endBar:i,c:bars[i].c};buckets.push(cur);}
+    else{cur.endBar=i;cur.c=bars[i].c;}
   }
-  if(cur)out.push(cur);
-  return out;
-}
-function computeIchimoku(bars,p){
-  const N=bars.length,total=N+p.disp;
-  const ten=donchianMid(bars,p.tenkan),kij=donchianMid(bars,p.kijun),rawB=donchianMid(bars,p.senkou);
-  const A=new Array(total).fill(null),B=new Array(total).fill(null),chik=new Array(total).fill(null);
-  for(let i=0;i<N;i++){
-    const j=i+p.disp;
-    if(ten[i]!==null&&kij[i]!==null&&j<total)A[j]=(ten[i]+kij[i])/2;
-    if(rawB[i]!==null&&j<total)B[j]=rawB[i];
-    const back=i-p.disp;
-    if(back>=0)chik[back]=bars[i].c;
-  }
-  return{ten,kij,A,B,chik,total};
-}
-function computeBand(bars,p){
-  const N=bars.length;const lo=new Array(N).fill(null),hi=new Array(N).fill(null);
-  if(p.band==='classic'||p.band==='custom'){
-    const closes=bars.map(b=>b.c);
-    const s=smaArr(closes,p.bandFast),e=emaArr(closes,p.bandSlow);
-    for(let i=0;i<N;i++){if(s[i]===null||e[i]===null)continue;lo[i]=Math.min(s[i],e[i]);hi[i]=Math.max(s[i],e[i]);}
-    return{lo,hi,label:p.bandFast+'SMA / '+p.bandSlow+'EMA · chart TF'};
-  }
-  const mode=p.band==='3m'?'Q':'M';
-  const buckets=ichiAggregate(bars,mode);
-  if(buckets.length<3)return{lo,hi,label:'insufficient higher-TF history'};
   const closes=buckets.map(b=>b.c);
-  const s=smaArr(closes,p.bandFast),e=emaArr(closes,p.bandSlow);
-  let b=0;
-  for(let i=0;i<N;i++){
-    while(b+1<buckets.length&&buckets[b+1].t<=bars[i].t)b++;
-    const prev=b-1;
-    if(prev<0||s[prev]===null||e[prev]===null)continue;
-    lo[i]=Math.min(s[prev],e[prev]);hi[i]=Math.max(s[prev],e[prev]);
+  const qSma=smaArr(closes,20),qEma=emaArr(closes,21);
+  const smaAtBar=new Array(bars.length).fill(NaN),emaAtBar=new Array(bars.length).fill(NaN);
+  let bi=0;
+  for(let i=0;i<bars.length;i++){
+    while(bi+1<buckets.length&&buckets[bi+1].endBar<i)bi++;
+    let closedIdx=-1;
+    for(let k=0;k<buckets.length;k++){if(buckets[k].endBar<i)closedIdx=k;}
+    if(closedIdx>=0){smaAtBar[i]=qSma[closedIdx];emaAtBar[i]=qEma[closedIdx];}
   }
-  return{lo,hi,label:p.bandFast+'SMA / '+p.bandSlow+'EMA · '+(mode==='Q'?'quarterly (3M)':'monthly')};
+  return{sma:smaAtBar,ema:emaAtBar};
 }
-function isPivotHigh(bars,i,r){
-  const v=bars[i].h;
-  for(let j=i-r;j<=i+r;j++){if(j===i||j<0||j>=bars.length)continue;if(bars[j].h>v)return false;}
-  return true;
-}
-function anchorsAt(bars,i,mode,p){
-  if(mode==='manual'){const H=+p.manHigh,L=+p.manLow;if(!(H>L&&L>0))return null;return{H,L,hi:Math.max(0,i-10),lo:i};}
-  if(mode==='hindsight'){
-    let H=-Infinity,hi=0;for(let k=0;k<bars.length;k++)if(bars[k].h>H){H=bars[k].h;hi=k;}
-    let L=Infinity,lo=hi;for(let k=hi;k<bars.length;k++)if(bars[k].l<L){L=bars[k].l;lo=k;}
-    if(!(H>L))return null;return{H,L,hi,lo};
+function buildMonthlySeries(bars){
+  const buckets=[];let cur=null;
+  for(let i=0;i<bars.length;i++){
+    const d=new Date(bars[i].t*1000);
+    const key=d.getUTCFullYear()+'-'+d.getUTCMonth();
+    if(!cur||cur.key!==key){cur={key,endBar:i,c:bars[i].c};buckets.push(cur);}
+    else{cur.endBar=i;cur.c=bars[i].c;}
   }
-  const from=Math.max(p.pivot,i-p.lookback),to=i-p.pivot;
-  if(to<from)return null;
-  let H=-Infinity,hi=-1;
-  for(let k=from;k<=to;k++){if(isPivotHigh(bars,k,p.pivot)&&bars[k].h>H){H=bars[k].h;hi=k;}}
-  if(hi<0){for(let k=from;k<=to;k++)if(bars[k].h>H){H=bars[k].h;hi=k;}}
-  if(hi<0||i-hi<3)return null;
-  let L=Infinity,lo=hi;
-  for(let k=hi;k<=i;k++)if(bars[k].l<L){L=bars[k].l;lo=k;}
-  if(!(H>L)||(H-L)/H<0.12)return null;
-  return{H,L,hi,lo};
+  const closes=buckets.map(b=>b.c);
+  const mSma=smaArr(closes,20),mEma=emaArr(closes,21);
+  const smaAtBar=new Array(bars.length).fill(NaN),emaAtBar=new Array(bars.length).fill(NaN);
+  for(let i=0;i<bars.length;i++){
+    let closedIdx=-1;
+    for(let k=0;k<buckets.length;k++){if(buckets[k].endBar<i)closedIdx=k;}
+    if(closedIdx>=0){smaAtBar[i]=mSma[closedIdx];emaAtBar[i]=mEma[closedIdx];}
+  }
+  return{sma:smaAtBar,ema:emaAtBar};
 }
-const fibValue=(a,r)=>a.H-r*(a.H-a.L);
-function cloudRegime(close,A,B){
-  if(A===null||B===null||!Number.isFinite(A)||!Number.isFinite(B))return'unknown';
-  const top=Math.max(A,B),bot=Math.min(A,B);
-  if(close>top)return'above';if(close<bot)return'below';return'inside';
+function computeIndicators(bars,p){
+  const n=bars.length,disp=p.disp;
+  const tenkan=new Array(n).fill(NaN),kijun=new Array(n).fill(NaN);
+  const spanAPlot=new Array(n+disp).fill(NaN),spanBPlot=new Array(n+disp).fill(NaN);
+  const spanACur=new Array(n).fill(NaN),spanBCur=new Array(n).fill(NaN);
+  const chikou=new Array(n).fill(NaN);
+  for(let i=0;i<n;i++){
+    if(i>=p.tenkan-1)tenkan[i]=donchianMid(bars,i,p.tenkan);
+    if(i>=p.kijun-1)kijun[i]=donchianMid(bars,i,p.kijun);
+    if(Number.isFinite(tenkan[i])&&Number.isFinite(kijun[i])){
+      const a=(tenkan[i]+kijun[i])/2;spanACur[i]=a;spanAPlot[i+disp]=a;
+    }
+    if(i>=p.senkou-1){const b=donchianMid(bars,i,p.senkou);spanBCur[i]=b;spanBPlot[i+disp]=b;}
+    if(i>=disp)chikou[i-disp]=bars[i].c;
+  }
+  const closes=bars.map(b=>b.c);
+  let bandSma,bandEma;
+  if(p.band==='3m'){const q=buildQuarterSeries(bars);bandSma=q.sma;bandEma=q.ema;}
+  else if(p.band==='1m'){const m=buildMonthlySeries(bars);bandSma=m.sma;bandEma=m.ema;}
+  else if(p.band==='classic'){bandSma=smaArr(closes,20);bandEma=emaArr(closes,21);}
+  else{bandSma=smaArr(closes,p.bandFast);bandEma=emaArr(closes,p.bandSlow);}
+  return{n,disp,tenkan,kijun,spanAPlot,spanBPlot,spanACur,spanBCur,chikou,bandSma,bandEma};
 }
-function resolveIchi(bars,i,entry,dir,T,H){
-  const end=Math.min(bars.length-1,i+H);
-  for(let j=i+1;j<=end;j++){
+function findConfirmedSwings(bars,R){
+  const highs=[],lows=[];const n=bars.length;
+  for(let i=R;i<n-R;i++){
+    let isH=true,isL=true;
+    for(let k=1;k<=R;k++){
+      if(bars[i-k].h>=bars[i].h||bars[i+k].h>bars[i].h)isH=false;
+      if(bars[i-k].l<=bars[i].l||bars[i+k].l<bars[i].l)isL=false;
+    }
+    if(isH)highs.push({idx:i,confIdx:i+R,price:bars[i].h});
+    if(isL)lows.push({idx:i,confIdx:i+R,price:bars[i].l});
+  }
+  return{highs,lows};
+}
+function anchorAt(bars,swings,i,p,hindsight){
+  if(p.anchor==='manual'){
+    const hi=Math.max(p.manHigh,p.manLow*1.01),lo=Math.min(p.manLow,p.manHigh*0.99);
+    return{high:hi,low:lo,highIdx:0,lowIdx:0};
+  }
+  if(hindsight){
+    const win=bars.slice(Math.max(0,i-p.lookback),i+1);
+    let hi=-Infinity,lo=Infinity,hiI=0,loI=0;
+    const base=Math.max(0,i-p.lookback);
+    for(let k=0;k<win.length;k++){
+      if(win[k].h>hi){hi=win[k].h;hiI=base+k;}
+      if(win[k].l<lo){lo=win[k].l;loI=base+k;}
+    }
+    if(!Number.isFinite(hi)||!Number.isFinite(lo)||hi<=lo)return null;
+    return{high:hi,low:lo,highIdx:hiI,lowIdx:loI};
+  }
+  const minIdx=i-p.lookback;
+  let bestH=null;
+  for(const h of swings.highs){if(h.confIdx<=i&&h.idx>=minIdx){if(!bestH||h.price>=bestH.price)bestH=h;}}
+  if(!bestH){
+    let hi=-Infinity,hiI=0;
+    for(let k=Math.max(0,minIdx);k<=i;k++){if(bars[k].h>hi){hi=bars[k].h;hiI=k;}}
+    bestH={idx:hiI,price:hi};
+  }
+  let runLow=Infinity,runLowIdx=bestH.idx;
+  for(let k=bestH.idx;k<=i;k++){if(bars[k].l<runLow){runLow=bars[k].l;runLowIdx=k;}}
+  if(!Number.isFinite(bestH.price)||!Number.isFinite(runLow)||bestH.price<=runLow)return null;
+  return{high:bestH.price,low:runLow,highIdx:bestH.idx,lowIdx:runLowIdx};
+}
+function fibPrice(anc,r){return anc.high-(anc.high-anc.low)*r;}
+function resolveOutcome(bars,idx,dir,thrPct,hor){
+  const entry=bars[idx].c;const upTarget=entry*(1+thrPct/100),dnTarget=entry*(1-thrPct/100);
+  const end=Math.min(bars.length-1,idx+hor);
+  for(let j=idx+1;j<=end;j++){
     const b=bars[j];
-    if(dir>0){if(b.c<=entry*(1-T))return{out:'LOSS',bars:j-i};if(b.h>=entry*(1+T))return{out:'WIN',bars:j-i};}
-    else{if(b.c>=entry*(1+T))return{out:'LOSS',bars:j-i};if(b.l<=entry*(1-T))return{out:'WIN',bars:j-i};}
+    if(dir>0){if(b.h>=upTarget)return{outcome:'WIN',ret:(b.h/entry-1)*100,barsHeld:j-idx};if(b.l<=dnTarget)return{outcome:'LOSS',ret:(b.l/entry-1)*100,barsHeld:j-idx};}
+    else{if(b.l<=dnTarget)return{outcome:'WIN',ret:(1-b.l/entry)*100,barsHeld:j-idx};if(b.h>=upTarget)return{outcome:'LOSS',ret:(1-b.h/entry)*100,barsHeld:j-idx};}
   }
-  return{out:'TIMEOUT',bars:end-i};
+  const lastB=bars[end];
+  const rawPct=(lastB.c/entry-1)*100;
+  const dirPct=dir>0?rawPct:-rawPct;
+  return{outcome:'TIMEOUT',ret:dirPct,barsHeld:end-idx};
 }
-function confluenceOK(kind,flags,mode){
-  if(mode==='fib')return true;
-  if(mode==='both')return flags.band&&flags.cloud;
-  if(mode==='any')return flags.band||flags.cloud;
-  return kind==='support'?flags.band:flags.cloud;
-}
-function runTest(bars,ind,band,p,anchorMode){
-  const N=bars.length,T=p.react/100,H=p.horizon,tol=p.tol/100;
-  const warm=Math.max(p.senkou+p.disp,p.bandFast+4,p.lookback>60?60:p.lookback,40);
-  const events=[],cooldown=new Map(),eventBars=new Set();
-  const lastI=N-1-H;
-  for(let i=warm;i<=lastI;i++){
-    const a=anchorsAt(bars,i,anchorMode,p);if(!a)continue;
-    const c=bars[i].c,prev=bars[i-1].c;
-    const regime=cloudRegime(c,ind.A[i],ind.B[i]);
-    const bLo=band.lo[i],bHi=band.hi[i];
-    for(const r of FIBS){
-      const lvl=fibValue(a,r);if(!(lvl>0))continue;
-      const touched=bars[i].l<=lvl*(1+tol)&&bars[i].h>=lvl*(1-tol);if(!touched)continue;
-      const kind=prev>lvl?'support':'resistance';
-      const key=kind+'_'+r;
-      const last=cooldown.get(key);if(last!==undefined&&i-last<p.cool)continue;
-      const bandFlag=bLo!==null&&bHi!==null&&lvl>=bLo*(1-tol)&&lvl<=bHi*(1+tol);
-      let cloudFlag=false;
-      if(ind.A[i]!==null&&ind.B[i]!==null){
-        const top=Math.max(ind.A[i],ind.B[i]),bot=Math.min(ind.A[i],ind.B[i]);
-        cloudFlag=Math.abs(lvl/top-1)<=tol||Math.abs(lvl/bot-1)<=tol;
+function runAudit(bars,ind,p,hindsight){
+  const n=bars.length,events=[],nonEvents=[];
+  const swings=findConfirmedSwings(bars,p.pivot);
+  let lastEvIdx=-999;
+  const warmup=Math.max(p.senkou+p.disp+5,40);
+  for(let i=warmup;i<n-2;i++){
+    const b=bars[i];
+    const sa=ind.spanACur[i],sb=ind.spanBCur[i];
+    const hasCloud=Number.isFinite(sa)&&Number.isFinite(sb);
+    const cTop=hasCloud?Math.max(sa,sb):NaN,cBot=hasCloud?Math.min(sa,sb):NaN;
+    const regime=!hasCloud?'no_cloud':b.c>cTop?'above_cloud':b.c<cBot?'below_cloud':'in_cloud';
+    const nearCloud=hasCloud&&(b.h>=cBot*0.992&&b.l<=cTop*1.008);
+    const s1=ind.bandSma[i],s2=ind.bandEma[i];
+    const hasBand=Number.isFinite(s1)&&Number.isFinite(s2);
+    const bTop=hasBand?Math.max(s1,s2):NaN,bBot=hasBand?Math.min(s1,s2):NaN;
+    const nearBand=hasBand&&(b.h>=bBot*0.992&&b.l<=bTop*1.008);
+    const anc=anchorAt(bars,swings,i,p,hindsight);
+    let matched=null;
+    if(anc){
+      const tol=p.tol/100;
+      for(const r of FIBS){
+        const fp=fibPrice(anc,r);
+        if(!(fp>0))continue;
+        if(Math.abs(b.c-fp)/fp<=tol||(b.l<=fp*(1+tol)&&b.h>=fp*(1-tol))){
+          const kind=r>=0.5?'support':'resistance';
+          const bandOk=nearBand;const cloudOk=nearCloud;
+          let confOk=false,confLabel='';
+          if(p.conf==='fib'){confOk=true;confLabel='Fib only';}
+          else if(p.conf==='both'){confOk=bandOk&&cloudOk;confLabel='Fib + Band + Cloud';}
+          else if(p.conf==='any'){confOk=bandOk||cloudOk;confLabel=bandOk&&cloudOk?'Fib + Band + Cloud':bandOk?'Fib + Band':'Fib + Cloud';}
+          else{confOk=kind==='support'?bandOk:cloudOk;confLabel=kind==='support'?(bandOk?'Fib + Band':'Fib (no band)'):(cloudOk?'Fib + Cloud':'Fib (no cloud)');}
+          if(confOk){matched={r,fp,kind,confLabel,bandOk,cloudOk,anc};break;}
+        }
       }
-      if(!confluenceOK(kind,{band:bandFlag,cloud:cloudFlag},p.conf))continue;
-      cooldown.set(key,i);eventBars.add(i);
-      const dir=kind==='support'?1:-1;
-      const res=resolveIchi(bars,i,c,dir,T,H);
-      const endI=Math.min(N-1,i+H);
-      let mfe=0,mae=0;const path=[0];
-      for(let j=i+1;j<=endI;j++){
-        const up=(bars[j].h/c-1)*dir,dn=(bars[j].l/c-1)*dir;
-        mfe=Math.max(mfe,up*100);mae=Math.min(mae,dn*100);
-        path.push((bars[j].c/c-1)*100*dir);
-      }
-      const fwd=(bars[endI].c/c-1)*100*dir;
-      events.push({id:anchorMode+'_'+i+'_'+r+'_'+kind,i,t:bars[i].t,kind,r,level:lvl,entry:c,dir,band:bandFlag,cloud:cloudFlag,regime,outcome:res.out,bars:res.bars,fwd,mfe,mae,path,anchorH:a.H,anchorL:a.L});
+    }
+    if(matched&&(i-lastEvIdx)>p.cool){
+      const dir=matched.kind==='support'?1:-1;
+      const res=resolveOutcome(bars,i,dir,p.react,p.horizon);
+      events.push({id:p.tf+'_'+i+'_'+matched.r,idx:i,t:b.t,date:fmtD(b.t),type:matched.kind,dir,level:matched.r,
+        price:b.c,levelPrice:matched.fp,conf:matched.confLabel,bandOk:matched.bandOk,cloudOk:matched.cloudOk,
+        regime,anchorHigh:matched.anc.high,anchorLow:matched.anc.low,outcome:res.outcome,ret:res.ret,barsHeld:res.barsHeld});
+      lastEvIdx=i;
+    }else if(!matched&&regime!=='no_cloud'){
+      const dir=regime==='below_cloud'?-1:1;
+      const res=resolveOutcome(bars,i,dir,p.react,p.horizon);
+      nonEvents.push({idx:i,t:b.t,dir,regime,outcome:res.outcome,ret:res.ret});
     }
   }
-  const base={};
-  const ensure=k=>base[k]||(base[k]={up:{w:0,n:0},down:{w:0,n:0}});
-  for(let i=warm;i<=lastI;i++){
-    if(eventBars.has(i))continue;
-    const regime=cloudRegime(bars[i].c,ind.A[i],ind.B[i]);
-    const g=ensure(regime);
-    const up=resolveIchi(bars,i,bars[i].c,1,T,H),dn=resolveIchi(bars,i,bars[i].c,-1,T,H);
-    if(up.out!=='TIMEOUT'){g.up.n++;if(up.out==='WIN')g.up.w++;}
-    if(dn.out!=='TIMEOUT'){g.down.n++;if(dn.out==='WIN')g.down.w++;}
-  }
-  const baseRate=(regime,dir)=>{
-    const g=base[regime],side=dir>0?(g&&g.up):(g&&g.down);
-    if(side&&side.n>=12)return side.w/side.n;
-    let w=0,n=0;Object.keys(base).forEach(k=>{const s=dir>0?base[k].up:base[k].down;w+=s.w;n+=s.n;});
-    return n?w/n:0.5;
-  };
-  events.forEach(e=>{e.base=baseRate(e.regime,e.dir);});
-  return{events,base,warm,T,H,anchorMode,lastI};
-}
-function summarize(events){
   const active=events.filter(e=>!excluded.has(e.id));
-  const dec=active.filter(e=>e.outcome!=='TIMEOUT');
+  const dec=active.filter(e=>e.outcome==='WIN'||e.outcome==='LOSS');
   const wins=dec.filter(e=>e.outcome==='WIN').length;
-  const losses=dec.length-wins;
-  const hit=dec.length?wins/dec.length:0;
-  const ci=wilson(wins,dec.length);
-  const baseAvg=dec.length?dec.reduce((s,e)=>s+e.base,0)/dec.length:0.5;
-  const edge=dec.length?(hit-baseAvg)*100:0;
-  const timeouts=active.length-dec.length;
-  const expectancy=active.length?active.reduce((s,e)=>s+e.fwd,0)/active.length:0;
-  const avgBars=dec.length?dec.reduce((s,e)=>s+e.bars,0)/dec.length:0;
-  let pval=1;
-  if(dec.length>=5){
-    const n2=400,p2=baseAvg,p1=hit,n1=dec.length;
-    const pb=(p1*n1+p2*n2)/(n1+n2);
-    const se=Math.sqrt(pb*(1-pb)*(1/n1+1/n2));
-    if(se>0){const z=(p1-p2)/se;pval=2*(1-normCdf(Math.abs(z)));}
-  }
-  let boot=[0,0];
-  if(dec.length>=12){
-    const diffs=dec.map(e=>(e.outcome==='WIN'?1:0)-e.base);
-    const n=diffs.length,bl=4,reps=1500,rnd=rng(20261122);
-    const means=[];
-    for(let r=0;r<reps;r++){
-      let s=0,c=0,idx=Math.floor(rnd()*n);
-      while(c<n){for(let k=0;k<bl&&c<n;k++){s+=diffs[(idx+k)%n];c++;}idx=Math.floor(rnd()*n);}
-      means.push(s/n);
-    }
-    means.sort((a,b)=>a-b);
-    boot=[means[Math.floor(reps*0.025)]*100,means[Math.floor(reps*0.975)]*100];
-  }
-  const sorted=[...dec].sort((a,b)=>a.t-b.t);
-  const cut=Math.floor(sorted.length*0.6);
-  const is=sorted.slice(0,cut),oos=sorted.slice(cut);
-  const rate=arr=>arr.length?arr.filter(e=>e.outcome==='WIN').length/arr.length:null;
-  const edgeOf=arr=>arr.length?(rate(arr)-arr.reduce((s,e)=>s+e.base,0)/arr.length)*100:null;
-  const byKind=k=>{
-    const k2=dec.filter(e=>e.kind===k);
-    const w=k2.filter(e=>e.outcome==='WIN').length;
-    return{n:k2.length,w,rate:k2.length?w/k2.length:null,ci:wilson(w,k2.length),base:k2.length?k2.reduce((s,e)=>s+e.base,0)/k2.length:null};
-  };
+  const hitRate=dec.length?wins/dec.length:0;
+  const[ciLo,ciHi]=wilson(wins,dec.length);
+  const baseDec=nonEvents.filter(e=>e.outcome==='WIN'||e.outcome==='LOSS');
+  const baseWins=baseDec.filter(e=>e.outcome==='WIN').length;
+  const baseRate=baseDec.length?baseWins/baseDec.length:0.5;
+  const diff=hitRate-baseRate;
+  const se=Math.sqrt((hitRate*(1-hitRate))/Math.max(1,dec.length)+(baseRate*(1-baseRate))/Math.max(1,baseDec.length));
+  const z=se>0?diff/se:0;
+  const pVal=clamp(2*(1-normCdf(Math.abs(z))),0,1);
+  const avgRet=active.length?active.reduce((s,e)=>s+e.ret,0)/active.length:0;
+  const baseRet=nonEvents.length?nonEvents.reduce((s,e)=>s+e.ret,0)/nonEvents.length:0;
+  const splitIdx=Math.floor(events.length*0.6);
+  const isEv=events.slice(0,splitIdx).filter(e=>!excluded.has(e.id)&&e.outcome!=='TIMEOUT');
+  const oosEv=events.slice(splitIdx).filter(e=>!excluded.has(e.id)&&e.outcome!=='TIMEOUT');
+  const isRate=isEv.length?isEv.filter(e=>e.outcome==='WIN').length/isEv.length:NaN;
+  const oosRate=oosEv.length?oosEv.filter(e=>e.outcome==='WIN').length/oosEv.length:NaN;
   const byLevel=FIBS.map(r=>{
-    const grp=dec.filter(e=>e.r===r);
-    const s=grp.filter(e=>e.kind==='support'),rs=grp.filter(e=>e.kind==='resistance');
-    const sw=s.filter(e=>e.outcome==='WIN').length,rw=rs.filter(e=>e.outcome==='WIN').length;
-    return{r,sN:s.length,sW:sw,sRate:s.length?sw/s.length:null,sCI:wilson(sw,s.length),
-      rN:rs.length,rW:rw,rRate:rs.length?rw/rs.length:null,rCI:wilson(rw,rs.length),
-      base:grp.length?grp.reduce((s2,e)=>s2+e.base,0)/grp.length:0.5};
+    const sub=dec.filter(e=>e.level===r);const w=sub.filter(e=>e.outcome==='WIN').length;
+    const rate=sub.length?w/sub.length:NaN;const[lo,hi]=wilson(w,sub.length);
+    return{r,n:sub.length,w,rate,ciLo:lo,ciHi:hi,baseRate,kind:r>=0.5?'support':'resistance'};
   });
-  return{active,dec,wins,losses,n:dec.length,total:active.length,timeouts,hit,ci,baseAvg,edge,boot,pval,expectancy,avgBars,isRate:rate(is),oosRate:rate(oos),isEdge:edgeOf(is),oosEdge:edgeOf(oos),oosN:oos.length,support:byKind('support'),resistance:byKind('resistance'),byLevel};
-}
-function verdictOf(st){
-  if(!st||st.n<25)return{level:'insufficient',cls:'v-cond',icon:'🧪',color:'var(--amber)',
-    title:'Not enough decisive events to certify this setup',
-    body:'Only '+(st?st.n:0)+' resolved confluence events exist under the current rules. Anything below ~25 is anecdote territory — loosen the tolerance, extend the horizon, or switch the confluence mode to gather a usable sample before giving this indicator high weight.'};
-  const bootLo=st.boot[0],oos=st.oosEdge;
-  if(st.edge<=0)return{level:'weak',cls:'v-weak',icon:'⛔',color:'var(--red)',
-    title:'No — it underperforms its own baseline',
-    body:'Across '+st.n+' walk-forward events the confluence hit rate is '+(st.hit*100).toFixed(1)+'% versus a direction-matched baseline of '+(st.baseAvg*100).toFixed(1)+'%. The cloud/fib/band touch adds nothing here; use it to draw levels, never as a stand-alone signal.'};
-  if(bootLo<=0||st.pval>=0.05)return{level:'weak',cls:'v-weak',icon:'⚠️',color:'var(--red)',
-    title:'Not statistically reliable — the edge is inside the noise',
-    body:'Hit rate '+(st.hit*100).toFixed(1)+'% vs baseline '+(st.baseAvg*100).toFixed(1)+'% ('+fmtPP(st.edge)+'), but the bootstrap 95% interval '+fmtPP(st.boot[0])+' … '+fmtPP(st.boot[1])+' straddles zero (p ≈ '+st.pval.toFixed(3)+'). Keep it as a discretionary location overlay at low weight.'};
-  if(oos===null||oos<=0)return{level:'weak',cls:'v-weak',icon:'📉',color:'var(--red)',
-    title:'Fails out-of-sample — classic curve-fit signature',
-    body:'In-sample edge '+fmtPP(st.isEdge)+' collapses to '+fmtPP(oos)+' on the most recent 40% of events ('+st.oosN+' samples). Do not promote it to a primary recommendation input.'};
-  if(st.edge>=8&&bootLo>0&&oos>0)return{level:'strong',cls:'v-strong',icon:'✅',color:'var(--green)',
-    title:'Yes — a measurable, out-of-sample-surviving confluence edge',
-    body:'Hit rate '+(st.hit*100).toFixed(1)+'% vs baseline '+(st.baseAvg*100).toFixed(1)+'% ('+fmtPP(st.edge)+'), bootstrap 95% '+fmtPP(st.boot[0])+' … '+fmtPP(st.boot[1])+', out-of-sample '+fmtPP(oos)+' over '+st.oosN+' events. Worth wiring in as a weighted confluence factor.'};
-  return{level:'conditional',cls:'v-cond',icon:'🟡',color:'var(--amber)',
-    title:'Conditionally useful — a modest edge, not a signal generator',
-    body:'Hit rate '+(st.hit*100).toFixed(1)+'% vs baseline '+(st.baseAvg*100).toFixed(1)+'% ('+fmtPP(st.edge)+'), bootstrap 95% '+fmtPP(st.boot[0])+' … '+fmtPP(st.boot[1])+', out-of-sample '+fmtPP(oos)+'. Real but small: use it to choose locations and invalidation, at a partial weight.'};
-}
-function ichiRecompute(){
-  if(!BARS||BARS.length<60)return;
-  const ind=computeIchimoku(BARS,P);
-  const band=computeBand(BARS,P);
-  IND={ind,band};
-  TEST=runTest(BARS,ind,band,P,'walk');
-  HIND=runTest(BARS,ind,band,P,'hindsight');
-  TEST.stats=summarize(TEST.events);
-  HIND.stats=summarize(HIND.events);
-  DISPLAY=anchorsAt(BARS,BARS.length-1,P.anchor==='walk'?'hindsight':P.anchor,P)||anchorsAt(BARS,BARS.length-1,'walk',P);
-  buildRecommendation();
-  dirty=true;
-}
-function buildRecommendation(){
-  if(!BARS.length||!IND||!TEST){REC=null;return;}
-  const i=BARS.length-1,c=BARS[i].c;
-  const a=anchorsAt(BARS,i,'walk',P)||DISPLAY;
-  const st=TEST.stats,v=verdictOf(st);
-  const tol=P.tol/100;
-  const regime=cloudRegime(c,IND.ind.A[i],IND.ind.B[i]);
-  const bLo=IND.band.lo[i],bHi=IND.band.hi[i];
-  let best=null;
-  if(a){
-    for(const r of FIBS){
-      const lvl=fibValue(a,r);
-      const dist=Math.abs(c/lvl-1);
-      if(dist>tol*2.2)continue;
-      const bandFlag=bLo!==null&&bHi!==null&&lvl>=bLo*(1-tol)&&lvl<=bHi*(1+tol);
-      let cloudFlag=false;
-      if(IND.ind.A[i]!==null&&IND.ind.B[i]!==null){
-        const top=Math.max(IND.ind.A[i],IND.ind.B[i]),bot=Math.min(IND.ind.A[i],IND.ind.B[i]);
-        cloudFlag=Math.abs(lvl/top-1)<=tol||Math.abs(lvl/bot-1)<=tol;
+  const paths={pos:[],neg:[]};
+  const maxStep=Math.min(p.horizon,12);
+  for(let s=0;s<=maxStep;s++){
+    const pVals=[],nVals=[];
+    for(const e of active){
+      if(e.idx+s<bars.length){
+        const rPct=((bars[e.idx+s].c/e.price)-1)*100*e.dir;
+        if(e.dir>0)pVals.push(rPct);else nVals.push(rPct);
       }
-      const kind=c>=lvl?'support':'resistance';
-      const score=(bandFlag?2:0)+(cloudFlag?2:0)+(1-dist/(tol*2.2))*2;
-      if(!best||score>best.score)best={r,lvl,dist,bandFlag,cloudFlag,kind,score};
+    }
+    const meanSd=arr=>{
+      if(!arr.length)return{m:NaN,sd:0,n:0};
+      const m=arr.reduce((a,b)=>a+b,0)/arr.length;
+      const v=arr.reduce((a,b)=>a+(b-m)*(b-m),0)/arr.length;
+      return{m,sd:Math.sqrt(v),n:arr.length};
+    };
+    paths.pos.push(Object.assign({step:s},meanSd(pVals)));
+    paths.neg.push(Object.assign({step:s},meanSd(nVals)));
+  }
+  const rnd=rng(90125);let bootBeats=0;const B=600;
+  if(dec.length>=4){
+    for(let b=0;b<B;b++){
+      let bW=0,bN=0;
+      while(bN<dec.length){
+        const start=Math.floor(rnd()*dec.length);
+        for(let k=0;k<4&&bN<dec.length;k++){
+          const item=dec[(start+k)%dec.length];
+          if(item.outcome==='WIN')bW++;bN++;
+        }
+      }
+      if((bW/bN)>baseRate)bootBeats++;
     }
   }
-  const pool=best?(best.kind==='support'?st.support:st.resistance):null;
-  const raw=pool&&pool.n>=8?pool.rate:(st.n?st.hit:0.5);
-  const nEff=pool&&pool.n>=8?pool.n:st.n;
-  const shrunk=(raw*nEff+0.5*12)/(nEff+12);
-  const weight=v.level==='strong'?0.55:v.level==='conditional'?0.32:v.level==='insufficient'?0.12:0.15;
-  const T=P.react/100;
-  let action='STAND ASIDE — NO CONFLUENCE',cls='b-hold',why,targets=[],stop=null,entry=null;
-  if(best){
-    entry=[best.lvl*(1-tol),best.lvl*(1+tol)];
-    if(best.kind==='support'){
-      action=shrunk>0.55?'DEFEND SUPPORT — SCALE IN':'WATCH SUPPORT — CONFIRM FIRST';
-      cls=shrunk>0.55?'b-buy':'b-warn';
-      targets=FIBS.filter(r=>r<best.r).slice(-3).reverse().map(r=>fibValue(a,r));
-      stop=Math.min(fibValue(a,0.9),best.lvl*(1-T));
-      why='Price is testing the '+best.r+' retracement at '+fmtP(best.lvl)+(best.bandFlag?' inside the bull support band':'')+(best.cloudFlag?' at a cloud edge':'')+', cloud regime "'+regime+'". Measured hold rate: '+(pool&&pool.n?(pool.rate*100).toFixed(0)+'% over '+pool.n+' decisive events':'pooled '+(st.hit*100).toFixed(0)+'% over '+st.n+' events')+'.';
-    }else{
-      action=shrunk>0.55?'RESISTANCE — TRIM / FADE':'RESISTANCE — WAIT FOR REJECTION';
-      cls=shrunk>0.55?'b-sell':'b-warn';
-      targets=FIBS.filter(r=>r>best.r).slice(0,3).map(r=>fibValue(a,r));
-      stop=Math.max(best.lvl*(1+T),fibValue(a,Math.max(0.236,best.r-0.15)));
-      why='Price is pressing the '+best.r+' retracement at '+fmtP(best.lvl)+(best.cloudFlag?' against Ichimoku cloud resistance':'')+(best.bandFlag?' with the band overhead':'')+', cloud regime "'+regime+'". Measured rejection rate: '+(pool&&pool.n?(pool.rate*100).toFixed(0)+'% over '+pool.n+' decisive events':'pooled '+(st.hit*100).toFixed(0)+'% over '+st.n+' events')+'.';
-    }
-  }else{
-    why='No Fibonacci level is within '+(tol*2.2*100).toFixed(1)+'% of spot, so the confluence filter is idle. Cloud regime "'+regime+'"'+(bLo!==null?', bull band '+fmtP(bLo)+'–'+fmtP(bHi):'')+'. Let the terminal’s trend, volume and quant factors drive the call until price returns to a mapped level.';
-    targets=a?[fibValue(a,0.5),fibValue(a,0.786),fibValue(a,0.886)]:[];
-    stop=a?fibValue(a,0.9):null;
+  const bootProb=dec.length>=4?bootBeats/B:0.5;
+  return{events,active,dec,wins,nDec:dec.length,hitRate,ciLo,ciHi,baseRate,diff,pVal,avgRet,baseRet,isRate,oosRate,oosN:oosEv.length,byLevel,paths,bootProb};
+}
+function buildDisplay(bars,ind,p){
+  const n=bars.length,disp=p.disp;
+  const swings=findConfirmedSwings(bars,p.pivot);
+  const anc=anchorAt(bars,swings,n-1,p,p.anchor==='hindsight');
+  const fibLevels=anc?FIBS.map(r=>({r,price:fibPrice(anc,r),kind:r>=0.5?'support':'resistance'})):[];
+  const cloud=[];
+  for(let i=0;i<n+disp;i++){
+    const t=i<n?bars[i].t:bars[n-1].t+(i-(n-1))*ichiNextBucket(p.tf,bars[n-1].t).replace?0:0;
+    let bt=bars[0].t;
+    if(i<n)bt=bars[i].t;
+    else{const step=bars[n-1].t-bars[n-2].t;bt=bars[n-1].t+(i-(n-1))*step;}
+    const a=ind.spanAPlot[i],b=ind.spanBPlot[i];
+    cloud.push({i,t:bt,a,b});
   }
-  REC={
-    symbol:'BTCUSDT',tf:P.tf,generatedAt:new Date().toISOString(),spot:c,action,cls,why,
-    confidence:Math.round(shrunk*100),weight,verdict:v.level,entry,targets,stop,
-    level:best?best.r:null,levelPrice:best?best.lvl:null,kind:best?best.kind:null,
-    confluence:best?{band:best.bandFlag,cloud:best.cloudFlag}:null,
-    regime,band:bLo!==null?[bLo,bHi]:null,anchors:a?{high:a.H,low:a.L}:null,
-    levels:a?FIBS.map(r=>({r,price:fibValue(a,r)})):[],
-    stats:{n:st.n,hit:+(st.hit*100).toFixed(1),baseline:+(st.baseAvg*100).toFixed(1),edge:+st.edge.toFixed(1),bootCI:[+st.boot[0].toFixed(1),+st.boot[1].toFixed(1)],oosEdge:st.oosEdge===null?null:+st.oosEdge.toFixed(1),p:+st.pval.toFixed(4)}
+  const last=bars[n-1];
+  const sa=ind.spanACur[n-1],sb=ind.spanBCur[n-1];
+  const cloudState=!Number.isFinite(sa)||!Number.isFinite(sb)?'no cloud':last.c>Math.max(sa,sb)?'above cloud':last.c<Math.min(sa,sb)?'below cloud':'inside cloud';
+  const s1=ind.bandSma[n-1],s2=ind.bandEma[n-1];
+  const bandState=Number.isFinite(s1)&&Number.isFinite(s2)?(last.c>=Math.min(s1,s2)?'above band ('+fmtP(Math.min(s1,s2))+'–'+fmtP(Math.max(s1,s2))+')':'below band ('+fmtP(Math.min(s1,s2))+'–'+fmtP(Math.max(s1,s2))+')'):'band warming up';
+  return{anc,fibLevels,cloud,last,cloudState,bandState};
+}
+function buildRecommendation(bars,ind,test,dispObj,p){
+  const spot=bars[bars.length-1].c;
+  const nearFib=dispObj.fibLevels.slice().sort((a,b)=>Math.abs(a.price-spot)-Math.abs(b.price-spot))[0];
+  const distPct=nearFib?((spot-nearFib.price)/nearFib.price)*100:0;
+  const kind=nearFib?nearFib.kind:'support';
+  const rawRate=test.nDec>=4?test.hitRate:0.55;
+  const calRate=(rawRate*test.nDec+0.55*8)/(test.nDec+8);
+  const edge=calRate-test.baseRate;
+  let action='HOLD / STAND ASIDE',cls='b-hold',dir=0;
+  if(test.nDec<6||Math.abs(edge)<0.03){action='NEUTRAL / NO EDGE';cls='b-hold';dir=0;}
+  else if(kind==='support'&&edge>=0.03&&Math.abs(distPct)<=p.tol*2.2){action='ACCUMULATE SUPPORT';cls='b-acc';dir=1;}
+  else if(kind==='resistance'&&edge>=0.03&&Math.abs(distPct)<=p.tol*2.2){action='TRIM / FADE RESISTANCE';cls='b-trim';dir=-1;}
+  else if(dispObj.cloudState==='above cloud'&&edge>0){action='TREND HOLD (ABOVE CLOUD)';cls='b-buy';dir=1;}
+  else if(dispObj.cloudState==='below cloud'&&edge>0){action='DEFENSIVE / BELOW CLOUD';cls='b-sell';dir=-1;}
+  const conf=Math.round(clamp((0.5+edge*1.8)*100,25,88));
+  const target=nearFib?(dir>=0?nearFib.price*(1+p.react/100):nearFib.price*(1-p.react/100)):spot*(1+(dir||1)*p.react/100);
+  const stop=dir>=0?spot*(1-p.react*0.65/100):spot*(1+p.react*0.65/100);
+  const weight=Number(clamp(Math.abs(edge)*1.4+(test.nDec>=15?0.12:0.04),0.05,0.35).toFixed(2));
+  const why='Walk-forward hit rate '+Math.round(calRate*100)+'% vs '+Math.round(test.baseRate*100)+'% baseline ('+test.nDec+' decisive events, p='+test.pVal.toFixed(3)+'). Nearest Fib '+(nearFib?nearFib.r.toFixed(3)+' @ '+fmtP(nearFib.price)+' ('+fmtPct(distPct)+')':'n/a')+'.';
+  return{symbol:'BTCUSDT',tf:p.tf,spot,action,cls,dir,kind,confidence:conf,calRate,baseRate:test.baseRate,edge,target,stop,weight,why,generatedAt:new Date().toISOString()};
+}
+function recomputeLab(){
+  if(!BARS.length)return;
+  IND=computeIndicators(BARS,P);
+  TEST=runAudit(BARS,IND,P,P.anchor==='hindsight');
+  HIND=P.anchor==='hindsight'?TEST:runAudit(BARS,IND,P,true);
+  DISPLAY=buildDisplay(BARS,IND,P);
+  REC=buildRecommendation(BARS,IND,TEST,DISPLAY,P);
+  needsCompute=false;dirty=true;
+}
+function publishToTerminal(){
+  if(!REC)recomputeLab();
+  const payload={
+    symbol:'BTCUSDT',tf:REC.tf,action:REC.action,kind:REC.kind,
+    confidence:REC.confidence,weight:REC.weight,stop:REC.stop,target:REC.target,
+    why:REC.why,generatedAt:REC.generatedAt
   };
+  saveLS(PUBLISH_KEY,payload);
+  recompute();renderAll();
+  toast('Published Ichimoku × Fib overlay ('+REC.action+', weight '+REC.weight.toFixed(2)+') to terminal.','ok');
+}
+function clearPublishedOverlay(){
+  try{localStorage.removeItem(PUBLISH_KEY);}catch(e){}
+  recompute();renderAll();
+  toast('Cleared published Ichimoku × Fib overlay.','warn');
 }
 
-/* ================= ICHIMOKU CANVAS ENGINE ================= */
-const ichiChart={
-  cv:null,ctx:null,w:0,h:0,dpr:1,padR:80,padB:26,
-  i0:0,i1:100,total:100,hover:null,cross:null,drag:null,pointers:new Map(),pinch:null,pulse:0
-};
+/* Lab Canvas & Charts */
+const ichiCv=$('ichiChart');const ichiCtx=ichiCv?ichiCv.getContext('2d'):null;
+const VW={start:0,count:140,hoverIdx:-1,mx:0,my:0,drag:false,dragStartX:0,dragStartStart:0};
+function clampView(){
+  if(!BARS.length)return;
+  const maxC=BARS.length+P.disp+12;
+  VW.count=clamp(Math.round(VW.count),24,Math.max(40,maxC));
+  const minS=-10;
+  const maxS=Math.max(minS,BARS.length+P.disp-VW.count+6);
+  VW.start=clamp(VW.start,minS,maxS);
+}
+function fitIchiView(){if(!BARS.length)return;VW.count=Math.min(130,BARS.length+P.disp);VW.start=BARS.length+P.disp-VW.count-2;clampView();dirty=true;}
+function jumpIchiLatest(){if(!BARS.length)return;VW.start=BARS.length+P.disp-VW.count-2;clampView();dirty=true;}
+function panIchi(deltaBars){VW.start+=deltaBars;clampView();dirty=true;}
+function zoomIchi(factor,anchorFrac){
+  if(anchorFrac===undefined)anchorFrac=0.7;
+  const oldC=VW.count,newC=clamp(Math.round(oldC*factor),24,Math.max(40,BARS.length+P.disp+12));
+  const anchorPos=VW.start+oldC*anchorFrac;
+  VW.count=newC;VW.start=anchorPos-newC*anchorFrac;clampView();dirty=true;
+}
 function ichiResize(){
-  if(!ichiChart.cv)return;
-  const wrap=ichiChart.cv.parentElement;if(!wrap)return;
-  const r=wrap.getBoundingClientRect();
-  if(r.width<=0||r.height<=0)return;
-  ichiChart.dpr=Math.min(2,window.devicePixelRatio||1);
-  ichiChart.w=Math.max(320,r.width);ichiChart.h=Math.max(240,r.height);
-  ichiChart.cv.width=Math.round(ichiChart.w*ichiChart.dpr);ichiChart.cv.height=Math.round(ichiChart.h*ichiChart.dpr);
-  ichiChart.padR=ichiChart.w<560?62:80;
+  if(!ichiCv)return;
+  const wrap=ichiCv.parentElement;if(!wrap)return;
+  const r=wrap.getBoundingClientRect();if(r.width<=0||r.height<=0)return;
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  ichiCv.width=Math.round(r.width*dpr);ichiCv.height=Math.round(r.height*dpr);
   dirty=true;
-}
-function ichiChartInit(){
-  ichiChart.cv=$('ichiChart');if(!ichiChart.cv)return;
-  ichiChart.ctx=ichiChart.cv.getContext('2d');
-  ichiResize();
-  if(typeof ResizeObserver!=='undefined'){new ResizeObserver(ichiResize).observe(ichiChart.cv.parentElement);}
-  const idxAt=px=>ichiChart.i0+(px/ichiPlotW())*(ichiChart.i1-ichiChart.i0)-0.5;
-  ichiChart.cv.addEventListener('pointerdown',e=>{
-    ichiChart.cv.setPointerCapture(e.pointerId);
-    ichiChart.pointers.set(e.pointerId,{x:e.offsetX,y:e.offsetY});
-    if(ichiChart.pointers.size===1){ichiChart.drag={x:e.offsetX,i0:ichiChart.i0,i1:ichiChart.i1,moved:false};}
-    else if(ichiChart.pointers.size===2){
-      const p=[...ichiChart.pointers.values()];
-      ichiChart.pinch={d:Math.abs(p[0].x-p[1].x)||1,i0:ichiChart.i0,i1:ichiChart.i1,cx:(p[0].x+p[1].x)/2};
-      ichiChart.drag=null;
-    }
-  });
-  ichiChart.cv.addEventListener('pointermove',e=>{
-    if(ichiChart.pointers.has(e.pointerId))ichiChart.pointers.set(e.pointerId,{x:e.offsetX,y:e.offsetY});
-    if(ichiChart.pinch&&ichiChart.pointers.size===2){
-      const p=[...ichiChart.pointers.values()];
-      const d=Math.abs(p[0].x-p[1].x)||1;
-      const f=clamp(ichiChart.pinch.d/d,0.2,5);
-      const span=clamp((ichiChart.pinch.i1-ichiChart.pinch.i0)*f,20,ichiChart.total+10);
-      const anchor=ichiChart.pinch.i0+(ichiChart.pinch.cx/ichiPlotW())*(ichiChart.pinch.i1-ichiChart.pinch.i0);
-      const rel=(anchor-ichiChart.pinch.i0)/(ichiChart.pinch.i1-ichiChart.pinch.i0);
-      ichiChart.i0=anchor-rel*span;ichiChart.i1=ichiChart.i0+span;
-      ichiClampView();dirty=true;return;
-    }
-    if(ichiChart.drag){
-      const dx=e.offsetX-ichiChart.drag.x;
-      if(Math.abs(dx)>3)ichiChart.drag.moved=true;
-      const shift=dx/ichiPlotW()*(ichiChart.drag.i1-ichiChart.drag.i0);
-      ichiChart.i0=ichiChart.drag.i0-shift;ichiChart.i1=ichiChart.drag.i1-shift;
-      ichiClampView();dirty=true;
-    }
-    ichiChart.cross={x:e.offsetX,y:e.offsetY};
-    const i=Math.round(idxAt(e.offsetX));
-    ichiChart.hover=(i>=0&&i<BARS.length)?i:null;
-    const ev=eventNear(e.offsetX,e.offsetY);
-    ichiChart.cv.style.cursor=ev?'pointer':(ichiChart.drag?'grabbing':'crosshair');
-    updateIchiLegend();dirty=true;
-  });
-  const endPtr=e=>{
-    ichiChart.pointers.delete(e.pointerId);
-    if(ichiChart.pointers.size<2)ichiChart.pinch=null;
-    if(ichiChart.drag&&!ichiChart.drag.moved){const ev=eventNear(e.offsetX,e.offsetY);if(ev)openDrawer(ev.id);}
-    ichiChart.drag=null;
-  };
-  ichiChart.cv.addEventListener('pointerup',endPtr);
-  ichiChart.cv.addEventListener('pointercancel',endPtr);
-  ichiChart.cv.addEventListener('pointerleave',()=>{ichiChart.cross=null;ichiChart.hover=null;updateIchiLegend();dirty=true;});
-  ichiChart.cv.addEventListener('wheel',e=>{
-    e.preventDefault();
-    const f=e.deltaY>0?1.12:0.89;
-    const span=clamp((ichiChart.i1-ichiChart.i0)*f,20,ichiChart.total+10);
-    const anchor=idxAt(e.offsetX);
-    const rel=clamp((anchor-ichiChart.i0)/(ichiChart.i1-ichiChart.i0),0,1);
-    ichiChart.i0=anchor-rel*span;ichiChart.i1=ichiChart.i0+span;
-    ichiClampView();dirty=true;
-  },{passive:false});
-  ichiChart.cv.addEventListener('dblclick',()=>ichiFitChart());
-  ichiChart.cv.addEventListener('keydown',e=>{
-    const span=ichiChart.i1-ichiChart.i0;
-    if(e.key==='ArrowLeft'){ichiChart.i0-=span*0.12;ichiChart.i1-=span*0.12;ichiClampView();dirty=true;e.preventDefault();}
-    if(e.key==='ArrowRight'){ichiChart.i0+=span*0.12;ichiChart.i1+=span*0.12;ichiClampView();dirty=true;e.preventDefault();}
-    if(e.key==='+'||e.key==='='){ichiZoomChart(0.85);e.preventDefault();}
-    if(e.key==='-'||e.key==='_'){ichiZoomChart(1.18);e.preventDefault();}
-  });
-  requestAnimationFrame(ichiLoop);
-}
-function ichiPlotW(){return Math.max(50,ichiChart.w-ichiChart.padR);}
-function ichiPlotH(){return Math.max(50,ichiChart.h-ichiChart.padB);}
-function ichiClampView(){
-  const span=ichiChart.i1-ichiChart.i0;
-  if(ichiChart.i0<-8){ichiChart.i0=-8;ichiChart.i1=ichiChart.i0+span;}
-  if(ichiChart.i1>ichiChart.total+8){ichiChart.i1=ichiChart.total+8;ichiChart.i0=ichiChart.i1-span;}
-}
-function ichiFitChart(){
-  if(!IND)return;
-  ichiChart.total=IND.ind.total;
-  const span=Math.min(ichiChart.total+6,P.tf==='1d'?220:165);
-  ichiChart.i1=ichiChart.total+4;ichiChart.i0=ichiChart.i1-span;
-  ichiClampView();dirty=true;updateIchiViewChip();
-}
-function ichiZoomChart(f){
-  const mid=(ichiChart.i0+ichiChart.i1)/2;
-  const span=clamp((ichiChart.i1-ichiChart.i0)*f,20,ichiChart.total+10);
-  ichiChart.i0=mid-span/2;ichiChart.i1=mid+span/2;ichiClampView();dirty=true;updateIchiViewChip();
-}
-function ichiPanChart(f){
-  const span=ichiChart.i1-ichiChart.i0;
-  ichiChart.i0+=span*f;ichiChart.i1+=span*f;ichiClampView();dirty=true;updateIchiViewChip();
-}
-function focusIndex(i){
-  const span=Math.min(120,ichiChart.i1-ichiChart.i0);
-  ichiChart.i0=i-span*0.55;ichiChart.i1=ichiChart.i0+span;ichiClampView();dirty=true;updateIchiViewChip();
-}
-function updateIchiViewChip(){
-  const el=$('ichiViewChip');if(!el||!BARS.length)return;
-  const a=clamp(Math.round(ichiChart.i0),0,BARS.length-1),b=clamp(Math.round(ichiChart.i1),0,BARS.length-1);
-  el.textContent=fmtShort(BARS[a].t)+' → '+fmtShort(BARS[b].t)+' · '+Math.round(ichiChart.i1-ichiChart.i0)+' bars';
-}
-function timeAt(i){
-  if(!BARS.length)return 0;
-  if(i<BARS.length)return BARS[Math.max(0,i)].t;
-  let t=BARS[BARS.length-1].t;
-  for(let k=BARS.length;k<=i;k++)t=ichiNextBucket(P.tf,t);
-  return t;
-}
-let ichiScale={min:0,max:1,log:false};
-function ichiPriceRange(){
-  const a=clamp(Math.floor(ichiChart.i0),0,ichiChart.total-1),b=clamp(Math.ceil(ichiChart.i1),0,ichiChart.total-1);
-  let lo=Infinity,hi=-Infinity;
-  const add=v=>{if(Number.isFinite(v)&&v>0){if(v<lo)lo=v;if(v>hi)hi=v;}};
-  for(let i=a;i<=b;i++){
-    if(i<BARS.length){add(BARS[i].h);add(BARS[i].l);}
-    if(P.cloud){add(IND.ind.A[i]);add(IND.ind.B[i]);}
-    if(P.bandOn&&i<BARS.length){add(IND.band.lo[i]);add(IND.band.hi[i]);}
-  }
-  if(P.fib&&DISPLAY){FIBS.forEach(r=>{const v=fibValue(DISPLAY,r);if(v>0)add(v);});}
-  if(!Number.isFinite(lo)||!Number.isFinite(hi)){lo=1;hi=2;}
-  if(hi/lo<1.05){const m=(hi+lo)/2;lo=m*0.97;hi=m*1.03;}
-  const pad=(hi-lo)*0.08;
-  return{min:Math.max(1e-6,lo-pad),max:hi+pad};
-}
-const xOf=i=>(i-ichiChart.i0+0.5)*(ichiPlotW()/(ichiChart.i1-ichiChart.i0));
-function yOf(p){
-  const h=ichiPlotH();
-  if(P.log){const l0=Math.log(ichiScale.min),l1=Math.log(ichiScale.max);return h-(Math.log(Math.max(p,1e-9))-l0)/(l1-l0)*h;}
-  return h-(p-ichiScale.min)/(ichiScale.max-ichiScale.min)*h;
-}
-function priceAtY(y){
-  const h=ichiPlotH();
-  if(P.log){const l0=Math.log(ichiScale.min),l1=Math.log(ichiScale.max);return Math.exp(l0+(h-y)/h*(l1-l0));}
-  return ichiScale.min+(h-y)/h*(ichiScale.max-ichiScale.min);
-}
-function eventNear(px,py){
-  if(!P.markers||!TEST)return null;
-  let best=null,bd=13;
-  for(const e of TEST.events){
-    if(excluded.has(e.id))continue;
-    if(e.i<ichiChart.i0-2||e.i>ichiChart.i1+2)continue;
-    const d=Math.hypot(xOf(e.i)-px,yOf(e.level)-py);
-    if(d<bd){bd=d;best=e;}
-  }
-  return best;
-}
-function fillRibbon(ctx,xs,aVals,bVals,from,to,colorPos,colorNeg){
-  let run=null;
-  const flush=()=>{
-    if(!run||run.pts.length<2){run=null;return;}
-    ctx.beginPath();ctx.moveTo(run.pts[0].x,run.pts[0].a);
-    for(let k=1;k<run.pts.length;k++)ctx.lineTo(run.pts[k].x,run.pts[k].a);
-    for(let k=run.pts.length-1;k>=0;k--)ctx.lineTo(run.pts[k].x,run.pts[k].b);
-    ctx.closePath();ctx.fillStyle=run.pos?colorPos:colorNeg;ctx.fill();run=null;
-  };
-  for(let i=from;i<=to;i++){
-    const a=aVals[i],b=bVals[i];
-    if(!Number.isFinite(a)||!Number.isFinite(b)){flush();continue;}
-    const pos=a>=b,x=xs(i),ya=yOf(a),yb=yOf(b);
-    if(run&&run.pos!==pos){
-      const prev=run.pts[run.pts.length-1];
-      const pa=aVals[i-1],pb=bVals[i-1];
-      const da=pa-pb,db=a-b,t=da/(da-db||1e-9);
-      const cx=prev.x+(x-prev.x)*t,cy=prev.a+(ya-prev.a)*t;
-      run.pts.push({x:cx,a:cy,b:cy});flush();run={pos,pts:[{x:cx,a:cy,b:cy}]};
-    }
-    if(!run)run={pos,pts:[]};
-    run.pts.push({x,a:ya,b:yb});
-  }
-  flush();
-}
-function strokeSeries(ctx,arr,from,to,color,width,dash){
-  ctx.save();ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineJoin='round';ctx.lineCap='round';
-  if(dash)ctx.setLineDash(dash);
-  ctx.beginPath();let started=false;
-  for(let i=from;i<=to;i++){
-    const v=arr[i];if(!Number.isFinite(v)){started=false;continue;}
-    const x=xOf(i),y=yOf(v);if(!started){ctx.moveTo(x,y);started=true;}else ctx.lineTo(x,y);
-  }
-  ctx.stroke();ctx.restore();
-}
-function niceTicks(min,max,count){
-  const span=max-min,raw=span/count,mag=Math.pow(10,Math.floor(Math.log10(raw))),norm=raw/mag;
-  const step=(norm>=5?10:norm>=2?5:norm>=1?2:1)*mag;
-  const out=[];for(let v=Math.ceil(min/step)*step;v<=max;v+=step)out.push(v);return out;
 }
 function drawIchiChart(){
-  const ctx=ichiChart.ctx;if(!ctx||!IND||!BARS.length||ichiChart.w<=0)return;
-  const W=ichiChart.w,H=ichiChart.h,pw=ichiPlotW(),ph=ichiPlotH();
-  ctx.setTransform(ichiChart.dpr,0,0,ichiChart.dpr,0,0);
-  ctx.clearRect(0,0,W,H);
-  const bg=ctx.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#070e15');bg.addColorStop(.55,'#0a141c');bg.addColorStop(1,'#08111a');
-  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
-  ichiScale=ichiPriceRange();ichiScale.log=P.log;
-  const a=clamp(Math.floor(ichiChart.i0)-1,0,ichiChart.total-1),b=clamp(Math.ceil(ichiChart.i1)+1,0,ichiChart.total-1);
-  const bw=pw/(ichiChart.i1-ichiChart.i0);
+  if(!ichiCtx||!BARS.length)return;
+  if(needsCompute)recomputeLab();
+  clampView();
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  const w=ichiCv.width/dpr,h=ichiCv.height/dpr;
+  if(w<=0||h<=0)return;
+  ichiCtx.setTransform(dpr,0,0,dpr,0,0);
+  const padL=10,padR=68,padT=14,padB=24;
+  const pw=Math.max(50,w-padL-padR),ph=Math.max(50,h-padT-padB);
+  ichiCtx.clearRect(0,0,w,h);
+  ichiCtx.fillStyle='#080f15';ichiCtx.fillRect(0,0,w,h);
 
-  ctx.save();ctx.beginPath();ctx.rect(0,0,pw,ph);ctx.clip();
-  if(P.grid){
-    ctx.strokeStyle='rgba(35,48,71,.55)';ctx.lineWidth=1;
-    niceTicks(ichiScale.min,ichiScale.max,8).forEach(v=>{const y=Math.round(yOf(v))+.5;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(pw,y);ctx.stroke();});
-    let lastMonth=-1;
-    for(let i=Math.max(0,a);i<=Math.min(BARS.length-1,b);i++){
-      const d=new Date(BARS[i].t*1000);
-      const key=P.tf==='1M'?d.getUTCFullYear():d.getUTCFullYear()*12+d.getUTCMonth();
-      if(key!==lastMonth){lastMonth=key;const x=Math.round(xOf(i))+.5;
-        ctx.strokeStyle=(P.tf==='1M'||d.getUTCMonth()%3===0)?'rgba(46,61,88,.7)':'rgba(35,48,71,.35)';
-        ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,ph);ctx.stroke();}
-    }
+  const i0=Math.floor(VW.start),i1=Math.ceil(VW.start+VW.count);
+  let pMin=Infinity,pMax=-Infinity;
+  const addP=v=>{if(Number.isFinite(v)&&v>0){if(v<pMin)pMin=v;if(v>pMax)pMax=v;}};
+  for(let i=Math.max(0,i0);i<Math.min(BARS.length,i1);i++){addP(BARS[i].l);addP(BARS[i].h);}
+  if(P.cloud&&DISPLAY){
+    for(let i=Math.max(0,i0);i<Math.min(DISPLAY.cloud.length,i1);i++){addP(DISPLAY.cloud[i].a);addP(DISPLAY.cloud[i].b);}
   }
-  const alpha=P.alpha/100;
-  if(P.cloud){
-    fillRibbon(ctx,xOf,IND.ind.A,IND.ind.B,a,b,'rgba(20,184,166,'+alpha.toFixed(2)+')','rgba(125,138,146,'+(alpha*0.85).toFixed(2)+')');
-    strokeSeries(ctx,IND.ind.A,a,b,'rgba(95,240,230,.45)',1);
-    strokeSeries(ctx,IND.ind.B,a,b,'rgba(160,175,183,.4)',1);
-  }
-  if(P.bandOn){
-    fillRibbon(ctx,xOf,IND.band.hi,IND.band.lo,a,Math.min(b,BARS.length-1),'rgba(163,134,47,'+(alpha*0.9).toFixed(2)+')','rgba(163,134,47,'+(alpha*0.9).toFixed(2)+')');
-    strokeSeries(ctx,IND.band.lo,a,Math.min(b,BARS.length-1),'rgba(239,68,68,.75)',1.4);
-    strokeSeries(ctx,IND.band.hi,a,Math.min(b,BARS.length-1),'rgba(245,165,36,.7)',1.2);
-  }
-  if(P.chikou)strokeSeries(ctx,IND.ind.chik,a,Math.min(b,BARS.length-1),'rgba(232,121,249,.8)',1.3,[5,4]);
-  strokeSeries(ctx,IND.ind.ten,a,Math.min(b,BARS.length-1),'rgba(59,130,246,.9)',1.4);
-  strokeSeries(ctx,IND.ind.kij,a,Math.min(b,BARS.length-1),'rgba(95,240,230,.95)',2.1);
-
-  const cw=clamp(bw*0.66,1,16);
-  const upC=P.semantic?'#22c55e':'#14b8a6';
-  const dnC=P.semantic?'#ef4444':'#d7dee8';
-  for(let i=Math.max(0,a);i<=Math.min(BARS.length-1,b);i++){
-    const bar=BARS[i],x=xOf(i),up=bar.c>=bar.o,col=up?upC:dnC;
-    ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=Math.max(1,cw*0.14);
-    ctx.beginPath();ctx.moveTo(Math.round(x)+.5,yOf(bar.h));ctx.lineTo(Math.round(x)+.5,yOf(bar.l));ctx.stroke();
-    const yo=yOf(bar.o),yc=yOf(bar.c),top=Math.min(yo,yc),hgt=Math.max(1.2,Math.abs(yc-yo));
-    ctx.fillRect(x-cw/2,top,cw,hgt);
+  if(P.bandOn&&IND){
+    for(let i=Math.max(0,i0);i<Math.min(BARS.length,i1);i++){addP(IND.bandSma[i]);addP(IND.bandEma[i]);}
   }
   if(P.fib&&DISPLAY){
-    ctx.font="500 10px 'IBM Plex Mono',monospace";
-    FIBS.forEach(r=>{
-      const v=fibValue(DISPLAY,r);if(v<ichiScale.min||v>ichiScale.max)return;
-      const y=yOf(v),isKey=r===0.5,isDeep=r===0.886||r===0.9;
-      ctx.strokeStyle=isKey?'rgba(34,197,94,.75)':isDeep?'rgba(239,68,68,.8)':'rgba(139,152,173,.32)';
-      ctx.lineWidth=isKey||isDeep?1.3:1;
-      ctx.setLineDash(isKey||isDeep?[]:[3,4]);
-      ctx.beginPath();ctx.moveTo(0,y+.5);ctx.lineTo(pw,y+.5);ctx.stroke();ctx.setLineDash([]);
-      ctx.fillStyle=isKey?'#4ade80':isDeep?'#fca5a5':'rgba(139,152,173,.75)';
-      ctx.textAlign='right';ctx.textBaseline='bottom';
-      ctx.fillText(r.toFixed(3).replace(/0$/,'')+' ('+fmtP(v)+')',pw-6,y-2);
-    });
-    if(P.zone){
-      const yA=yOf(fibValue(DISPLAY,0.886)),yB=yOf(fibValue(DISPLAY,0.9));
-      const top=Math.min(yA,yB),hh=Math.max(3,Math.abs(yB-yA));
-      const g=ctx.createLinearGradient(0,top,pw,top);
-      g.addColorStop(0,'rgba(239,68,68,.12)');g.addColorStop(.55,'rgba(239,68,68,.55)');g.addColorStop(1,'rgba(239,68,68,.8)');
-      ctx.fillStyle=g;ctx.fillRect(pw*0.18,top,pw*0.82,hh);
-    }
+    DISPLAY.fibLevels.forEach(fl=>{if(fl.price>=pMin*0.65&&fl.price<=pMax*1.45)addP(fl.price);});
   }
-  if(P.markers&&TEST){
-    const pulse=0.5+0.5*Math.sin(ichiChart.pulse);
-    TEST.events.forEach(e=>{
-      if(excluded.has(e.id)||e.i<a-2||e.i>b+2)return;
-      const x=xOf(e.i),y=yOf(e.level);if(y<-20||y>ph+20)return;
-      const isSel=e.id===selectedId;
-      const col=e.outcome==='WIN'?(e.kind==='support'?'#22c55e':'#5ff0e6'):e.outcome==='LOSS'?'#ef4444':'#f5a524';
-      if(isSel){ctx.beginPath();ctx.arc(x,y,12+pulse*4,0,Math.PI*2);ctx.fillStyle='rgba(99,102,241,'+(0.14+pulse*0.12).toFixed(2)+')';ctx.fill();}
-      ctx.beginPath();ctx.arc(x,y,isSel?7:5.2,0,Math.PI*2);
-      ctx.fillStyle=col;ctx.globalAlpha=e.outcome==='TIMEOUT'?.6:.92;ctx.fill();ctx.globalAlpha=1;
-      ctx.lineWidth=1.4;ctx.strokeStyle='rgba(6,9,15,.85)';ctx.stroke();
-    });
-    if(P.labels){
-      const visible=TEST.events.filter(e=>!excluded.has(e.id)&&e.i>=a&&e.i<=b);
-      const sup=[...visible].reverse().find(e=>e.kind==='support');
-      const res=[...visible].reverse().find(e=>e.kind==='resistance');
-      ctx.font="600 11.5px 'Space Grotesk',sans-serif";ctx.textAlign='left';ctx.textBaseline='middle';
-      const callout=(e,text,color,dy)=>{
-        if(!e)return;
-        const x=clamp(xOf(e.i)+16,8,pw-260),y=clamp(yOf(e.level)+dy,16,ph-16);
-        ctx.fillStyle='rgba(6,9,15,.78)';const w=ctx.measureText(text).width+14;ctx.fillRect(x-6,y-11,w,22);
-        ctx.fillStyle=color;ctx.fillText(text,x,y);
-      };
-      callout(res,'Rejected · '+(res?res.r:'')+' fib'+(res&&res.cloud?' + cloud resistance':''),'#f87171',-22);
-      callout(sup,'Support test · '+(sup?sup.r:'')+' fib'+(sup&&sup.band?' + bull support band':''),'#4ade80',24);
-    }
-  }
-  const last=BARS[BARS.length-1],ly=yOf(last.c);
-  if(ly>=0&&ly<=ph){ctx.setLineDash([4,4]);ctx.strokeStyle='rgba(239,68,68,.55)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,ly+.5);ctx.lineTo(pw,ly+.5);ctx.stroke();ctx.setLineDash([]);}
-  ctx.restore();
+  if(!Number.isFinite(pMin)||!Number.isFinite(pMax)||pMax<=pMin){pMin=40000;pMax=100000;}
+  const logY=!!P.log;
+  const yMap=v=>{
+    const vv=Math.max(v,1e-6);
+    if(logY){const a=Math.log(pMin*0.96),b=Math.log(pMax*1.04);return padT+ph-((Math.log(vv)-a)/Math.max(1e-6,b-a))*ph;}
+    const a=pMin*0.96,b=pMax*1.04;return padT+ph-((vv-a)/Math.max(1e-6,b-a))*ph;
+  };
+  const xMap=idx=>padL+((idx-VW.start)/Math.max(1,VW.count))*pw;
 
-  ctx.fillStyle='rgba(10,15,26,.92)';ctx.fillRect(pw,0,ichiChart.padR,H);
-  ctx.strokeStyle='rgba(46,61,88,.9)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pw+.5,0);ctx.lineTo(pw+.5,H);ctx.stroke();
-  ctx.font="500 10px 'IBM Plex Mono',monospace";ctx.textAlign='left';ctx.textBaseline='middle';
-  niceTicks(ichiScale.min,ichiScale.max,8).forEach(v=>{const y=yOf(v);if(y<8||y>ph-4)return;ctx.fillStyle='rgba(139,152,173,.85)';ctx.fillText(fmtP(v),pw+7,y);});
-  if(ly>=0&&ly<=ph){
-    ctx.fillStyle=last.c>=last.o?'#0d7f83':'#dc2626';ctx.fillRect(pw+2,ly-9,ichiChart.padR-4,18);
-    ctx.fillStyle='#ffffff';ctx.font="600 10.5px 'IBM Plex Mono',monospace";ctx.fillText(fmtP(last.c),pw+7,ly);
+  if(P.grid){
+    ichiCtx.strokeStyle='rgba(35,48,71,.45)';ichiCtx.lineWidth=1;
+    for(let g=0;g<=5;g++){const y=padT+(ph*g)/5;ichiCtx.beginPath();ichiCtx.moveTo(padL,y);ichiCtx.lineTo(padL+pw,y);ichiCtx.stroke();}
   }
-  ctx.fillStyle='rgba(10,15,26,.92)';ctx.fillRect(0,ph,W,ichiChart.padB);
-  ctx.strokeStyle='rgba(46,61,88,.9)';ctx.beginPath();ctx.moveTo(0,ph+.5);ctx.lineTo(W,ph+.5);ctx.stroke();
-  ctx.textAlign='center';ctx.textBaseline='middle';ctx.font="500 10px 'IBM Plex Mono',monospace";
-  let lastKey=null,lastX=-999;
-  for(let i=Math.max(0,Math.floor(ichiChart.i0));i<=Math.min(ichiChart.total-1,Math.ceil(ichiChart.i1));i++){
-    const t=timeAt(i),d=new Date(t*1000);
-    const key=P.tf==='1d'?d.getUTCFullYear()*12+d.getUTCMonth():P.tf==='1w'?d.getUTCFullYear()*12+d.getUTCMonth():d.getUTCFullYear();
-    if(key===lastKey)continue;
-    const x=xOf(i);if(x<16||x>pw-16||x-lastX<46){lastKey=key;continue;}
-    lastKey=key;lastX=x;
-    const isYear=P.tf==='1M'?true:d.getUTCMonth()===0;
-    ctx.fillStyle=isYear?'rgba(95,240,230,.95)':'rgba(139,152,173,.8)';
-    ctx.fillText(isYear?String(d.getUTCFullYear()):MON[d.getUTCMonth()],x,ph+ichiChart.padB/2);
-  }
-  if(ichiChart.cross&&ichiChart.cross.x<pw&&ichiChart.cross.y<ph){
-    const{x,y}=ichiChart.cross;
-    ctx.save();ctx.setLineDash([3,4]);ctx.strokeStyle='rgba(139,152,173,.55)';ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(x+.5,0);ctx.lineTo(x+.5,ph);ctx.moveTo(0,y+.5);ctx.lineTo(pw,y+.5);ctx.stroke();ctx.restore();
-    const pv=priceAtY(y);
-    ctx.fillStyle='rgba(20,184,166,.92)';ctx.fillRect(pw+2,y-9,ichiChart.padR-4,18);
-    ctx.fillStyle='#03191b';ctx.font="600 10.5px 'IBM Plex Mono',monospace";ctx.textAlign='left';ctx.textBaseline='middle';
-    ctx.fillText(fmtP(pv),pw+7,y);
-    const i=Math.round(ichiChart.i0+(x/pw)*(ichiChart.i1-ichiChart.i0)-0.5);
-    if(i>=0&&i<ichiChart.total){
-      const label=fmtDate(timeAt(i));ctx.font="500 10px 'IBM Plex Mono',monospace";
-      const w=ctx.measureText(label).width+14;
-      ctx.fillStyle='rgba(20,184,166,.92)';ctx.fillRect(clamp(x-w/2,0,pw-w),ph+2,w,ichiChart.padB-4);
-      ctx.fillStyle='#03191b';ctx.textAlign='center';ctx.fillText(label,clamp(x,w/2,pw-w/2),ph+ichiChart.padB/2);
-    }
-  }
-}
-function ichiLoop(ts){
-  ichiChart.pulse=(ts||0)/420;
-  if(needsCompute){needsCompute=false;ichiRecompute();ichiRenderAll();}
-  const animating=P.markers&&selectedId;
-  if(dirty||animating){drawIchiChart();dirty=false;}
-  requestAnimationFrame(ichiLoop);
-}
-function updateIchiLegend(){
-  if(!BARS.length||!IND)return;
-  const i=ichiChart.hover!==null?ichiChart.hover:BARS.length-1;
-  const b=BARS[i];
-  const set=(id,v)=>{const el=$(id);if(el)el.textContent=v;};
-  set('lgO',fmtP(b.o));set('lgH',fmtP(b.h));set('lgL',fmtP(b.l));set('lgC',fmtP(b.c));
-  const lc=$('lgC');if(lc)lc.style.color=b.c>=b.o?'var(--teal-l)':'var(--red)';
-  const A=IND.ind.A[i],B=IND.ind.B[i];
-  const reg=cloudRegime(b.c,A,B);
-  const cl=$('lgCloud');
-  if(cl){cl.textContent='cloud '+(A!==null&&B!==null?fmtP(Math.min(A,B))+'–'+fmtP(Math.max(A,B))+' · '+reg:'n/a');cl.style.color=reg==='above'?'var(--teal-l)':reg==='below'?'var(--red)':'var(--amber)';}
-  const bl=$('lgBand');if(bl)bl.textContent=IND.band.lo[i]!==null?'band '+fmtP(IND.band.lo[i])+'–'+fmtP(IND.band.hi[i]):'band warming up';
-  const sy=$('lgSym');if(sy)sy.textContent='Bitcoin / '+(SOURCE==='bitfinex'?'USD':'Tether')+' · '+P.tf.toUpperCase();
-}
 
-/* ================= MINI CHARTS ================= */
-function miniCtx(id){
-  const cv=$(id);if(!cv)return null;
-  const wrap=cv.parentElement,r=wrap.getBoundingClientRect();
-  if(r.width<=0||r.height<=0)return null;
-  const dpr=Math.min(2,window.devicePixelRatio||1);
-  cv.width=Math.max(200,Math.round(r.width*dpr));cv.height=Math.max(140,Math.round(r.height*dpr));
-  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
-  const w=r.width,h=r.height;ctx.clearRect(0,0,w,h);
-  const g=ctx.createLinearGradient(0,0,w,h);g.addColorStop(0,'#070e14');g.addColorStop(1,'#0a1520');
-  ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
-  return{ctx,w,h};
-}
-function drawLevels(){
-  const m=miniCtx('lvlCanvas');if(!m||!TEST)return;
-  const{ctx,w,h}=m;
-  const padL=34,padR=12,padT=16,padB=30,pw=w-padL-padR,ph=h-padT-padB;
-  ctx.font="500 9.5px 'IBM Plex Mono',monospace";ctx.strokeStyle='rgba(35,48,71,.7)';ctx.fillStyle='rgba(139,152,173,.75)';
-  ctx.textAlign='right';ctx.textBaseline='middle';
-  for(let p=0;p<=100;p+=25){const y=padT+ph-(p/100)*ph;ctx.beginPath();ctx.moveTo(padL,y+.5);ctx.lineTo(padL+pw,y+.5);ctx.stroke();ctx.fillText(p+'%',padL-6,y);}
-  const rows=TEST.stats.byLevel,gw=pw/rows.length;
-  rows.forEach((row,k)=>{
-    const cx=padL+gw*k+gw/2,bw=Math.min(15,gw*0.3);
-    const bar=(val,ci,n,off,col)=>{
-      if(val===null||!n){ctx.fillStyle='rgba(125,138,146,.22)';ctx.fillRect(cx+off-bw/2,padT+ph-4,bw,4);return;}
-      const y=padT+ph-val*ph,bh=val*ph;
-      const grad=ctx.createLinearGradient(0,y,0,padT+ph);grad.addColorStop(0,col);grad.addColorStop(1,col+'33');
-      ctx.fillStyle=n<8?'rgba(125,138,146,.55)':grad;ctx.fillRect(cx+off-bw/2,y,bw,bh);
-      ctx.strokeStyle='rgba(232,244,246,.65)';ctx.lineWidth=1;
-      const yl=padT+ph-ci[0]*ph,yh=padT+ph-ci[1]*ph;
-      ctx.beginPath();ctx.moveTo(cx+off,yl);ctx.lineTo(cx+off,yh);ctx.moveTo(cx+off-3,yl);ctx.lineTo(cx+off+3,yl);ctx.moveTo(cx+off-3,yh);ctx.lineTo(cx+off+3,yh);ctx.stroke();
-      ctx.fillStyle='rgba(232,244,246,.8)';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.font="500 8.5px 'IBM Plex Mono',monospace";
-      ctx.fillText(String(n),cx+off,yh-3);
+  // Fib lines & 0.886-0.9 zone
+  if(P.fib&&DISPLAY&&DISPLAY.fibLevels.length){
+    const f886=DISPLAY.fibLevels.find(x=>x.r===0.886),f9=DISPLAY.fibLevels.find(x=>x.r===0.9);
+    if(P.zone&&f886&&f9){
+      const y1=yMap(f886.price),y2=yMap(f9.price);
+      ichiCtx.fillStyle='rgba(20,184,166,.12)';
+      ichiCtx.fillRect(padL,Math.min(y1,y2),pw,Math.abs(y2-y1)||2);
+    }
+    DISPLAY.fibLevels.forEach(fl=>{
+      const y=yMap(fl.price);if(y<padT-10||y>padT+ph+10)return;
+      ichiCtx.save();ichiCtx.setLineDash([4,4]);
+      ichiCtx.strokeStyle=fl.kind==='support'?'rgba(25,198,192,.55)':'rgba(239,68,68,.5)';
+      ichiCtx.lineWidth=1;ichiCtx.beginPath();ichiCtx.moveTo(padL,y);ichiCtx.lineTo(padL+pw,y);ichiCtx.stroke();
+      ichiCtx.restore();
+      if(P.labels){
+        ichiCtx.font="600 9.5px 'IBM Plex Mono',monospace";
+        ichiCtx.fillStyle=fl.kind==='support'?'#5ff0e6':'#fca5a5';
+        ichiCtx.textAlign='left';ichiCtx.fillText(fl.r.toFixed(3)+' ('+fmtP(fl.price)+')',padL+4,y-3);
+      }
+    });
+  }
+
+  // Ichimoku Cloud
+  if(P.cloud&&DISPLAY&&IND){
+    const alpha=P.alpha/100;
+    for(let i=Math.max(0,i0);i<Math.min(DISPLAY.cloud.length-1,i1);i++){
+      const c0=DISPLAY.cloud[i],c1=DISPLAY.cloud[i+1];
+      if(!Number.isFinite(c0.a)||!Number.isFinite(c0.b)||!Number.isFinite(c1.a)||!Number.isFinite(c1.b))continue;
+      const x0=xMap(i),x1=xMap(i+1);
+      const bull=(c0.a+c1.a)>=(c0.b+c1.b);
+      ichiCtx.fillStyle=bull?`rgba(20,184,166,${alpha*0.42})`:`rgba(239,68,68,${alpha*0.38})`;
+      ichiCtx.beginPath();
+      ichiCtx.moveTo(x0,yMap(c0.a));ichiCtx.lineTo(x1,yMap(c1.a));
+      ichiCtx.lineTo(x1,yMap(c1.b));ichiCtx.lineTo(x0,yMap(c0.b));
+      ichiCtx.closePath();ichiCtx.fill();
+    }
+    const drawLine=(arr,col,lw)=>{
+      ichiCtx.strokeStyle=col;ichiCtx.lineWidth=lw;ichiCtx.beginPath();let started=false;
+      for(let i=Math.max(0,i0);i<Math.min(arr.length,i1);i++){
+        const v=arr[i];if(!Number.isFinite(v)){started=false;continue;}
+        const x=xMap(i),y=yMap(v);if(!started){ichiCtx.moveTo(x,y);started=true;}else ichiCtx.lineTo(x,y);
+      }
+      ichiCtx.stroke();
     };
-    bar(row.sRate,row.sCI,row.sN,-bw*0.62,'#19c6c0');
-    bar(row.rRate,row.rCI,row.rN,bw*0.62,'#ef4444');
-    const by=padT+ph-row.base*ph;
-    ctx.strokeStyle='rgba(245,165,36,.9)';ctx.lineWidth=1.4;ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(cx-gw*0.36,by);ctx.lineTo(cx+gw*0.36,by);ctx.stroke();ctx.setLineDash([]);
-    ctx.fillStyle='rgba(139,152,173,.9)';ctx.textAlign='center';ctx.textBaseline='top';ctx.font="500 9.5px 'IBM Plex Mono',monospace";
-    ctx.fillText(String(row.r),cx,padT+ph+7);
+    drawLine(IND.tenkan,'rgba(56,189,248,.85)',1.2);
+    drawLine(IND.kijun,'rgba(245,165,36,.85)',1.3);
+    if(P.chikou)drawLine(IND.chikou,'rgba(232,121,249,.8)',1.2);
+  }
+
+  // Bull Support Band (20 SMA / 21 EMA)
+  if(P.bandOn&&IND){
+    const drawBand=(arr,col)=>{
+      ichiCtx.strokeStyle=col;ichiCtx.lineWidth=1.6;ichiCtx.beginPath();let st=false;
+      for(let i=Math.max(0,i0);i<Math.min(BARS.length,i1);i++){
+        const v=arr[i];if(!Number.isFinite(v)){st=false;continue;}
+        const x=xMap(i),y=yMap(v);if(!st){ichiCtx.moveTo(x,y);st=true;}else ichiCtx.lineTo(x,y);
+      }
+      ichiCtx.stroke();
+    };
+    drawBand(IND.bandSma,'#22c55e');
+    drawBand(IND.bandEma,'#f5a524');
+  }
+
+  // Candles
+  const cw=Math.max(2,Math.min(11,(pw/Math.max(1,VW.count))*0.65));
+  for(let i=Math.max(0,i0);i<Math.min(BARS.length,i1);i++){
+    const b=BARS[i],x=xMap(i);
+    const up=b.c>=b.o;
+    const col=P.semantic?(up?'#22c55e':'#ef4444'):(up?'#38bdf8':'#f472b6');
+    ichiCtx.strokeStyle=col;ichiCtx.lineWidth=1;
+    ichiCtx.beginPath();ichiCtx.moveTo(x,yMap(b.h));ichiCtx.lineTo(x,yMap(b.l));ichiCtx.stroke();
+    const yO=yMap(b.o),yC=yMap(b.c);
+    ichiCtx.fillStyle=col;
+    ichiCtx.fillRect(x-cw/2,Math.min(yO,yC),cw,Math.max(1.5,Math.abs(yC-yO)));
+  }
+
+  // Audited Event Markers
+  if(P.markers&&TEST){
+    TEST.active.forEach(ev=>{
+      if(ev.idx<i0||ev.idx>i1)return;
+      const x=xMap(ev.idx),y=yMap(ev.price);
+      const mCol=ev.outcome==='WIN'?'#22c55e':ev.outcome==='LOSS'?'#ef4444':'#f5a524';
+      ichiCtx.beginPath();ichiCtx.arc(x,y,ev.id===selectedId?7:4.5,0,Math.PI*2);
+      ichiCtx.fillStyle=mCol;ichiCtx.fill();
+      ichiCtx.strokeStyle='#06090f';ichiCtx.lineWidth=1.5;ichiCtx.stroke();
+      if(P.labels){
+        ichiCtx.font="600 9px 'IBM Plex Mono',monospace";
+        ichiCtx.fillStyle=mCol;ichiCtx.textAlign='center';
+        ichiCtx.fillText(ev.level.toFixed(2),x,y+(ev.type==='support'?14:-8));
+      }
+    });
+  }
+
+  // Right price axis
+  ichiCtx.fillStyle='#8b98ad';ichiCtx.font="500 9.5px 'IBM Plex Mono',monospace";ichiCtx.textAlign='left';
+  for(let g=0;g<=5;g++){
+    const frac=g/5;const y=padT+ph*frac;
+    const val=logY?Math.exp(Math.log(pMax*1.04)-frac*(Math.log(pMax*1.04)-Math.log(pMin*0.96))):(pMax*1.04-frac*(pMax*1.04-pMin*0.96));
+    ichiCtx.fillText(fmtP(val),padL+pw+6,y+3);
+  }
+  const viewChip=$('ichiViewChip');
+  if(viewChip)viewChip.textContent='bars '+Math.max(0,i0)+'..'+Math.min(BARS.length-1,i1)+' / '+BARS.length;
+  dirty=false;
+}
+
+function drawLevels(){
+  const cv=$('lvlCanvas');if(!cv||!TEST)return;
+  const r=cv.parentElement.getBoundingClientRect();if(r.width<=0||r.height<=0)return;
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);
+  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+  const w=r.width,h=r.height,padL=42,padR=14,padT=16,padB=26;
+  const pw=w-padL-padR,ph=h-padT-padB;
+  ctx.clearRect(0,0,w,h);ctx.fillStyle='#070e14';ctx.fillRect(0,0,w,h);
+  const items=TEST.byLevel;const bw=pw/items.length;
+  items.forEach((it,idx)=>{
+    const x=padL+idx*bw+bw*0.2,barW=bw*0.6;
+    const rate=Number.isFinite(it.rate)?it.rate:0;
+    const bh=rate*ph,y=padT+ph-bh;
+    ctx.fillStyle=it.n<8?'#7d8a92':(it.kind==='support'?'#19c6c0':'#ef4444');
+    ctx.fillRect(x,y,barW,bh);
+    const yLo=padT+ph-it.ciLo*ph,yHi=padT+ph-it.ciHi*ph,cx=x+barW/2;
+    ctx.strokeStyle='#e6edf7';ctx.lineWidth=1.2;
+    ctx.beginPath();ctx.moveTo(cx,yLo);ctx.lineTo(cx,yHi);ctx.stroke();
+    const yB=padT+ph-it.baseRate*ph;
+    ctx.strokeStyle='#f5a524';ctx.setLineDash([3,3]);
+    ctx.beginPath();ctx.moveTo(x-2,yB);ctx.lineTo(x+barW+2,yB);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#94a3b8';ctx.font="500 9px 'IBM Plex Mono',monospace";ctx.textAlign='center';
+    ctx.fillText(it.r.toFixed(2),cx,padT+ph+14);
+    ctx.fillText(it.n?'n='+it.n:'n=0',cx,padT+10);
   });
-  ctx.fillStyle='rgba(95,240,230,.85)';ctx.textAlign='left';ctx.textBaseline='top';ctx.font="600 9.5px 'IBM Plex Mono',monospace";
-  ctx.fillText('HIT RATE BY FIB LEVEL · n above whisker',padL,3);
 }
 function drawPath(){
-  const m=miniCtx('pathCanvas');if(!m||!TEST)return;
-  const{ctx,w,h}=m;
-  const padL=38,padR=12,padT=18,padB=26,pw=w-padL-padR,ph=h-padT-padB,H=P.horizon;
-  const series=['support','resistance'].map(kind=>{
-    const evs=TEST.stats.active.filter(e=>e.kind===kind&&e.path.length>1);
-    const mean=[],sd=[];
-    for(let k=0;k<=H;k++){
-      const vals=evs.map(e=>e.path[Math.min(k,e.path.length-1)]).filter(Number.isFinite);
-      if(!vals.length){mean.push(0);sd.push(0);continue;}
-      const mu=vals.reduce((a,b)=>a+b,0)/vals.length;
-      const v=vals.reduce((a,b)=>a+(b-mu)*(b-mu),0)/vals.length;
-      mean.push(mu);sd.push(Math.sqrt(v));
-    }
-    return{kind,mean,sd,n:evs.length};
-  });
-  let lo=-1,hi=1;
-  series.forEach(s=>s.mean.forEach((v,k)=>{lo=Math.min(lo,v-s.sd[k]);hi=Math.max(hi,v+s.sd[k]);}));
-  const pad=(hi-lo)*0.12;lo-=pad;hi+=pad;
-  const X=k=>padL+(k/H)*pw,Y=v=>padT+ph-((v-lo)/(hi-lo))*ph;
-  ctx.strokeStyle='rgba(35,48,71,.7)';ctx.fillStyle='rgba(139,152,173,.75)';ctx.font="500 9.5px 'IBM Plex Mono',monospace";ctx.textAlign='right';ctx.textBaseline='middle';
-  niceTicks(lo,hi,4).forEach(v=>{const y=Y(v);ctx.beginPath();ctx.moveTo(padL,y+.5);ctx.lineTo(padL+pw,y+.5);ctx.stroke();ctx.fillText(v.toFixed(0)+'%',padL-6,y);});
-  ctx.strokeStyle='rgba(139,152,173,.55)';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(padL,Y(0));ctx.lineTo(padL+pw,Y(0));ctx.stroke();
-  const cols={support:'#22c55e',resistance:'#e879f9'};
-  series.forEach(s=>{
-    if(!s.n)return;
-    ctx.beginPath();
-    for(let k=0;k<=H;k++){const x=X(k),y=Y(s.mean[k]+s.sd[k]);k?ctx.lineTo(x,y):ctx.moveTo(x,y);}
-    for(let k=H;k>=0;k--)ctx.lineTo(X(k),Y(s.mean[k]-s.sd[k]));
-    ctx.closePath();ctx.fillStyle=cols[s.kind]+'22';ctx.fill();
-    ctx.beginPath();
-    for(let k=0;k<=H;k++){const x=X(k),y=Y(s.mean[k]);k?ctx.lineTo(x,y):ctx.moveTo(x,y);}
-    ctx.strokeStyle=cols[s.kind];ctx.lineWidth=2;ctx.lineJoin='round';ctx.stroke();
-    const lx=X(H),ly=Y(s.mean[H]);
-    ctx.beginPath();ctx.arc(lx,ly,3.4,0,Math.PI*2);ctx.fillStyle=cols[s.kind];ctx.fill();
-    ctx.fillStyle=cols[s.kind];ctx.textAlign='right';ctx.textBaseline='bottom';ctx.font="600 9.5px 'IBM Plex Mono',monospace";
-    ctx.fillText((s.kind==='support'?'S ':'R ')+fmtPct(s.mean[H])+' · n'+s.n,lx-4,ly-5);
-  });
-  ctx.fillStyle='rgba(139,152,173,.8)';ctx.textAlign='center';ctx.textBaseline='top';ctx.font="500 9.5px 'IBM Plex Mono',monospace";
-  for(let k=0;k<=H;k+=Math.max(1,Math.round(H/6)))ctx.fillText('+'+k,X(k),padT+ph+6);
-  ctx.fillStyle='rgba(232,121,249,.85)';ctx.textAlign='left';ctx.textBaseline='top';ctx.font="600 9.5px 'IBM Plex Mono',monospace";
-  ctx.fillText('DIRECTION-ADJUSTED RETURN AFTER TOUCH',padL,3);
+  const cv=$('pathCanvas');if(!cv||!TEST)return;
+  const r=cv.parentElement.getBoundingClientRect();if(r.width<=0||r.height<=0)return;
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);
+  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+  const w=r.width,h=r.height,padL=42,padR=14,padT=16,padB=24;
+  const pw=w-padL-padR,ph=h-padT-padB;
+  ctx.clearRect(0,0,w,h);ctx.fillStyle='#070e14';ctx.fillRect(0,0,w,h);
+  const pos=TEST.paths.pos,neg=TEST.paths.neg;
+  let minV=-5,maxV=10;
+  pos.concat(neg).forEach(pt=>{if(Number.isFinite(pt.m)){minV=Math.min(minV,pt.m-pt.sd);maxV=Math.max(maxV,pt.m+pt.sd);}});
+  const yMap=v=>padT+ph-((v-minV)/Math.max(1,maxV-minV))*ph;
+  const xMap=s=>padL+(s/Math.max(1,pos.length-1))*pw;
+  ctx.strokeStyle='rgba(148,163,184,.3)';ctx.beginPath();ctx.moveTo(padL,yMap(0));ctx.lineTo(padL+pw,yMap(0));ctx.stroke();
+  const plotArr=(arr,col)=>{
+    ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();let st=false;
+    arr.forEach((pt,idx)=>{if(!Number.isFinite(pt.m))return;const x=xMap(idx),y=yMap(pt.m);if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);});
+    ctx.stroke();
+  };
+  plotArr(pos,'#22c55e');plotArr(neg,'#e879f9');
 }
 function drawBias(){
-  const m=miniCtx('biasCanvas');if(!m||!TEST||!HIND)return;
-  const{ctx,w,h}=m;const st=TEST.stats,ht=HIND.stats;
+  const cv=$('biasCanvas');if(!cv||!TEST||!HIND)return;
+  const r=cv.parentElement.getBoundingClientRect();if(r.width<=0||r.height<=0)return;
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);
+  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+  const w=r.width,h=r.height,padL=120,padR=24,padT=14,padB=18;
+  const pw=w-padL-padR,ph=h-padT-padB;
+  ctx.clearRect(0,0,w,h);ctx.fillStyle='#070e14';ctx.fillRect(0,0,w,h);
   const rows=[
-    {label:'Walk-forward · in-sample',v:st.isRate,n:Math.max(0,st.n-st.oosN),col:'#3b82f6'},
-    {label:'Walk-forward · out-of-sample',v:st.oosRate,n:st.oosN,col:'#14b8a6'},
-    {label:'Chart-style anchors (look-ahead)',v:ht.n?ht.hit:null,n:ht.n,col:'#ef4444'}
+    {label:'Honest / Active',rate:TEST.hitRate,n:TEST.nDec,col:'#19c6c0'},
+    {label:'Full-sample (Hindsight)',rate:HIND.hitRate,n:HIND.nDec,col:'#f5a524'},
+    {label:'Regime Baseline',rate:TEST.baseRate,n:100,col:'#8b98ad'}
   ];
-  const padL=195,padR=66,padT=26,padB=22,pw=Math.max(60,w-padL-padR),ph=h-padT-padB;
-  const bh=Math.min(26,ph/rows.length-10);
-  const baseX=padL+pw*0.5;
-  ctx.strokeStyle='rgba(245,165,36,.75)';ctx.setLineDash([4,4]);ctx.lineWidth=1.3;
-  ctx.beginPath();ctx.moveTo(baseX,padT-8);ctx.lineTo(baseX,padT+ph);ctx.stroke();ctx.setLineDash([]);
-  ctx.fillStyle='rgba(245,165,36,.9)';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.font="500 9px 'IBM Plex Mono',monospace";
-  ctx.fillText('50% coin-flip',baseX,padT-9);
-  rows.forEach((r,k)=>{
-    const y=padT+k*(ph/rows.length)+(ph/rows.length-bh)/2;
-    ctx.textAlign='right';ctx.textBaseline='middle';ctx.font="500 10.5px 'IBM Plex Mono',monospace";ctx.fillStyle='rgba(200,220,226,.9)';
-    ctx.fillText(r.label,padL-10,y+bh/2);
-    ctx.fillStyle='rgba(35,48,71,.6)';ctx.fillRect(padL,y,pw,bh);
-    if(r.v===null){ctx.fillStyle='rgba(139,152,173,.6)';ctx.textAlign='left';ctx.fillText('no sample',padL+8,y+bh/2);return;}
-    const g=ctx.createLinearGradient(padL,0,padL+pw*r.v,0);g.addColorStop(0,r.col+'55');g.addColorStop(1,r.col);
-    ctx.fillStyle=g;ctx.fillRect(padL,y,pw*r.v,bh);
-    ctx.fillStyle='#e6edf7';ctx.textAlign='left';ctx.font="600 11px 'IBM Plex Mono',monospace";
-    ctx.fillText((r.v*100).toFixed(1)+'%  n'+r.n,padL+pw+8,y+bh/2);
+  const rh=ph/rows.length;
+  rows.forEach((rw,i)=>{
+    const y=padT+i*rh+6,bh=Math.max(12,rh-14);
+    ctx.fillStyle='#94a3b8';ctx.font="600 10.5px 'IBM Plex Mono',monospace";ctx.textAlign='right';
+    ctx.fillText(rw.label,padL-10,y+bh/2+3);
+    ctx.fillStyle=rw.col;ctx.fillRect(padL,y,clamp(rw.rate,0,1)*pw,bh);
+    ctx.fillStyle='#e6edf7';ctx.textAlign='left';
+    ctx.fillText((rw.rate*100).toFixed(1)+'% (n='+rw.n+')',padL+clamp(rw.rate,0,1)*pw+8,y+bh/2+3);
   });
-  ctx.fillStyle='rgba(239,68,68,.9)';ctx.textAlign='left';ctx.textBaseline='top';ctx.font="600 9.5px 'IBM Plex Mono',monospace";
-  ctx.fillText('HINDSIGHT INFLATION CHECK',12,5);
-}
-
-/* ================= ICHIMOKU LAB RENDERERS ================= */
-function renderVerdict(){
-  if(!TEST)return;
-  const st=TEST.stats,v=verdictOf(st);
-  const ic=$('vIcon');if(ic){ic.textContent=v.icon;ic.style.borderColor=v.color;}
-  const t=$('vTitle');if(t){t.textContent=v.title;t.style.color=v.color;}
-  const b=$('vBody');if(b)b.textContent=v.body;
-  const chip=$('ichiVerdictChip');
-  if(chip){chip.className='chip '+v.cls;chip.textContent='Verdict: '+(v.level==='strong'?'usable edge':v.level==='conditional'?'conditional':v.level==='insufficient'?'insufficient n':'not reliable');}
-  const meta=$('vMeta');
-  if(meta){
-    const ht=HIND&&HIND.stats.n?HIND.stats.hit:null;
-    const items=[
-      ['Events tested',st.total+' ('+st.n+' decisive · '+st.timeouts+' timeout)'],
-      ['Hit rate',(st.hit*100).toFixed(1)+'%'],['Baseline',(st.baseAvg*100).toFixed(1)+'%'],['Edge',fmtPP(st.edge)],
-      ['Bootstrap 95%',fmtPP(st.boot[0])+' … '+fmtPP(st.boot[1])],['p-value',st.pval.toFixed(3)],
-      ['Out-of-sample',st.oosEdge===null?'n/a':fmtPP(st.oosEdge)],
-      ['Look-ahead anchors',ht===null?'n/a':(ht*100).toFixed(1)+'%'],
-      ['Rules','±'+P.react+'% · '+P.horizon+' bars · tol '+P.tol+'%']
-    ];
-    meta.innerHTML=items.map(([k,val])=>'<span class="vpill">'+esc(k)+' <b>'+esc(val)+'</b></span>').join('');
-  }
   const bn=$('biasNote');
-  if(bn&&HIND){
-    const ht2=HIND.stats.n?HIND.stats.hit:null;
-    const delta=ht2!==null&&st.n?(ht2-st.hit)*100:null;
-    bn.textContent=delta===null?'Not enough events in one of the runs to compare. Loosen the tolerance or extend the horizon.'
-      :'Picking the swing with full knowledge of the future moves the measured hit rate by '+fmtPP(delta)+' ('+(st.hit*100).toFixed(1)+'% honest → '+(ht2*100).toFixed(1)+'% chart-style). '+(delta>3?'That gap is the hindsight premium a hand-annotated screenshot silently collects — it is not tradeable.':'The gap is small here, which means the anchors are not the main problem: the sample size and the baseline comparison are.');
-  }
-}
-function renderIchiKPIs(){
-  if(!TEST)return;
-  const st=TEST.stats,el=$('ichiKpiRow');if(!el)return;
-  el.innerHTML=
-    kpi('Decisive events',String(st.n),st.total+' touches · '+st.timeouts+' unresolved','var(--blue)')+
-    kpi('Support holds',st.support.n?(st.support.rate*100).toFixed(0)+'%':'—','n '+st.support.n+' · base '+(st.support.base!==null?(st.support.base*100).toFixed(0)+'%':'—'),'var(--teal)')+
-    kpi('Resistance rejects',st.resistance.n?(st.resistance.rate*100).toFixed(0)+'%':'—','n '+st.resistance.n+' · base '+(st.resistance.base!==null?(st.resistance.base*100).toFixed(0)+'%':'—'),'var(--red)')+
-    kpi('Edge vs baseline',fmtPP(st.edge),'boot '+fmtPP(st.boot[0])+' … '+fmtPP(st.boot[1]),st.edge>0?'var(--green)':'var(--red)')+
-    kpi('Out-of-sample',st.oosEdge===null?'—':fmtPP(st.oosEdge),st.oosN+' most recent events',(st.oosEdge||0)>0?'var(--green)':'var(--amber)')+
-    kpi('Expectancy / event',fmtPct(st.expectancy),'dir-adjusted · resolves in '+st.avgBars.toFixed(1)+' bars',st.expectancy>0?'var(--fuchsia)':'var(--amber)');
-}
-const SNIPPET=
-'// Built-in inside recompute() → applyIchimokuOverlay():\n'+
-'const im = JSON.parse(localStorage.getItem("cryptoanalyst_ichimoku_input_v1") || "null");\n'+
-'const fresh = im && (Date.now() - new Date(im.generatedAt).getTime()) < 36 * 3600e3;\n'+
-'if (fresh && im.symbol && AN[im.symbol]) {\n'+
-'  const a = AN[im.symbol];\n'+
-'  a.ichimoku = im;\n'+
-'  const tilt = (im.confidence / 100 - 0.5) * 2;\n'+
-'  const dir  = im.kind === "resistance" ? -1 : 1;\n'+
-'  a.sig.score += Math.round(tilt * dir * im.weight * 4);\n'+
-'  if (im.stop) a.ichimokuStop = im.stop;\n'+
-'}';
-function renderRecommendation(){
-  if(!REC)return;
-  const a=$('recAction');if(a){a.textContent=REC.action;a.className='badge '+REC.cls;}
-  const sp=$('recSpot');if(sp)sp.textContent='spot '+fmtP(REC.spot)+' · '+REC.regime+' cloud';
-  const meter=$('recMeter');if(meter)meter.style.width=REC.confidence+'%';
-  const cf=$('recConf');if(cf)cf.textContent=REC.confidence+'% (shrunk to 50% prior)';
-  const wy=$('recWhy');if(wy)wy.textContent=REC.why;
-  const tf=$('recTf');if(tf)tf.textContent=P.tf.toUpperCase()+' basis';
-  const st=$('recStamp');if(st)st.textContent=new Date(REC.generatedAt).toLocaleTimeString();
-  const wt=$('recWeight');if(wt){wt.textContent='suggested weight '+REC.weight.toFixed(2);wt.className='chip '+(REC.weight>=0.4?'live':REC.weight>=0.25?'seed':'sync');}
-  const list=$('recLevels');
-  if(list){
-    const rows=[];
-    if(REC.entry)rows.push(['Entry zone',fmtP(REC.entry[0])+' – '+fmtP(REC.entry[1])]);
-    if(REC.levelPrice)rows.push([REC.kind==='support'?'Defended level':'Rejected level',REC.level+' fib · '+fmtP(REC.levelPrice)]);
-    REC.targets.slice(0,3).forEach((t,k)=>rows.push(['Target '+(k+1),fmtP(t)]));
-    if(REC.stop)rows.push(['Invalidation',fmtP(REC.stop)]);
-    if(REC.band)rows.push(['Bull support band',fmtP(REC.band[0])+' – '+fmtP(REC.band[1])]);
-    if(REC.anchors)rows.push(['Swing anchors',fmtP(REC.anchors.high)+' → '+fmtP(REC.anchors.low)]);
-    list.innerHTML=rows.map(([k,v])=>'<div><span class="mut">'+esc(k)+'</span><span>'+esc(v)+'</span></div>').join('');
-  }
-  const pre=$('snipPre');if(pre)pre.textContent=SNIPPET;
-}
-function renderEvents(){
-  if(!TEST)return;
-  const body=$('evBody');if(!body)return;
-  let rows=TEST.events.slice();
-  const q=filters.q.trim().toLowerCase();
-  if(q)rows=rows.filter(e=>(fmtDate(e.t)+' '+e.kind+' '+e.r+' '+e.regime+' '+e.outcome).toLowerCase().includes(q));
-  if(filters.type!=='all')rows=rows.filter(e=>e.kind===filters.type);
-  if(filters.outcome==='excluded')rows=rows.filter(e=>excluded.has(e.id));
-  else if(filters.outcome!=='all')rows=rows.filter(e=>e.outcome===filters.outcome&&!excluded.has(e.id));
-  const cmp={time_desc:(a,b)=>b.t-a.t,time_asc:(a,b)=>a.t-b.t,ret_desc:(a,b)=>b.fwd-a.fwd,ret_asc:(a,b)=>a.fwd-b.fwd,level_asc:(a,b)=>a.r-b.r}[filters.sort]||((a,b)=>b.t-a.t);
-  rows.sort(cmp);
-  const cnt=$('evCount');if(cnt)cnt.textContent=rows.length+' / '+TEST.events.length+' events';
-  if(!rows.length){body.innerHTML='<tr><td colspan="10" class="mut" style="padding:20px;text-align:center">No events match these filters.</td></tr>';}
-  else{
-    body.innerHTML=rows.slice(0,400).map(e=>{
-      const ex=excluded.has(e.id);
-      const oc=e.outcome==='WIN'?'pos':e.outcome==='LOSS'?'neg':'wrn';
-      const cf=[e.band?'band':null,e.cloud?'cloud':null].filter(Boolean).join(' + ')||'fib only';
-      return'<tr data-id="'+e.id+'" class="'+(ex?'excluded ':'')+(e.id===selectedId?'sel':'')+'">'+
-        '<td>'+esc(fmtDate(e.t))+'</td>'+
-        '<td class="'+(e.kind==='support'?'pos':'neg')+'">'+(e.kind==='support'?'▼ support':'▲ resist')+'</td>'+
-        '<td class="inf">'+e.r+'</td>'+
-        '<td>'+fmtP(e.level)+'</td>'+
-        '<td class="mag">'+esc(cf)+'</td>'+
-        '<td class="mut">'+esc(e.regime)+'</td>'+
-        '<td class="'+(e.fwd>=0?'pos':'neg')+'">'+fmtPct(e.fwd)+'</td>'+
-        '<td class="mut">'+e.bars+'</td>'+
-        '<td class="'+oc+'"><span class="tag">'+e.outcome+'</span></td>'+
-        '<td class="mut">'+(ex?'excluded':'in sample')+'</td></tr>';
-    }).join('');
-    [...body.querySelectorAll('tr[data-id]')].forEach(tr=>tr.addEventListener('click',()=>openDrawer(tr.dataset.id)));
-  }
-  const meta=$('evMeta');
-  if(meta){
-    const st=TEST.stats;
-    meta.textContent='Sample: '+st.total+' active touches · '+st.n+' decisive · '+excluded.size+' excluded. Warm-up skips the first '+TEST.warm+' bars.';
-  }
-}
-function ichiRenderAll(){
-  if(!IND||!TEST)return;
-  ichiChart.total=IND.ind.total;
-  if(ichiChart.i1<=1)ichiFitChart();
-  ichiClampView();
-  renderVerdict();renderIchiKPIs();renderRecommendation();renderEvents();
-  drawLevels();drawPath();drawBias();
-  updateIchiLegend();updateIchiViewChip();
-  const ti=$('tfInfo');if(ti)ti.textContent=P.tf.toUpperCase();
-  [...document.querySelectorAll('#ichiTfPills .pill')].forEach(p=>p.classList.toggle('on',p.dataset.tf===P.tf));
-  dirty=true;
+  if(bn)bn.textContent='Honest decisive hit rate: '+(TEST.hitRate*100).toFixed(1)+'% vs. full-sample hindsight: '+(HIND.hitRate*100).toFixed(1)+'%. Out-of-sample (last 40%): '+(Number.isFinite(TEST.oosRate)?(TEST.oosRate*100).toFixed(1)+'% (n='+TEST.oosN+')':'n/a')+'.';
 }
 
-/* ================= DRAWER & CONTROLS ================= */
-function openDrawer(id){
-  const e=TEST&&TEST.events.find(x=>x.id===id);if(!e)return;
-  selectedId=id;
-  const d=$('drawer'),s=$('scrim');
-  if(d){d.classList.add('on');d.setAttribute('aria-hidden','false');}
-  if(s)s.classList.add('on');
-  const t=$('drawerTitle');if(t)t.textContent=(e.kind==='support'?'Support test · ':'Resistance test · ')+fmtDate(e.t);
-  const b=$('drawerBody');
-  if(b){
-    const rows=[
-      ['Fibonacci level',e.r+' → '+fmtP(e.level)],['Decision close',fmtP(e.entry)],['Swing anchors',fmtP(e.anchorH)+' → '+fmtP(e.anchorL)],
-      ['Confluence',[e.band?'bull support band':null,e.cloud?'cloud edge':null].filter(Boolean).join(' + ')||'fib only'],
-      ['Cloud regime',e.regime],['Rule','±'+P.react+'% within '+P.horizon+' bars'],['Outcome',e.outcome],
-      ['Resolved in',e.bars+' bars'],['Forward return (dir-adj)',fmtPct(e.fwd)],['Max favourable',fmtPct(e.mfe)],
-      ['Max adverse',fmtPct(e.mae)],['Matched baseline',(e.base*100).toFixed(1)+'%'],['Sample state',excluded.has(e.id)?'EXCLUDED':'included']
-    ];
-    b.innerHTML=rows.map(([k,v])=>'<div class="dl"><span>'+esc(k)+'</span><span>'+esc(v)+'</span></div>').join('')+
-      '<p class="note" style="margin-top:10px">'+(e.outcome==='WIN'?'The reaction threshold was reached before the adverse threshold.':e.outcome==='LOSS'?'The adverse threshold triggered first (or both fired inside one bar, scored conservatively as a loss).':'Neither threshold was reached inside the horizon.')+'</p>';
-  }
-  const ex=$('drawerExclude');
-  if(ex){ex.textContent=excluded.has(e.id)?'↩ Include again':'🚫 Exclude';ex.className='btn btn-sm '+(excluded.has(e.id)?'btn-green':'btn-red');}
-  renderEvents();dirty=true;
+function renderLabAll(){
+  if(needsCompute)recomputeLab();
+  if(!TEST||!REC||!DISPLAY)return;
+  const vChip=$('ichiVerdictChip');
+  const edgePP=(REC.calRate-REC.baseRate)*100;
+  if(TEST.nDec<6){vChip.className='chip v-cond';vChip.textContent='Verdict: Small sample (n='+TEST.nDec+')';}
+  else if(edgePP>=4&&TEST.pVal<0.1){vChip.className='chip v-strong';vChip.textContent='Verdict: Edge '+fmtPP(edgePP)+' (p='+TEST.pVal.toFixed(2)+')';}
+  else if(edgePP>0){vChip.className='chip v-cond';vChip.textContent='Verdict: Marginal '+fmtPP(edgePP);}
+  else{vChip.className='chip v-weak';vChip.textContent='Verdict: No edge '+fmtPP(edgePP);}
+
+  $('vTitle').textContent=edgePP>=4?'Statistically notable confluence edge ('+fmtPP(edgePP)+' vs baseline)':
+    edgePP>0?'Modest positive tilt ('+fmtPP(edgePP)+' vs baseline) — verify sample & regime':
+    'Weak / unconfirmed edge ('+fmtPP(edgePP)+' vs baseline) — avoid over-sizing';
+  $('vBody').textContent=REC.why;
+  $('vMeta').innerHTML=
+    '<span class="vpill">TF: <b>'+esc(P.tf.toUpperCase())+'</b></span>'+
+    '<span class="vpill">Anchor: <b>'+esc(P.anchor)+'</b></span>'+
+    '<span class="vpill">Decisive events: <b>'+TEST.nDec+'</b></span>'+
+    '<span class="vpill">95% CI: <b>'+(TEST.ciLo*100).toFixed(1)+'%–'+(TEST.ciHi*100).toFixed(1)+'%</b></span>'+
+    '<span class="vpill">Bootstrap beat: <b>'+Math.round(TEST.bootProb*100)+'%</b></span>';
+
+  $('ichiKpiRow').innerHTML=
+    kpi('Hit Rate (Decisive)',(TEST.hitRate*100).toFixed(1)+'%',TEST.wins+'W / '+(TEST.nDec-TEST.wins)+'L (n='+TEST.nDec+')','#14b8a6')+
+    kpi('Regime Baseline',(TEST.baseRate*100).toFixed(1)+'%',fmtPP(edgePP)+' vs confluence','#f5a524')+
+    kpi('Avg Fwd Return',fmtPct(TEST.avgRet),'Base '+fmtPct(TEST.baseRet)+' ('+P.horizon+' bars)','#22c55e')+
+    kpi('OOS Hit Rate',Number.isFinite(TEST.oosRate)?(TEST.oosRate*100).toFixed(1)+'%':'—','Last 40% (n='+TEST.oosN+')','#6366f1')+
+    kpi('Cloud Regime',DISPLAY.cloudState,'Span A/B '+P.disp+'-bar shift','#38bdf8')+
+    kpi('Bull Band',DISPLAY.bandState.split(' ')[0].toUpperCase(),DISPLAY.bandState,'#a855f7');
+
+  $('lgSym').textContent='Bitcoin / Tether · '+P.tf.toUpperCase();
+  $('lgO').textContent=fmtP(DISPLAY.last.o);$('lgH').textContent=fmtP(DISPLAY.last.h);
+  $('lgL').textContent=fmtP(DISPLAY.last.l);$('lgC').textContent=fmtP(DISPLAY.last.c);
+  $('lgCloud').textContent='cloud: '+DISPLAY.cloudState;
+  $('lgBand').textContent='band: '+DISPLAY.bandState;
+
+  $('recTf').textContent=P.tf.toUpperCase();
+  $('recStamp').textContent='Updated '+new Date(REC.generatedAt).toLocaleTimeString();
+  const act=$('recAction');act.textContent=REC.action;act.className='badge '+REC.cls;
+  $('recSpot').textContent='Spot '+fmtP(REC.spot);
+  $('recMeter').style.width=REC.confidence+'%';
+  $('recConf').textContent=REC.confidence+'% (cal '+Math.round(REC.calRate*100)+'%)';
+  $('recWhy').textContent=REC.why;
+  $('recLevels').innerHTML=
+    '<div><span>Target</span><span class="pos">'+fmtP(REC.target)+'</span></div>'+
+    '<div><span>Stop / Invalidation</span><span class="neg">'+fmtP(REC.stop)+'</span></div>'+
+    '<div><span>Suggested Overlay Weight</span><span class="info">'+REC.weight.toFixed(2)+'</span></div>';
+  $('recWeight').textContent='weight '+REC.weight.toFixed(2);
+  $('snipPre').textContent=JSON.stringify({
+    symbol:REC.symbol,tf:REC.tf,action:REC.action,confidence:REC.confidence,
+    weight:REC.weight,target:+REC.target.toFixed(2),stop:+REC.stop.toFixed(2),generatedAt:REC.generatedAt
+  },null,2);
+
+  renderLabEvents();
+  dirty=true;
+  drawIchiChart();drawLevels();drawPath();drawBias();
 }
-function closeDrawer(){
-  const d=$('drawer'),s=$('scrim');
-  if(d){d.classList.remove('on');d.setAttribute('aria-hidden','true');}
-  if(s)s.classList.remove('on');
-  selectedId=null;renderEvents();dirty=true;
+function renderLabEvents(){
+  if(!TEST)return;
+  const tb=$('evBody');if(!tb)return;
+  const q=filters.q.trim().toLowerCase();
+  let list=TEST.events.filter(e=>{
+    const isEx=excluded.has(e.id);
+    if(filters.outcome==='excluded')return isEx;
+    if(isEx)return false;
+    if(filters.type!=='all'&&e.type!==filters.type)return false;
+    if(filters.outcome!=='all'&&e.outcome!==filters.outcome)return false;
+    if(q){const hay=(e.date+' '+e.level+' '+e.conf+' '+e.regime+' '+e.outcome).toLowerCase();if(!hay.includes(q))return false;}
+    return true;
+  });
+  list.sort((a,b)=>{
+    if(filters.sort==='time_asc')return a.idx-b.idx;
+    if(filters.sort==='ret_desc')return b.ret-a.ret;
+    if(filters.sort==='ret_asc')return a.ret-b.ret;
+    if(filters.sort==='level_asc')return a.level-b.level;
+    return b.idx-a.idx;
+  });
+  $('evCount').textContent=list.length+' / '+TEST.events.length+' events';
+  $('evMeta').textContent='Excluded in stress-test: '+excluded.size+'. Click any row to open the event dossier.';
+  if(!list.length){tb.innerHTML='<tr><td colspan="10" class="mut">No events match current filters.</td></tr>';return;}
+  tb.innerHTML=list.slice(0,150).map(e=>{
+    const oCls=e.outcome==='WIN'?'b-win':e.outcome==='LOSS'?'b-loss':'b-open';
+    const sel=e.id===selectedId?' sel':'';
+    return '<tr class="'+sel+'" data-id="'+esc(e.id)+'">'+
+      '<td>'+esc(e.date)+'</td>'+
+      '<td><span class="tag" style="color:'+(e.type==='support'?'#22c55e':'#f472b6')+'">'+esc(e.type)+'</span></td>'+
+      '<td>'+e.level.toFixed(3)+'</td>'+
+      '<td>'+fmtP(e.levelPrice)+'</td>'+
+      '<td>'+esc(e.conf)+'</td>'+
+      '<td>'+esc(e.regime)+'</td>'+
+      '<td class="'+(e.ret>=0?'pos':'neg')+'">'+fmtPct(e.ret)+'</td>'+
+      '<td>'+e.barsHeld+'</td>'+
+      '<td><span class="badge '+oCls+'">'+e.outcome+'</span></td>'+
+      '<td>'+(P.anchor==='hindsight'?'full-sample':'walk-fwd')+'</td>'+
+      '</tr>';
+  }).join('');
+  [...tb.querySelectorAll('tr[data-id]')].forEach(tr=>{
+    tr.onclick=()=>openEventDrawer(tr.dataset.id);
+  });
 }
-function toggleExclude(){
-  if(!selectedId)return;
-  const id=selectedId,was=excluded.has(id);
-  if(was)excluded.delete(id);else excluded.add(id);
-  TEST.stats=summarize(TEST.events);buildRecommendation();ichiRenderAll();openDrawer(id);
-  toast(was?'Event restored to sample.':'Event excluded — statistics recomputed.','warn',{label:'Undo',fn(){if(was)excluded.add(id);else excluded.delete(id);TEST.stats=summarize(TEST.events);buildRecommendation();ichiRenderAll();}});
+function openEventDrawer(id){
+  if(!TEST)return;
+  const ev=TEST.events.find(x=>x.id===id);if(!ev)return;
+  selectedId=id;renderLabEvents();dirty=true;drawIchiChart();
+  $('drawerTitle').textContent=ev.date+' · Fib '+ev.level.toFixed(3)+' ('+ev.type+')';
+  $('drawerBody').innerHTML=
+    '<div class="dl"><span>Outcome</span><b>'+esc(ev.outcome)+'</b></div>'+
+    '<div class="dl"><span>Touch Close</span><b>'+fmtP(ev.price)+'</b></div>'+
+    '<div class="dl"><span>Fib Level Price</span><b>'+fmtP(ev.levelPrice)+'</b></div>'+
+    '<div class="dl"><span>Swing Anchor High / Low</span><b>'+fmtP(ev.anchorHigh)+' / '+fmtP(ev.anchorLow)+'</b></div>'+
+    '<div class="dl"><span>Confluence</span><b>'+esc(ev.conf)+'</b></div>'+
+    '<div class="dl"><span>Cloud Regime</span><b>'+esc(ev.regime)+'</b></div>'+
+    '<div class="dl"><span>Forward Return ('+ev.barsHeld+' bars)</span><b class="'+(ev.ret>=0?'pos':'neg')+'">'+fmtPct(ev.ret)+'</b></div>';
+  $('scrim').classList.add('on');$('drawer').classList.add('on');$('drawer').setAttribute('aria-hidden','false');
+  $('drawerFocus').onclick=()=>{VW.count=80;VW.start=ev.idx-40;clampView();dirty=true;drawIchiChart();closeDrawer();};
+  $('drawerExclude').onclick=()=>{excluded.add(ev.id);closeDrawer();needsCompute=true;renderLabAll();toast('Excluded event '+ev.date+'.','warn');};
 }
+function closeDrawer(){$('scrim').classList.remove('on');$('drawer').classList.remove('on');$('drawer').setAttribute('aria-hidden','true');}
+
 const PRESETS=[
-  {id:'screenshot',name:'AlgoAffe 1W',p:{tf:'1w',tenkan:9,kijun:26,senkou:52,disp:26,band:'3m',conf:'screenshot',tol:1.2,react:6,horizon:8,anchor:'walk',lookback:104,pivot:4}},
-  {id:'classic',name:'Classic 9/26/52',p:{tf:'1w',tenkan:9,kijun:26,senkou:52,disp:26,band:'classic',conf:'any',tol:1.5,react:7,horizon:10}},
-  {id:'fast',name:'Fast 7/22/44',p:{tf:'1w',tenkan:7,kijun:22,senkou:44,disp:22,band:'classic',conf:'any',tol:1.6,react:6,horizon:6}},
-  {id:'cycle',name:'Monthly cycle',p:{tf:'1M',tenkan:9,kijun:26,senkou:52,disp:26,band:'1m',conf:'any',tol:2.4,react:12,horizon:8,lookback:48,pivot:2}},
-  {id:'tactical',name:'Daily tactical',p:{tf:'1d',tenkan:9,kijun:26,senkou:52,disp:26,band:'classic',conf:'any',tol:0.9,react:4,horizon:12,lookback:250,pivot:5}},
-  {id:'control',name:'Control: fib only',p:{conf:'fib',tol:1.2,react:6,horizon:8}},
-  {id:'strict',name:'Strict triple',p:{conf:'both',tol:0.8,react:8,horizon:12}}
+  {id:'algoaffe',label:'AlgoAffe 1W',patch:{tf:'1w',anchor:'walk',band:'3m',conf:'screenshot',tol:1.2,react:6,horizon:8}},
+  {id:'strict',label:'Strict Triple',patch:{tf:'1w',anchor:'walk',band:'classic',conf:'both',tol:1.0,react:6,horizon:8}},
+  {id:'monthly',label:'Monthly Cycle',patch:{tf:'1M',anchor:'walk',band:'1m',conf:'any',tol:1.8,react:10,horizon:6}},
+  {id:'hindsight',label:'Hindsight Demo',patch:{tf:'1w',anchor:'hindsight',band:'3m',conf:'screenshot',tol:1.5,react:6,horizon:8}}
 ];
-function readControls(){
-  const num=(id,d)=>{const el=$(id);const v=el?parseFloat(el.value):NaN;return Number.isFinite(v)?v:d;};
-  const val=(id,d)=>{const el=$(id);return el?el.value:d;};
-  const chk=(id,d)=>{const el=$(id);return el?el.checked:d;};
-  P.tf=val('tfSel',P.tf);
-  P.tenkan=clamp(Math.round(num('tenkanN',9)),3,30);
-  P.kijun=clamp(Math.round(num('kijunN',26)),8,60);
-  P.senkou=clamp(Math.round(num('senkouN',52)),20,120);
-  P.disp=clamp(Math.round(num('dispN',26)),1,60);
-  P.lookback=clamp(Math.round(num('lookbackN',104)),20,400);
-  P.pivot=clamp(Math.round(num('pivotN',4)),1,12);
-  P.anchor=val('anchorSel','walk');
-  P.manHigh=num('manHigh',126200);P.manLow=num('manLow',49130);
-  P.band=val('bandSel','3m');
-  P.bandFast=clamp(Math.round(num('bandFastN',20)),3,60);
-  P.bandSlow=clamp(Math.round(num('bandSlowN',21)),3,60);
-  P.conf=val('confSel','screenshot');
-  P.tol=clamp(num('tolR',1.2),0.2,4);
-  P.react=clamp(num('reactR',6),2,16);
-  P.horizon=clamp(Math.round(num('horR',8)),2,30);
-  P.cool=clamp(Math.round(num('coolN',4)),0,20);
-  P.alpha=clamp(Math.round(num('alphaR',42)),8,80);
-  P.cloud=chk('tgCloud',true);P.fib=chk('tgFib',true);P.bandOn=chk('tgBand',true);
-  P.chikou=chk('tgChikou',false);P.markers=chk('tgMarkers',true);P.labels=chk('tgLabels',true);
-  P.grid=chk('tgGrid',true);P.log=chk('tgLog',false);P.semantic=chk('tgSemantic',false);P.zone=chk('tgZone',true);
-  syncLabels();
-}
-function syncLabels(){
-  const set=(id,v)=>{const el=$(id);if(el)el.textContent=v;};
-  set('tenkanV',P.tenkan);set('kijunV',P.kijun);set('senkouV',P.senkou);set('dispV',P.disp);
-  set('lookbackV',P.lookback);set('pivotV',P.pivot);set('bandFastV',P.bandFast);set('bandSlowV',P.bandSlow);
-  set('tolV',P.tol.toFixed(1));set('reactV',P.react);set('horV',P.horizon);set('coolV',P.cool);set('alphaV',P.alpha);
-  set('tfInfo',P.tf.toUpperCase());
-}
-function writeControls(){
-  const set=(id,v)=>{const el=$(id);if(el)el.value=v;};
-  const chk=(id,v)=>{const el=$(id);if(el)el.checked=!!v;};
-  set('tfSel',P.tf);set('tenkanN',P.tenkan);set('kijunN',P.kijun);set('senkouN',P.senkou);set('dispN',P.disp);
-  set('lookbackN',P.lookback);set('pivotN',P.pivot);set('anchorSel',P.anchor);set('manHigh',P.manHigh);set('manLow',P.manLow);
-  set('bandSel',P.band);set('bandFastN',P.bandFast);set('bandSlowN',P.bandSlow);set('confSel',P.conf);
-  set('tolR',P.tol);set('reactR',P.react);set('horR',P.horizon);set('coolN',P.cool);set('alphaR',P.alpha);
-  chk('tgCloud',P.cloud);chk('tgFib',P.fib);chk('tgBand',P.bandOn);chk('tgChikou',P.chikou);
-  chk('tgMarkers',P.markers);chk('tgLabels',P.labels);chk('tgGrid',P.grid);chk('tgLog',P.log);
-  chk('tgSemantic',P.semantic);chk('tgZone',P.zone);
-  syncLabels();
-}
-function scheduleCompute(){needsCompute=true;}
-function applyControls(refit){
-  const oldTF=P.tf;
-  readControls();saveLS(LSK,P);
-  if(P.tf!==oldTF){
-    excluded.clear();selectedId=null;
-    loadIchiTF(P.tf,true).then(()=>{ichiFitChart();ichiRenderAll();});
-    if(RAW[P.tf]){BARS=RAW[P.tf].bars;ichiRecompute();ichiFitChart();ichiRenderAll();}
-    return;
-  }
-  ichiRecompute();if(refit)ichiFitChart();ichiRenderAll();
-}
-function renderPresets(){
-  const row=$('presetRow');if(!row)return;
-  row.innerHTML=PRESETS.map(p=>'<button class="pchip" data-preset="'+p.id+'">'+esc(p.name)+'</button>').join('');
-  [...row.querySelectorAll('[data-preset]')].forEach(btn=>btn.addEventListener('click',()=>{
-    const pr=PRESETS.find(x=>x.id===btn.dataset.preset);if(!pr)return;
-    const before=Object.assign({},P);Object.assign(P,pr.p);writeControls();
-    [...row.querySelectorAll('.pchip')].forEach(b=>b.classList.toggle('on',b===btn));
-    const tag=$('presetTag');if(tag)tag.textContent=pr.name;
-    applyControls(true);
-    toast('Preset "'+pr.name+'" applied.','ok',{label:'Undo',fn(){P=before;writeControls();applyControls(true);}});
-  }));
-  const first=row.querySelector('.pchip');if(first)first.classList.add('on');
+function syncLabControls(){
+  $('tfSel').value=P.tf;$('tfInfo').textContent=P.tf.toUpperCase();
+  $('anchorSel').value=P.anchor;$('manHigh').value=P.manHigh;$('manLow').value=P.manLow;
+  $('lookbackN').value=P.lookback;$('lookbackV').textContent=P.lookback;
+  $('pivotN').value=P.pivot;$('pivotV').textContent=P.pivot;
+  $('tenkanN').value=P.tenkan;$('tenkanV').textContent=P.tenkan;
+  $('kijunN').value=P.kijun;$('kijunV').textContent=P.kijun;
+  $('senkouN').value=P.senkou;$('senkouV').textContent=P.senkou;
+  $('dispN').value=P.disp;$('dispV').textContent=P.disp;
+  $('alphaR').value=P.alpha;$('alphaV').textContent=P.alpha;
+  $('bandSel').value=P.band;$('bandFastN').value=P.bandFast;$('bandFastV').textContent=P.bandFast;
+  $('bandSlowN').value=P.bandSlow;$('bandSlowV').textContent=P.bandSlow;
+  $('confSel').value=P.conf;$('tolR').value=P.tol;$('tolV').textContent=P.tol;
+  $('reactR').value=P.react;$('reactV').textContent=P.react;
+  $('horR').value=P.horizon;$('horV').textContent=P.horizon;
+  $('coolN').value=P.cool;$('coolV').textContent=P.cool;
+  $('tgCloud').checked=P.cloud;$('tgFib').checked=P.fib;$('tgBand').checked=P.bandOn;
+  $('tgChikou').checked=P.chikou;$('tgMarkers').checked=P.markers;$('tgLabels').checked=P.labels;
+  $('tgGrid').checked=P.grid;$('tgLog').checked=P.log;$('tgSemantic').checked=P.semantic;$('tgZone').checked=P.zone;
+  const pb=$('ichiTfPills');if(pb){pb.innerHTML='';['1w','1M','1d'].forEach(t=>{const b=document.createElement('button');b.className='pill'+(P.tf===t?' on':'');b.textContent=t.toUpperCase();
+    b.onclick=async()=>{P.tf=t;$('tfSel').value=t;$('tfInfo').textContent=t.toUpperCase();await loadIchiTf(t,false);fitIchiView();renderLabAll();};pb.appendChild(b);});}
+  const pr=$('presetRow');if(pr){pr.innerHTML='';PRESETS.forEach(ps=>{const b=document.createElement('button');b.className='pchip';b.textContent=ps.label;
+    b.onclick=async()=>{const prevTf=P.tf;Object.assign(P,ps.patch);syncLabControls();if(P.tf!==prevTf)await loadIchiTf(P.tf,false);needsCompute=true;renderLabAll();toast('Preset "'+ps.label+'" applied.','ok');};pr.appendChild(b);});}
+  renderSavedViews();
 }
 function renderSavedViews(){
   const box=$('savedViews');if(!box)return;
-  if(!savedViews.length){box.innerHTML='<span class="note">No saved setups yet.</span>';return;}
-  box.innerHTML=savedViews.map((v,i)=>'<span class="sv" data-i="'+i+'">'+esc(v.name)+' <b data-del="'+i+'">×</b></span>').join('');
-  [...box.querySelectorAll('.sv')].forEach(el=>el.addEventListener('click',ev=>{
-    const i=+el.dataset.i;
-    if(ev.target&&ev.target.dataset&&ev.target.dataset.del!==undefined){
-      const removed=savedViews.splice(i,1)[0];saveLS(LSK+'_views',savedViews);renderSavedViews();
-      toast('View "'+removed.name+'" deleted.','warn',{label:'Undo',fn(){savedViews.splice(i,0,removed);saveLS(LSK+'_views',savedViews);renderSavedViews();}});
-      return;
-    }
-    const before=Object.assign({},P);P=Object.assign({},DEFAULTS,savedViews[i].p);writeControls();applyControls(true);
-    toast('View "'+savedViews[i].name+'" loaded.','ok',{label:'Undo',fn(){P=before;writeControls();applyControls(true);}});
-  }));
-}
-function publishIchiToTerminal(){
-  if(!REC)return;
-  const ok=saveLS(PUBLISH_KEY,REC);
-  if(ok){
-    recompute();
-    renderAll();
-    toast('Published to Terminal — BTCUSDT score & Analyst Report updated live!','ok');
-  }else toast('Browser blocked localStorage; use JSON export instead.','err');
-}
-function clearIchiOverlay(){
-  try{localStorage.removeItem(PUBLISH_KEY);}catch(e){}
-  recompute();renderAll();
-  toast('Ichimoku Lab overlay cleared from Terminal.','warn');
-}
-function copySnippet(){
-  const text=SNIPPET;
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(()=>toast('Integration hook copied to clipboard.','ok'),()=>fallbackCopy(text));
-  }else fallbackCopy(text);
-}
-function fallbackCopy(text){
-  try{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
-    document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Integration hook copied.','ok');
-  }catch(e){toast('Copy failed — select snippet manually.','err');}
-}
-function exportIchiAll(){
-  if(!TEST)return;
-  download('ichimoku_fib_audit_'+P.tf+'_'+new Date().toISOString().slice(0,10)+'.json',{
-    tool:'ichimoku-fib-reliability-lab',version:1,generatedAt:new Date().toISOString(),source:SOURCE,params:P,verdict:verdictOf(TEST.stats),
-    stats:{n:TEST.stats.n,total:TEST.stats.total,timeouts:TEST.stats.timeouts,wins:TEST.stats.wins,losses:TEST.stats.losses,
-      hitRate:+(TEST.stats.hit*100).toFixed(2),baseline:+(TEST.stats.baseAvg*100).toFixed(2),edgePP:+TEST.stats.edge.toFixed(2),
-      bootstrap95:TEST.stats.boot.map(x=>+x.toFixed(2)),pValue:+TEST.stats.pval.toFixed(4),
-      oosEdgePP:TEST.stats.oosEdge===null?null:+TEST.stats.oosEdge.toFixed(2),hindsightHitRate:HIND.stats.n?+(HIND.stats.hit*100).toFixed(2):null},
-    recommendation:REC,events:TEST.events.map(({path,...rest})=>rest)
+  box.innerHTML=savedViews.map((sv,i)=>'<span class="sv" data-i="'+i+'">'+esc(sv.name)+' <b data-del="'+i+'">×</b></span>').join('');
+  [...box.querySelectorAll('.sv')].forEach(el=>{
+    el.onclick=async e=>{
+      const del=e.target&&e.target.dataset&&e.target.dataset.del;
+      if(del!==undefined){savedViews.splice(+del,1);saveLS(LSK+'_views',savedViews);renderSavedViews();return;}
+      const item=savedViews[+el.dataset.i];if(!item)return;
+      const prevTf=P.tf;Object.assign(P,item.params);syncLabControls();
+      if(P.tf!==prevTf)await loadIchiTf(P.tf,false);needsCompute=true;renderLabAll();toast('Loaded setup "'+item.name+'".','ok');
+    };
   });
-  toast('Audit JSON downloaded.','ok');
 }
-function exportIchiPng(){
-  if(!ichiChart.cv)return;
-  try{const a=document.createElement('a');a.href=ichiChart.cv.toDataURL('image/png');a.download='ichimoku_fib_'+P.tf+'.png';document.body.appendChild(a);a.click();a.remove();toast('Chart PNG downloaded.','ok');}
-  catch(e){toast('PNG export blocked by browser.','err');}
-}
-function bindIchiEvents(){
-  const savedP=loadLS(LSK,null);if(savedP&&typeof savedP==='object')P=Object.assign({},DEFAULTS,savedP);
-  writeControls();renderPresets();renderSavedViews();
-  const pills=$('ichiTfPills');
-  if(pills){
-    pills.innerHTML=[['1w','1W'],['1M','1M'],['1d','1D']].map(([v,l])=>'<button class="pill" data-tf="'+v+'">'+l+'</button>').join('');
-    [...pills.querySelectorAll('.pill')].forEach(b=>b.addEventListener('click',()=>{P.tf=b.dataset.tf;$('tfSel').value=P.tf;applyControls(true);}));
-  }
-  ['tfSel','anchorSel','bandSel','confSel'].forEach(id=>on(id,'change',()=>applyControls(id==='tfSel'||id==='anchorSel')));
-  ['tenkanN','kijunN','senkouN','dispN','lookbackN','pivotN','manHigh','manLow','bandFastN','bandSlowN','coolN'].forEach(id=>{
-    on(id,'input',()=>{readControls();scheduleCompute();});
-    on(id,'change',()=>applyControls(false));
+function bindLabEvents(){
+  syncLabControls();
+  on('tfSel','change',async e=>{P.tf=e.target.value;$('tfInfo').textContent=P.tf.toUpperCase();await loadIchiTf(P.tf,false);fitIchiView();renderLabAll();});
+  on('anchorSel','change',e=>{P.anchor=e.target.value;needsCompute=true;renderLabAll();});
+  on('manHigh','change',e=>{P.manHigh=+e.target.value||126200;needsCompute=true;renderLabAll();});
+  on('manLow','change',e=>{P.manLow=+e.target.value||49130;needsCompute=true;renderLabAll();});
+  on('bandSel','change',e=>{P.band=e.target.value;needsCompute=true;renderLabAll();});
+  on('confSel','change',e=>{P.conf=e.target.value;needsCompute=true;renderLabAll();});
+  const bindNum=(id,vId,key,recalc)=>{on(id,'input',e=>{const val=+e.target.value;if(!Number.isFinite(val))return;P[key]=val;if(vId)$(vId).textContent=val;if(recalc)needsCompute=true;dirty=true;renderLabAll();});};
+  bindNum('lookbackN','lookbackV','lookback',true);
+  bindNum('pivotN','pivotV','pivot',true);
+  bindNum('tenkanN','tenkanV','tenkan',true);
+  bindNum('kijunN','kijunV','kijun',true);
+  bindNum('senkouN','senkouV','senkou',true);
+  bindNum('dispN','dispV','disp',true);
+  bindNum('alphaR','alphaV','alpha',false);
+  bindNum('bandFastN','bandFastV','bandFast',true);
+  bindNum('bandSlowN','bandSlowV','bandSlow',true);
+  bindNum('tolR','tolV','tol',true);
+  bindNum('reactR','reactV','react',true);
+  bindNum('horR','horV','horizon',true);
+  bindNum('coolN','coolV','cool',true);
+  document.querySelectorAll('#ichilab [data-stp]').forEach(btn=>{
+    btn.onclick=()=>{
+      const inp=$(btn.dataset.stp);if(!inp)return;
+      const step=+inp.step||1;const min=inp.min===''?-Infinity:+inp.min;const max=inp.max===''?Infinity:+inp.max;
+      const d=(+btn.dataset.d>0?1:-1)*step;
+      const next=clamp((+inp.value||0)+d,min,max);
+      inp.value=next;inp.dispatchEvent(new Event('input'));
+    };
   });
-  ['tolR','reactR','horR','alphaR'].forEach(id=>{
-    on(id,'input',()=>{readControls();if(id==='alphaR')dirty=true;else scheduleCompute();});
-    on(id,'change',()=>applyControls(false));
-  });
-  ['tgCloud','tgFib','tgBand','tgChikou','tgMarkers','tgLabels','tgGrid','tgLog','tgSemantic','tgZone'].forEach(id=>{
-    on(id,'change',()=>{readControls();saveLS(LSK,P);dirty=true;});
-  });
-  document.querySelectorAll('[data-stp]').forEach(btn=>btn.addEventListener('click',()=>{
-    const el=$(btn.dataset.stp);if(!el)return;
-    const step=parseFloat(el.step||'1')||1,d=parseFloat(btn.dataset.d||'1');
-    const mn=el.min!==''?parseFloat(el.min):-Infinity,mx=el.max!==''?parseFloat(el.max):Infinity;
-    el.value=clamp((parseFloat(el.value)||0)+d*step,mn,mx);
-    applyControls(false);
-  }));
+  const bindChk=(id,key,recalc)=>{on(id,'change',e=>{P[key]=!!e.target.checked;if(recalc)needsCompute=true;dirty=true;renderLabAll();});};
+  bindChk('tgCloud','cloud',false);bindChk('tgFib','fib',false);bindChk('tgBand','bandOn',false);
+  bindChk('tgChikou','chikou',false);bindChk('tgMarkers','markers',false);bindChk('tgLabels','labels',false);
+  bindChk('tgGrid','grid',false);bindChk('tgLog','log',false);bindChk('tgSemantic','semantic',false);bindChk('tgZone','zone',false);
+
   on('btnSaveView','click',()=>{
-    const inp=$('viewName');const name=(inp?inp.value:'').trim();
-    if(!name){toast('Type a name first.','warn');return;}
-    savedViews.push({name,p:Object.assign({},P)});saveLS(LSK+'_views',savedViews);if(inp)inp.value='';renderSavedViews();
-    toast('Setup "'+name+'" saved.','ok');
+    const nm=($('viewName').value||'').trim()||('Setup #'+(savedViews.length+1));
+    savedViews.push({name:nm,params:Object.assign({},P)});
+    saveLS(LSK+'_views',savedViews);$('viewName').value='';renderSavedViews();toast('Saved setup "'+nm+'".','ok');
   });
-  on('btnIchiReset','click',()=>{
-    const before=Object.assign({},P);P=Object.assign({},DEFAULTS);excluded.clear();writeControls();applyControls(true);
-    toast('Reset to AlgoAffe 1W defaults.','ok',{label:'Undo',fn(){P=before;writeControls();applyControls(true);}});
-  });
+  on('btnIchiRerun','click',async()=>{await loadIchiTf(P.tf,true);needsCompute=true;renderLabAll();toast('Re-ran walk-forward audit.','ok');});
+  on('btnIchiReset','click',async()=>{const prevTf=P.tf;P=Object.assign({},DEFAULTS);syncLabControls();if(P.tf!==prevTf)await loadIchiTf(P.tf,false);fitIchiView();needsCompute=true;renderLabAll();toast('Reset lab parameters to defaults.','ok');});
   on('btnIchiRandom','click',()=>{
-    const before=Object.assign({},P);const pick=a=>a[Math.floor(Math.random()*a.length)];
-    P.tenkan=pick([7,9,10,12]);P.kijun=pick([20,22,26,30]);P.senkou=pick([44,52,60]);P.disp=P.kijun;
-    P.band=pick(['3m','1m','classic']);P.conf=pick(['screenshot','any','both','fib']);
-    P.tol=+(0.6+Math.random()*2.2).toFixed(1);P.react=+(4+Math.random()*8).toFixed(1);P.horizon=Math.floor(5+Math.random()*14);
-    writeControls();applyControls(true);
-    toast('Randomized parameters.','ok',{label:'Undo',fn(){P=before;writeControls();applyControls(true);}});
+    P.tol=+(0.6+Math.random()*2.2).toFixed(1);P.react=+(4+Math.random()*8).toFixed(1);P.horizon=Math.round(4+Math.random()*16);
+    syncLabControls();needsCompute=true;renderLabAll();toast('Randomized test thresholds.','ok');
   });
-  on('btnIchiRerun','click',()=>{ichiRecompute();ichiRenderAll();toast('Audit re-run complete.','ok');});
-  on('btnIchiFit','click',ichiFitChart);on('btnIchiFit2','click',ichiFitChart);
-  on('btnIchiLeft','click',()=>ichiPanChart(-0.3));on('btnIchiRight','click',()=>ichiPanChart(0.3));
-  on('btnIchiZoomIn','click',()=>ichiZoomChart(0.75));on('btnIchiZoomOut','click',()=>ichiZoomChart(1.33));
-  on('btnIchiLatest','click',()=>{const span=ichiChart.i1-ichiChart.i0;ichiChart.i1=ichiChart.total+4;ichiChart.i0=ichiChart.i1-span;ichiClampView();dirty=true;updateIchiViewChip();});
-  on('btnIchiPublish','click',publishIchiToTerminal);on('btnIchiPublish2','click',publishIchiToTerminal);
-  on('btnIchiClearPub','click',clearIchiOverlay);
-  on('btnCopySnip','click',copySnippet);
-  on('btnExportRec','click',()=>{if(REC){download('ichimoku_recommendation_'+P.tf+'.json',REC);toast('Recommendation JSON exported.','ok');}});
-  on('btnIchiExportJson','click',exportIchiAll);
-  on('btnIchiPng','click',exportIchiPng);
-  on('evSearch','input',e=>{filters.q=e.target.value;renderEvents();});
-  on('evType','change',e=>{filters.type=e.target.value;renderEvents();});
-  on('evOutcome','change',e=>{filters.outcome=e.target.value;renderEvents();});
-  on('evSort','change',e=>{filters.sort=e.target.value;renderEvents();});
-  on('btnClearFilters','click',()=>{filters={q:'',type:'all',outcome:'all',sort:'time_desc'};$('evSearch').value='';$('evType').value='all';$('evOutcome').value='all';$('evSort').value='time_desc';renderEvents();});
-  on('btnRestoreExcluded','click',()=>{if(!excluded.size){toast('No events are excluded.','warn');return;}excluded.clear();TEST.stats=summarize(TEST.events);buildRecommendation();ichiRenderAll();toast('All events restored.','ok');});
-  document.querySelectorAll('#ichiEventsCard thead th[data-sort]').forEach(th=>th.addEventListener('click',()=>{
-    const map={time:['time_desc','time_asc'],ret:['ret_desc','ret_asc'],level:['level_asc','level_asc']}[th.dataset.sort];
-    if(!map)return;filters.sort=filters.sort===map[0]?map[1]:map[0];$('evSort').value=filters.sort;renderEvents();
-  }));
-  on('drawerClose','click',closeDrawer);on('scrim','click',closeDrawer);
-  on('drawerExclude','click',toggleExclude);
-  on('drawerFocus','click',()=>{const e=TEST&&TEST.events.find(x=>x.id===selectedId);if(e){focusIndex(e.i);closeDrawer();}});
-  window.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer();});
+  on('btnIchiFit','click',()=>{fitIchiView();drawIchiChart();});
+  on('btnIchiFit2','click',()=>{fitIchiView();drawIchiChart();});
+  on('btnIchiLatest','click',()=>{jumpIchiLatest();drawIchiChart();});
+  on('btnIchiLeft','click',()=>{panIchi(-Math.round(VW.count*0.35));drawIchiChart();});
+  on('btnIchiRight','click',()=>{panIchi(Math.round(VW.count*0.35));drawIchiChart();});
+  on('btnIchiZoomIn','click',()=>{zoomIchi(0.75);drawIchiChart();});
+  on('btnIchiZoomOut','click',()=>{zoomIchi(1.33);drawIchiChart();});
+  on('btnIchiPublish','click',publishToTerminal);
+  on('btnIchiPublish2','click',publishToTerminal);
+  on('btnIchiClearPub','click',clearPublishedOverlay);
+  on('btnCopySnip','click',()=>{
+    const txt=$('snipPre').textContent||'';
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(()=>toast('Hook JSON copied.','ok')).catch(()=>toast('Clipboard unavailable.','warn'));
+  });
+  on('btnExportRec','click',()=>download('ichimoku_fib_recommendation.json',REC||{error:'no recommendation'}));
+  on('btnIchiExportJson','click',()=>download('ichimoku_fib_audit.json',{params:P,recommendation:REC,summary:TEST?{hitRate:TEST.hitRate,baseRate:TEST.baseRate,nDec:TEST.nDec,pVal:TEST.pVal}:null,events:TEST?TEST.events:[]}));
+  on('btnIchiPng','click',()=>{
+    if(!ichiCv)return;
+    const a=document.createElement('a');a.href=ichiCv.toDataURL('image/png');a.download='ichimoku_fib_chart.png';a.click();
+  });
+
+  on('evSearch','input',e=>{filters.q=e.target.value;renderLabEvents();});
+  on('evType','change',e=>{filters.type=e.target.value;renderLabEvents();});
+  on('evOutcome','change',e=>{filters.outcome=e.target.value;renderLabEvents();});
+  on('evSort','change',e=>{filters.sort=e.target.value;renderLabEvents();});
+  on('btnClearFilters','click',()=>{filters={q:'',type:'all',outcome:'all',sort:'time_desc'};$('evSearch').value='';$('evType').value='all';$('evOutcome').value='all';$('evSort').value='time_desc';renderLabEvents();});
+  on('btnRestoreExcluded','click',()=>{excluded.clear();needsCompute=true;renderLabAll();toast('Restored all excluded events.','ok');});
+  on('drawerClose','click',closeDrawer);
+  on('scrim','click',closeDrawer);
+
+  if(ichiCv){
+    ichiCv.addEventListener('mousedown',e=>{
+      VW.drag=true;VW.dragStartX=e.clientX;VW.dragStartStart=VW.start;
+    });
+    window.addEventListener('mousemove',e=>{
+      if(!VW.drag)return;
+      const r=ichiCv.getBoundingClientRect();
+      const dx=e.clientX-VW.dragStartX;
+      const deltaBars=-(dx/Math.max(1,r.width))*VW.count;
+      VW.start=VW.dragStartStart+deltaBars;clampView();dirty=true;drawIchiChart();
+    });
+    window.addEventListener('mouseup',()=>{VW.drag=false;});
+    ichiCv.addEventListener('wheel',e=>{
+      e.preventDefault();
+      const r=ichiCv.getBoundingClientRect();
+      const frac=clamp((e.clientX-r.left)/Math.max(1,r.width),0,1);
+      zoomIchi(e.deltaY<0?0.82:1.22,frac);drawIchiChart();
+    },{passive:false});
+    ichiCv.addEventListener('dblclick',()=>{fitIchiView();drawIchiChart();});
+    ichiCv.addEventListener('click',e=>{
+      if(!TEST||!P.markers)return;
+      const r=ichiCv.getBoundingClientRect();
+      const mx=e.clientX-r.left,my=e.clientY-r.top;
+      const padL=10,padR=68,padT=14,padB=24,pw=r.width-padL-padR,ph=r.height-padT-padB;
+      let pMin=Infinity,pMax=-Infinity;
+      for(let i=Math.max(0,Math.floor(VW.start));i<Math.min(BARS.length,Math.ceil(VW.start+VW.count));i++){
+        if(BARS[i].l<pMin)pMin=BARS[i].l;if(BARS[i].h>pMax)pMax=BARS[i].h;
+      }
+      if(!Number.isFinite(pMin)||pMax<=pMin)return;
+      const yMap=v=>{
+        if(P.log){const a=Math.log(pMin*0.96),b=Math.log(pMax*1.04);return padT+ph-((Math.log(Math.max(v,1e-6))-a)/Math.max(1e-6,b-a))*ph;}
+        const a=pMin*0.96,b=pMax*1.04;return padT+ph-((v-a)/Math.max(1e-6,b-a))*ph;
+      };
+      const xMap=idx=>padL+((idx-VW.start)/Math.max(1,VW.count))*pw;
+      for(const ev of TEST.active){
+        const ex=xMap(ev.idx),ey=yMap(ev.price);
+        if(Math.hypot(ex-mx,ey-my)<=11){openEventDrawer(ev.id);break;}
+      }
+    });
+    ichiCv.addEventListener('keydown',e=>{
+      if(e.key==='ArrowLeft'){e.preventDefault();panIchi(-12);drawIchiChart();}
+      else if(e.key==='ArrowRight'){e.preventDefault();panIchi(12);drawIchiChart();}
+      else if(e.key==='+'||e.key==='='){e.preventDefault();zoomIchi(0.8);drawIchiChart();}
+      else if(e.key==='-'){e.preventDefault();zoomIchi(1.25);drawIchiChart();}
+    });
+  }
 }
 
 /* ============================================================================
-   UNIFIED BOOTSTRAP
+   BOOT SEQUENCE
    ============================================================================ */
-function boot(){
-  checkFirstRun();
-  loadState();buildAssets();
-  buildTabs();buildIndicators();buildSelects();buildMiniBar();syncMagicTfBtns();
-  seedInstant();recompute();ensureBaseline();
+(async function boot(){
+  loadState();
+  buildAssets();
+  buildTabs();
+  buildIndicators();
+  buildSelects();
+  buildMiniBar();
+  syncMagicTfBtns();
   initDashboardCharts();
-  bindEvents();
+  seedInstant();
+  recompute();
+  ensureBaseline();
   engineTick(false);
   renderAll();
   dailySnapshot();
+  checkFirstRun();
+  bindEvents();
 
-  // Initialize Ichimoku × Fib Reliability Lab
-  ichiChartInit();
-  bindIchiEvents();
-  loadIchiTF(P.tf,false);
+  BARS=seedBars(P.tf);
+  setIchiSource('seed',BARS.length);
+  fitIchiView();
+  recomputeLab();
+  bindLabEvents();
+  renderLabAll();
 
-  refreshAll(false);
-}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+  await refreshAll(false);
+  await loadIchiTf(P.tf,false);
+  fitIchiView();
+  needsCompute=true;
+  renderLabAll();
+})();
 </script>
 </body>
 </html>
